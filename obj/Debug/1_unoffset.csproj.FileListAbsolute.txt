@@ -1,0 +1,11 @@
+C:\Users\juipe\Desktop\git_labs\1_UnrealizedGainsOrLosses\obj\Debug\1_unoffset.csproj.AssemblyReference.cache
+C:\Users\juipe\Desktop\git_labs\1_UnrealizedGainsOrLosses\obj\Debug\1_unoffset.csproj.SuggestedBindingRedirects.cache
+C:\Users\juipe\Desktop\git_labs\1_UnrealizedGainsOrLosses\obj\Debug\_1_unoffset.Form1.resources
+C:\Users\juipe\Desktop\git_labs\1_UnrealizedGainsOrLosses\obj\Debug\_1_UnrealizedGainsOrLosses.Properties.Resources.resources
+C:\Users\juipe\Desktop\git_labs\1_UnrealizedGainsOrLosses\obj\Debug\1_unoffset.csproj.GenerateResource.cache
+C:\Users\juipe\Desktop\git_labs\1_UnrealizedGainsOrLosses\obj\Debug\1_unoffset.csproj.CoreCompileInputs.cache
+C:\Users\juipe\Desktop\git_labs\1_UnrealizedGainsOrLosses\obj\Debug\1_UnrealizedGainsOrLosses.exe
+C:\Users\juipe\Desktop\git_labs\1_UnrealizedGainsOrLosses\obj\Debug\1_UnrealizedGainsOrLosses.pdb
+C:\Users\juipe\Desktop\git_labs\1_UnrealizedGainsOrLosses\bin\Debug\1_UnrealizedGainsOrLosses.exe.config
+C:\Users\juipe\Desktop\git_labs\1_UnrealizedGainsOrLosses\bin\Debug\1_UnrealizedGainsOrLosses.exe
+C:\Users\juipe\Desktop\git_labs\1_UnrealizedGainsOrLosses\bin\Debug\1_UnrealizedGainsOrLosses.pdb
