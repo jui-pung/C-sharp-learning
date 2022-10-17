@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace _1_UnrealizedGainsOrLosses
 {
@@ -10,22 +11,23 @@ namespace _1_UnrealizedGainsOrLosses
     {
         public string stock { get; set; }
         public string stocknm { get; set; }
-        public string ttype { get; set; }
-        public string ttypename { get; set; }
-        public string bstype { get; set; }
-        public float bqty { get; set; }
-        public float cost { get; set; }
-        public float avgprice { get; set; }
-        public float lastprice { get; set; }
-        public float marketvalue { get; set; }
-        public float profit { get; set; }
+        public string ttype { get; set; } = "0";
+        public string ttypename { get; set; } = "現買";
+        public string bstype { get; set; } = "B";
+        public decimal bqty { get; set; }
+        public decimal cost { get; set; }
+        public decimal avgprice { get; set; }
+        public decimal lastprice { get; set; }
+        public decimal marketvalue { get; set; }
+        public decimal profit { get; set; }
         public string pl_ratio { get; set; }
-        public float fee { get; set; }
-        public float tax { get; set; }
-        public float estimateAmt { get; set; }
-        public float estimateFee { get; set; }
-        public float estimateTax { get; set; }
-        public float amt { get; set; }
+        public decimal fee { get; set; }
+        public decimal tax { get; set; }
+        public decimal estimateAmt { get; set; }
+        public decimal estimateFee { get; set; }
+        public decimal estimateTax { get; set; }
+        public decimal amt { get; set; }
+        [XmlElement("unoffset_qtype_detail")]
         public List<unoffset_qtype_detail> unoffset_qtype_detail { get; set; }
     }
 }

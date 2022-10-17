@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace _1_UnrealizedGainsOrLosses
 {
     public class unoffset_qtype_detail
     {
+        [XmlIgnore]
+        public string stock { get; set; }
         public string tdate { get; set; }
         public string ttype { get; set; } = "0";
         public string ttypename { get; set; } = "現買";

@@ -42,7 +42,7 @@
             // txtBHNO
             // 
             this.txtBHNO.Location = new System.Drawing.Point(143, 34);
-            this.txtBHNO.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtBHNO.Margin = new System.Windows.Forms.Padding(4);
             this.txtBHNO.Name = "txtBHNO";
             this.txtBHNO.Size = new System.Drawing.Size(125, 36);
             this.txtBHNO.TabIndex = 0;
@@ -51,11 +51,11 @@
             // txtCSEQ
             // 
             this.txtCSEQ.Location = new System.Drawing.Point(143, 108);
-            this.txtCSEQ.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtCSEQ.Margin = new System.Windows.Forms.Padding(4);
             this.txtCSEQ.Name = "txtCSEQ";
             this.txtCSEQ.Size = new System.Drawing.Size(125, 36);
             this.txtCSEQ.TabIndex = 1;
-            this.txtCSEQ.Text = "0000527";
+            this.txtCSEQ.Text = "0000116";
             // 
             // label1
             // 
@@ -80,7 +80,7 @@
             // btnSearch
             // 
             this.btnSearch.Location = new System.Drawing.Point(143, 177);
-            this.btnSearch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnSearch.Margin = new System.Windows.Forms.Padding(4);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(124, 44);
             this.btnSearch.TabIndex = 4;
@@ -91,7 +91,7 @@
             // txtSearchContent
             // 
             this.txtSearchContent.Location = new System.Drawing.Point(311, 75);
-            this.txtSearchContent.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtSearchContent.Margin = new System.Windows.Forms.Padding(4);
             this.txtSearchContent.Multiline = true;
             this.txtSearchContent.Name = "txtSearchContent";
             this.txtSearchContent.Size = new System.Drawing.Size(751, 149);
@@ -105,7 +105,7 @@
             this.txtSearchResultContent.Multiline = true;
             this.txtSearchResultContent.Name = "txtSearchResultContent";
             this.txtSearchResultContent.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtSearchResultContent.Size = new System.Drawing.Size(1023, 360);
+            this.txtSearchResultContent.Size = new System.Drawing.Size(1023, 535);
             this.txtSearchResultContent.TabIndex = 6;
             // 
             // label3
@@ -130,7 +130,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1105, 684);
+            this.ClientSize = new System.Drawing.Size(1105, 852);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txtSearchResultContent);
@@ -141,7 +141,7 @@
             this.Controls.Add(this.txtCSEQ);
             this.Controls.Add(this.txtBHNO);
             this.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.ResumeLayout(false);
