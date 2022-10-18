@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace _1_UnrealizedGainsOrLosses
     public class unoffset_qtype_detail
     {
         [XmlIgnore]
+        [JsonIgnore]
         public string stock { get; set; }
         public string tdate { get; set; }
         public string ttype { get; set; } = "0";
@@ -30,6 +32,5 @@ namespace _1_UnrealizedGainsOrLosses
         public decimal estimateTax { get; set; }
         public decimal profit { get; set; }
         public string pl_ratio { get; set; }
-
     }
 }

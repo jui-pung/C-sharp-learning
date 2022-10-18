@@ -37,6 +37,8 @@
             this.txtSearchResultContent = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.radioBtnXml = new System.Windows.Forms.RadioButton();
+            this.radioBtnJson = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // txtBHNO
@@ -50,7 +52,7 @@
             // 
             // txtCSEQ
             // 
-            this.txtCSEQ.Location = new System.Drawing.Point(143, 108);
+            this.txtCSEQ.Location = new System.Drawing.Point(143, 89);
             this.txtCSEQ.Margin = new System.Windows.Forms.Padding(4);
             this.txtCSEQ.Name = "txtCSEQ";
             this.txtCSEQ.Size = new System.Drawing.Size(125, 36);
@@ -60,7 +62,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(34, 45);
+            this.label1.Location = new System.Drawing.Point(34, 38);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(85, 24);
@@ -70,7 +72,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(34, 118);
+            this.label2.Location = new System.Drawing.Point(34, 92);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(80, 24);
@@ -79,7 +81,7 @@
             // 
             // btnSearch
             // 
-            this.btnSearch.Location = new System.Drawing.Point(143, 177);
+            this.btnSearch.Location = new System.Drawing.Point(143, 146);
             this.btnSearch.Margin = new System.Windows.Forms.Padding(4);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(124, 44);
@@ -126,11 +128,39 @@
             this.label4.TabIndex = 8;
             this.label4.Text = "Search Result Content :";
             // 
+            // radioBtnXml
+            // 
+            this.radioBtnXml.AutoSize = true;
+            this.radioBtnXml.Font = new System.Drawing.Font("新細明體", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.radioBtnXml.Location = new System.Drawing.Point(38, 146);
+            this.radioBtnXml.Name = "radioBtnXml";
+            this.radioBtnXml.Size = new System.Drawing.Size(85, 26);
+            this.radioBtnXml.TabIndex = 9;
+            this.radioBtnXml.TabStop = true;
+            this.radioBtnXml.Text = "XML";
+            this.radioBtnXml.UseVisualStyleBackColor = true;
+            this.radioBtnXml.CheckedChanged += new System.EventHandler(this.radioBtnXml_CheckedChanged);
+            // 
+            // radioBtnJson
+            // 
+            this.radioBtnJson.AutoSize = true;
+            this.radioBtnJson.Font = new System.Drawing.Font("新細明體", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.radioBtnJson.Location = new System.Drawing.Point(38, 188);
+            this.radioBtnJson.Name = "radioBtnJson";
+            this.radioBtnJson.Size = new System.Drawing.Size(88, 26);
+            this.radioBtnJson.TabIndex = 10;
+            this.radioBtnJson.TabStop = true;
+            this.radioBtnJson.Text = "JSON";
+            this.radioBtnJson.UseVisualStyleBackColor = true;
+            this.radioBtnJson.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1105, 852);
+            this.Controls.Add(this.radioBtnJson);
+            this.Controls.Add(this.radioBtnXml);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txtSearchResultContent);
@@ -160,6 +190,8 @@
         private System.Windows.Forms.TextBox txtSearchResultContent;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.RadioButton radioBtnXml;
+        private System.Windows.Forms.RadioButton radioBtnJson;
     }
 }
 
