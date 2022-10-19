@@ -1,14 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
+using static Newtonsoft.Json.JsonIgnoreAttribute;
+using System.Text.Json;
+using System.Windows;
+using System.Windows.Automation;
+using Amazon.Auth.AccessControlPolicy;
+using StackExchange.Redis;
+using Newtonsoft.Json;
 
 namespace _1_UnrealizedGainsOrLosses
 {
     public class unoffset_qtype_sum
     {
+
         public string stock { get; set; }
         public string stocknm { get; set; }
         public string ttype { get; set; } = "0";
@@ -28,6 +33,8 @@ namespace _1_UnrealizedGainsOrLosses
         public decimal estimateTax { get; set; }
         public decimal amt { get; set; }
         [XmlElement("unoffset_qtype_detail")]
+        [JsonProperty("unoffset_qtype_detail", NullValueHandling = NullValueHandling.Ignore)]
+        
         public List<unoffset_qtype_detail> unoffset_qtype_detail { get; set; }
     }
 }

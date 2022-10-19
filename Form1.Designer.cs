@@ -131,6 +131,7 @@
             // radioBtnXml
             // 
             this.radioBtnXml.AutoSize = true;
+            this.radioBtnXml.Checked = true;
             this.radioBtnXml.Font = new System.Drawing.Font("新細明體", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.radioBtnXml.Location = new System.Drawing.Point(38, 146);
             this.radioBtnXml.Name = "radioBtnXml";

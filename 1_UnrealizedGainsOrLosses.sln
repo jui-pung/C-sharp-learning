@@ -5,6 +5,8 @@ VisualStudioVersion = 17.3.32721.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "1_UnrealizedGainsOrLosses", "1_UnrealizedGainsOrLosses.csproj", "{2747BB51-3F57-4AB5-A1C2-A65565F41942}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "1_UnrealizedGainsOrLossesTests", "..\1_UnrealizedGainsOrLossesTests\1_UnrealizedGainsOrLossesTests.csproj", "{879321DA-C434-46B6-9F84-4894ACA9C954}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{2747BB51-3F57-4AB5-A1C2-A65565F41942}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2747BB51-3F57-4AB5-A1C2-A65565F41942}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2747BB51-3F57-4AB5-A1C2-A65565F41942}.Release|Any CPU.Build.0 = Release|Any CPU
+		{879321DA-C434-46B6-9F84-4894ACA9C954}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{879321DA-C434-46B6-9F84-4894ACA9C954}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{879321DA-C434-46B6-9F84-4894ACA9C954}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{879321DA-C434-46B6-9F84-4894ACA9C954}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

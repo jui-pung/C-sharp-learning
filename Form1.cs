@@ -1,5 +1,7 @@
 ﻿using _1_UnrealizedGainsOrLosses.Properties;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +13,7 @@ namespace _1_UnrealizedGainsOrLosses
 {
     public partial class Form1 : Form
     {
-        int type = 1;                                       //查詢與回覆格式設定
+        int type;                                           //查詢與回覆格式設定
         string searchStr;                                   //查詢xml或json格式字串
         SqlTask sqlTask;                                    //自訂sql類別
         List<unoffset_qtype_detail> detailList;             //自訂unoffset_qtype_detail類別List (階層三:個股明細)
@@ -41,12 +43,19 @@ namespace _1_UnrealizedGainsOrLosses
                 accsumList = new List<unoffset_qtype_accsum>();
                 sqlTask = new SqlTask();
                 detailList = sqlTask.selectTCNUD(SearchElement);
-                detailList = sqlTask.selectMSTMB(SearchElement);
-                detailList = searchDetails();
-                sumList = searchSum(detailList);
-                accsumList = searchAccSum(sumList);
-                //呈現查詢結果
-                resultListSerilizer();
+                if(detailList.Count > 0)
+                {
+                    detailList = sqlTask.selectMSTMB(SearchElement);
+                    detailList = searchDetails();
+                    sumList = searchSum(detailList);
+                    accsumList = searchAccSum(sumList);
+                    //呈現查詢結果
+                    resultListSerilizer();
+                }
+                else
+                {
+                    resultErrListSerilizer();
+                }
             }
             else
                 MessageBox.Show("輸入格式錯誤 請重新輸入");
@@ -57,26 +66,22 @@ namespace _1_UnrealizedGainsOrLosses
         //-------------------------------------------------------------------
         public string searchSerilizer()
         {
-            if(type == 0)
+            var root = new root()
+            {
+                bhno = txtBHNO.Text,
+                cseq = txtCSEQ.Text
+            };
+            if (type == 0)
             {
                 using (var stringwriter = new System.IO.StringWriter())
                 {
                     var serializer = new XmlSerializer(typeof(root));
-                    serializer.Serialize(stringwriter, new root
-                    {
-                        bhno = txtBHNO.Text,
-                        cseq = txtCSEQ.Text
-                    });
+                    serializer.Serialize(stringwriter, root);
                     return stringwriter.ToString();
                 }
             }
             else if (type == 1)
             {
-                var root = new root
-                {
-                    bhno = txtBHNO.Text,
-                    cseq = txtCSEQ.Text
-                };
                 string jsonString = JsonConvert.SerializeObject(root);
                 return jsonString;
             }
@@ -205,7 +210,7 @@ namespace _1_UnrealizedGainsOrLosses
         }
 
         //---------------------------------------------------------------------------
-        //function resultListSerilizer() - 將查詢結果 序列化為xml格式字串
+        //function resultListSerilizer() - 將查詢結果 序列化為xml或json格式字串
         //---------------------------------------------------------------------------
         public void resultListSerilizer()
         {
@@ -215,6 +220,7 @@ namespace _1_UnrealizedGainsOrLosses
                 int index = 0;
                 for (int i = 0; i < item.unoffset_qtype_sum.Count; i++)
                 {
+                    //初始化 unoffset_qtype_sum[].unoffset_qtype_detail 清單長度為detaillist長度
                     List<unoffset_qtype_detail> initialization = new List<unoffset_qtype_detail>();
                     int count = 0;
                     while(count < detailList.Count)
@@ -226,6 +232,7 @@ namespace _1_UnrealizedGainsOrLosses
                     
                     for (int j = index; j < detailList.Count; j++)
                     {
+                        //合併第三階層相同股票代號到第二階層
                         if (item.unoffset_qtype_sum[i].stock.Equals(detailList[j].stock))
                         {
                             item.unoffset_qtype_sum[i].unoffset_qtype_detail[j] = detailList[j];
@@ -236,55 +243,79 @@ namespace _1_UnrealizedGainsOrLosses
                             break;
                         }      
                     }
+                    item.unoffset_qtype_sum[i].unoffset_qtype_detail.RemoveAll(s => s == null);
                 }
-                //透過unoffset_qtype_accsum自訂類別反序列
+
+                //透過unoffset_qtype_accsum自訂類別反序列 -> accsumSer
+                var accsumSer = new unoffset_qtype_accsum()
+                {
+                    errcode = "0000",
+                    errmsg = "成功",
+                    bqty = item.bqty,
+                    marketvalue = item.marketvalue,
+                    fee = item.fee,
+                    tax = item.tax,
+                    cost = item.cost,
+                    estimateAmt = item.estimateAmt,
+                    estimateFee = item.estimateFee,
+                    estimateTax = item.estimateTax,
+                    profit = item.profit,
+                    pl_ratio = item.pl_ratio,
+                    unoffset_qtype_sum = item.unoffset_qtype_sum
+                };
+                //序列化為xml格式字串
                 if (type == 0)
                 {
                     using (var stringwriter = new System.IO.StringWriter())
                     {
                         var serializer = new XmlSerializer(typeof(unoffset_qtype_accsum));
-                        var accsumSer = new unoffset_qtype_accsum()
-                        {
-                            bqty = item.bqty,
-                            marketvalue = item.marketvalue,
-                            fee = item.fee,
-                            tax = item.tax,
-                            cost = item.cost,
-                            estimateAmt = item.estimateAmt,
-                            estimateFee = item.estimateFee,
-                            estimateTax = item.estimateTax,
-                            profit = item.profit,
-                            pl_ratio = item.pl_ratio,
-                            unoffset_qtype_sum = item.unoffset_qtype_sum
-                        };
                         serializer.Serialize(stringwriter, accsumSer);
-                        txtSearchResultContent.Text += stringwriter.ToString() + "\r\n";
+                        txtSearchResultContent.Text += stringwriter.ToString();
                     }
                 }
+                //序列化為json格式字串
                 else if (type == 1)
                 {
-                    var accsumSer = new unoffset_qtype_accsum()
-                    {
-                        bqty = item.bqty,
-                        marketvalue = item.marketvalue,
-                        fee = item.fee,
-                        tax = item.tax,
-                        cost = item.cost,
-                        estimateAmt = item.estimateAmt,
-                        estimateFee = item.estimateFee,
-                        estimateTax = item.estimateTax,
-                        profit = item.profit,
-                        pl_ratio = item.pl_ratio,
-                        unoffset_qtype_sum = item.unoffset_qtype_sum
-                    };
-                    JsonSerializerSettings settings = new JsonSerializerSettings();
+                    var settings = new JsonSerializerSettings();
                     settings.NullValueHandling = NullValueHandling.Ignore;
-                    string jsonString = JsonConvert.SerializeObject(accsumSer);
-                    txtSearchResultContent.Text += jsonString.ToString() + "\r\n";
+                    settings.Formatting = Formatting.Indented;
+                    string jsonString = JsonConvert.SerializeObject(accsumSer, settings);
+                    txtSearchResultContent.Text += jsonString.ToString();
                 }
             }
         }
 
+        //---------------------------------------------------------------------------
+        //function resultErrListSerilizer() - 將查詢失敗結果 序列化為xml或json格式字串
+        //---------------------------------------------------------------------------
+        public void resultErrListSerilizer()
+        {
+            //透過unoffset_qtype_accsum自訂類別反序列 -> accsumSer
+            var accsumSer = new unoffset_qtype_accsum()
+            {
+                errcode = "0001",
+                errmsg = "查詢失敗",
+            };
+            //序列化為xml格式字串
+            if (type == 0)
+            {
+                using (var stringwriter = new System.IO.StringWriter())
+                {
+                    var serializer = new XmlSerializer(typeof(unoffset_qtype_accsum));
+                    serializer.Serialize(stringwriter, accsumSer);
+                    txtSearchResultContent.Text += stringwriter.ToString();
+                }
+            }
+            //序列化為json格式字串
+            else if (type == 1)
+            {
+                var settings = new JsonSerializerSettings();
+                settings.NullValueHandling = NullValueHandling.Ignore;
+                settings.Formatting = Formatting.Indented;
+                string jsonString = JsonConvert.SerializeObject(accsumSer, settings);
+                txtSearchResultContent.Text += jsonString.ToString();
+            }
+        }
         private void radioBtnXml_CheckedChanged(object sender, EventArgs e)
         {
             if (radioBtnXml.Checked)

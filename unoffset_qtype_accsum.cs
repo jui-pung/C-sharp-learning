@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -10,8 +12,9 @@ namespace _1_UnrealizedGainsOrLosses
 {
     public class unoffset_qtype_accsum
     {
+        public string errcode { get; set; }
+        public string errmsg { get; set; }
         public decimal bqty { get; set; }
-        public decimal real_qty { get; set; }
         public decimal cost { get; set; }
         public decimal marketvalue { get; set; }
         public decimal profit { get; set; }
@@ -22,6 +25,7 @@ namespace _1_UnrealizedGainsOrLosses
         public decimal estimateFee { get; set; }
         public decimal estimateTax { get; set; }
         [XmlElement("unoffset_qtype_sum")]
+        [JsonProperty("unoffset_qtype_sum", NullValueHandling = NullValueHandling.Ignore)]
         public List<unoffset_qtype_sum> unoffset_qtype_sum { get; set; }
     }
 }
