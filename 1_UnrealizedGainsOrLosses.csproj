@@ -108,6 +108,9 @@
     <Reference Include="UIAutomationClient" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="offset.cs" />
+    <Compile Include="profit_detail_out.cs" />
+    <Compile Include="unoffset.cs" />
     <Compile Include="unoffset_qtype_accsum.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
