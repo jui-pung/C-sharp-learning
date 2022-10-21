@@ -20,7 +20,8 @@ namespace _1_UnrealizedGainsOrLosses
         System.Windows.Forms.TextBox txtCSEQ = Application.OpenForms["Form1"].Controls["txtCSEQ"] as System.Windows.Forms.TextBox;
         System.Windows.Forms.TextBox txtSDATE = Application.OpenForms["Form1"].Controls["txtSDATE"] as System.Windows.Forms.TextBox;
         System.Windows.Forms.TextBox txtEDATE = Application.OpenForms["Form1"].Controls["txtEDATE"] as System.Windows.Forms.TextBox;
-        List<profit_detail_out> detailList = new List<profit_detail_out>();
+        List<profit_sum> sumList = new List<profit_sum>();
+        List<profit_accsum> accsumList = new List<profit_accsum>();
 
         //-------------------------------------------------------------------
         //function SearchSerilizer() - 將輸入的查詢資訊序列化為xml格式字串
@@ -85,11 +86,99 @@ namespace _1_UnrealizedGainsOrLosses
             foreach (var item in detailList)
             {
                 item.mamt = (item.cqty * Convert.ToDecimal(item.mprice)).ToString();
-                item.netamt = item.income;
                 item.pl_ratio = decimal.Round(((item.profit / item.cost) * 100), 2).ToString() + "%";
-                item.ttypename2 = "現賣";
             }
             return detailList;
+        }
+
+        //------------------------------------------------------------------------
+        // function searchDetails_B() - 計算取得 查詢回復階層三的個股明細資料 (買入)
+        //------------------------------------------------------------------------
+        public List<profit_detail> searchDetails_B(List<profit_detail> detailList)
+        {
+            foreach (var item in detailList)
+            {
+                item.mamt = (item.cqty * Convert.ToDecimal(item.mprice)).ToString();
+                item.pl_ratio = decimal.Round(((item.profit / item.cost) * 100), 2).ToString() + "%";
+            }
+            return detailList;
+        }
+
+        //------------------------------------------------------------------------
+        // function searchSum() - 計算取得 查詢回復階層二 個股已實現損益
+        //------------------------------------------------------------------------
+        public List<profit_sum> searchSum(List<profit_detail_out> detailList)
+        {
+            SqlTask sqlTask = new SqlTask();
+            string preStockNO = "";
+            int index = -1;
+            foreach (var item in detailList)
+            {
+                //判斷detailList的Stock名稱與前一次是否相同 是->個股明細加總
+                if (item.stock.Equals(preStockNO))
+                {
+                    sumList[index].tdate = item.tdate;
+                    sumList[index].dseq = item.dseq;
+                    sumList[index].dno = item.dno;
+                    sumList[index].cqty += item.cqty;
+                    sumList[index].fee += item.fee;
+                    sumList[index].tax += item.tax;
+                    sumList[index].cost += item.cost;
+                    sumList[index].income += item.income;
+                    sumList[index].profit += item.profit;
+                }
+                else
+                {
+                    preStockNO = item.stock;
+                    index++;
+                    var row = new profit_sum();
+                    row.tdate = item.tdate;
+                    row.dseq = item.dseq;
+                    row.dno = item.dno;
+                    row.stock = item.stock;
+                    row.stocknm = sqlTask.selectStockName(item.stock);
+                    row.cqty = item.cqty;
+                    row.mprice = item.mprice;
+                    row.fee = item.fee;
+                    row.tax = item.tax;
+                    row.cost = item.cost;
+                    row.income = item.income;
+                    row.profit = item.profit;
+                    row.ttypename2 = item.ttypename2;
+                    sumList.Add(row);
+                }
+            }
+            foreach (var item in sumList)
+            {
+                item.bhno = txtBHNO.Text;
+                item.cseq = txtCSEQ.Text;
+                item.pl_ratio = decimal.Round(((item.profit / item.cost) * 100), 2).ToString() + "%";
+            }
+            return sumList;
+        }
+
+        //------------------------------------------------------------------------
+        // function searchAccSum() - 計算取得 查詢回復階層三 帳戶已實現損益
+        //------------------------------------------------------------------------
+        public List<profit_accsum> searchAccSum(List<profit_sum> sumList)
+        {
+            var row = new profit_accsum();
+            foreach (var item in sumList)
+            {
+                row.cqty += item.cqty;
+                row.cost += item.cost;
+                row.income += item.income;
+                row.profit += item.profit;
+                row.fee += item.fee;
+                row.tax += item.tax;
+            }
+            accsumList.Add(row);
+            foreach (var item in accsumList)
+            {
+                item.pl_ratio = decimal.Round(((item.profit / item.cost) * 100), 2).ToString() + "%";
+                item.profit_sum = sumList;
+            }
+            return accsumList;
         }
     }
 }

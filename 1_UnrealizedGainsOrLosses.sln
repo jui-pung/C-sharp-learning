@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "1_UnrealizedGainsOrLosses",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "1_UnrealizedGainsOrLossesTests", "..\1_UnrealizedGainsOrLossesTests\1_UnrealizedGainsOrLossesTests.csproj", "{879321DA-C434-46B6-9F84-4894ACA9C954}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ESMP.STOCK.API", "ESMP.STOCK.API\ESMP.STOCK.API.csproj", "{6AA0FECF-240A-49C5-931C-A89994A901D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{879321DA-C434-46B6-9F84-4894ACA9C954}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{879321DA-C434-46B6-9F84-4894ACA9C954}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{879321DA-C434-46B6-9F84-4894ACA9C954}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AA0FECF-240A-49C5-931C-A89994A901D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AA0FECF-240A-49C5-931C-A89994A901D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AA0FECF-240A-49C5-931C-A89994A901D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AA0FECF-240A-49C5-931C-A89994A901D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

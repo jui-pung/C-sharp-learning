@@ -150,13 +150,15 @@ namespace _1_UnrealizedGainsOrLosses
         }
 
         //------------------------------------------------------------------------
-        // function searchSum() - 計算取得 查詢回復階層二 個股未實現損益
+        // function searchAccSum() - 計算取得 查詢回復階層三 帳戶未實現損益
         //------------------------------------------------------------------------
         public List<unoffset_qtype_accsum> searchAccSum(List<unoffset_qtype_sum> sumList)
         {
             var row = new unoffset_qtype_accsum();
+            row.bqty = sumList.Sum(x=>x.bqty);
             foreach (var item in sumList)
             {
+                
                 row.bqty += item.bqty;
                 row.cost += item.cost;
                 row.marketvalue += item.marketvalue;

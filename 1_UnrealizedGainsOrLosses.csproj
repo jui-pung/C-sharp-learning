@@ -109,7 +109,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="offset.cs" />
+    <Compile Include="profit_accsum.cs" />
+    <Compile Include="profit_detail.cs" />
     <Compile Include="profit_detail_out.cs" />
+    <Compile Include="profit_sum.cs" />
     <Compile Include="unoffset.cs" />
     <Compile Include="unoffset_qtype_accsum.cs" />
     <Compile Include="Form1.cs">
@@ -149,6 +152,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="ESMP.STOCK.API\ESMP.STOCK.API.csproj">
+      <Project>{6aa0fecf-240a-49c5-931c-a89994a901d2}</Project>
+      <Name>ESMP.STOCK.API</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\System.Text.Json.6.0.6\build\System.Text.Json.targets" Condition="Exists('packages\System.Text.Json.6.0.6\build\System.Text.Json.targets')" />

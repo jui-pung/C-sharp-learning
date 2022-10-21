@@ -13,7 +13,7 @@ namespace _1_UnrealizedGainsOrLosses
         SqlConnection sqlConn = new SqlConnection(sqlSet);
         List<unoffset_qtype_detail> lst = new List<unoffset_qtype_detail>();
         List<profit_detail_out> lst_detail = new List<profit_detail_out>();
-        //Dictionary<string, string> dic = new Dictionary<string, string>();
+        List<profit_detail> lst_detailB = new List<profit_detail>();
 
         //------------------------------------------------------------------------
         // function selectTCNUD() - 查詢 TCNUD TABLE 個股明細取得8個欄位值
@@ -148,7 +148,7 @@ namespace _1_UnrealizedGainsOrLosses
         }
 
         //------------------------------------------------------------------------
-        // function selectHCNRH() - 查詢 HCNRH TABLE 個股明細資料(賣出)取得12個欄位值
+        // function selectHCNRH() - 查詢 HCNRH TABLE 個股明細資料(賣出)取得13個欄位值
         //------------------------------------------------------------------------
         public List<profit_detail_out> selectHCNRH(object o)
         {
@@ -157,9 +157,10 @@ namespace _1_UnrealizedGainsOrLosses
             try
             {
                 sqlConn.Open();
-                string sqlQuery = @"SELECT TDATE, SDSEQ, SDNO, SQTY, CQTY, SPRICE, COST, INCOME, SFEE, TAX, WTYPE, PROFIT
+                string sqlQuery = @"SELECT STOCK, TDATE, SDSEQ, SDNO, SQTY, CQTY, SPRICE, COST, INCOME, SFEE, TAX, WTYPE, PROFIT
                                     FROM dbo.HCNRH
-                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE";
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
+                                    ORDER BY BHNO, CSEQ, STOCK, TDATE";
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
                 sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
@@ -175,18 +176,21 @@ namespace _1_UnrealizedGainsOrLosses
                     while (reader.Read())
                     {
                         var row = new profit_detail_out();
-                        row.tdate = reader.GetString(0);
-                        row.dseq = reader.GetString(1);
-                        row.dno = reader.GetString(2);
-                        row.mqty = reader.GetDecimal(3);
-                        row.cqty = reader.GetDecimal(4);
-                        row.mprice = reader.GetDecimal(5).ToString();
-                        row.cost = reader.GetDecimal(6);
-                        row.income = reader.GetDecimal(7);
-                        row.fee = reader.GetDecimal(8);
-                        row.tax = reader.GetDecimal(9);
-                        row.wtype = reader.GetString(10);
-                        row.profit = reader.GetDecimal(11);
+                        row.stock = reader.GetString(0);
+                        row.tdate = reader.GetString(1);
+                        row.dseq = reader.GetString(2);
+                        row.dno = reader.GetString(3);
+                        row.mqty = reader.GetDecimal(4);
+                        row.cqty = reader.GetDecimal(5);
+                        row.mprice = reader.GetDecimal(6).ToString();
+                        row.cost = reader.GetDecimal(7);
+                        row.income = reader.GetDecimal(8);
+                        row.netamt = reader.GetDecimal(8);
+                        row.fee = reader.GetDecimal(9);
+                        row.tax = reader.GetDecimal(10);
+                        row.wtype = reader.GetString(11);
+                        row.profit = reader.GetDecimal(12);
+                        row.ttypename2 = "現賣";
                         lst_detail.Add(row);
                     }
                     reader.Close();
@@ -201,6 +205,187 @@ namespace _1_UnrealizedGainsOrLosses
                 sqlConn.Close();
             }
             return lst_detail;
+        }
+
+        //------------------------------------------------------------------------
+        // function selectHCNTD() - 查詢 HCNTD TABLE 個股明細資料(賣出)取得12個欄位值
+        //------------------------------------------------------------------------
+        public List<profit_detail_out> selectHCNTD(object o)
+        {
+            root SearchElement = o as root;
+
+            try
+            {
+                sqlConn.Open();
+                string sqlQuery = @"SELECT STOCK, TDATE, SDSEQ, SDNO, SQTY, CQTY, SPRICE, COST, INCOME, SFEE, TAX, PROFIT
+                                    FROM dbo.HCNTD
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
+                                    ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
+                sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("reader has no rows");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new profit_detail_out();
+                        row.stock = reader.GetString(0);
+                        row.tdate = reader.GetString(1);
+                        row.dseq = reader.GetString(2);
+                        row.dno = reader.GetString(3);
+                        row.mqty = reader.GetDecimal(4);
+                        row.cqty = reader.GetDecimal(5);
+                        row.mprice = reader.GetDecimal(6).ToString();
+                        row.cost = reader.GetDecimal(7);
+                        row.income = reader.GetDecimal(8);
+                        row.netamt = reader.GetDecimal(8);
+                        row.fee = reader.GetDecimal(9);
+                        row.tax = reader.GetDecimal(10);
+                        row.profit = reader.GetDecimal(11);
+                        row.wtype = "0";
+                        row.ttypename2 = "賣沖";
+                        lst_detail.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+            return lst_detail;
+        }
+
+        //------------------------------------------------------------------------
+        // function selectHCNRH_B() - 查詢 HCNRH TABLE 個股明細資料(買入)取得14個欄位值
+        //------------------------------------------------------------------------
+        public List<profit_detail> selectHCNRH_B(object o)
+        {
+            root SearchElement = o as root;
+
+            try
+            {
+                sqlConn.Open();
+                string sqlQuery = @"SELECT STOCK, RDATE, BDSEQ, BDNO, BQTY, CQTY, BPRICE, COST, INCOME, BFEE, ADJDATE, WTYPE, PROFIT, IOFLAG
+                                    FROM dbo.HCNRH
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
+                                    ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
+                sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("reader has no rows");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new profit_detail();
+                        row.stock = reader.GetString(0);
+                        row.tdate = reader.GetString(1);
+                        row.dseq = reader.GetString(2);
+                        row.dno = reader.GetString(3);
+                        row.mqty = reader.GetDecimal(4);
+                        row.cqty = reader.GetDecimal(5);
+                        row.mprice = reader.GetDecimal(6).ToString();
+                        row.cost = reader.GetDecimal(7);
+                        row.income = reader.GetDecimal(8);
+                        row.netamt = reader.GetDecimal(8) * -1;
+                        row.fee = reader.GetDecimal(9);
+                        row.adjdate = reader.GetString(10);
+                        row.wtype = reader.GetString(11);
+                        row.profit = reader.GetDecimal(12);
+                        if(!reader.IsDBNull(13))
+                            row.ioflag = reader.GetString(13);
+                        lst_detailB.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+            return lst_detailB;
+        }
+
+        //------------------------------------------------------------------------
+        // function selectHCNTD_B() - 查詢 HCNTD TABLE 個股明細資料(買入)取得11個欄位值
+        //------------------------------------------------------------------------
+        public List<profit_detail> selectHCNTD_B(object o)
+        {
+            root SearchElement = o as root;
+
+            try
+            {
+                sqlConn.Open();
+                string sqlQuery = @"SELECT STOCK, TDATE, BDSEQ, BDNO, BQTY, CQTY, BPRICE, COST, INCOME, BFEE, PROFIT
+                                    FROM dbo.HCNTD
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
+                                    ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
+                sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("reader has no rows");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new profit_detail();
+                        row.stock = reader.GetString(0);
+                        row.tdate = reader.GetString(1);
+                        row.dseq = reader.GetString(2);
+                        row.dno = reader.GetString(3);
+                        row.mqty = reader.GetDecimal(4);
+                        row.cqty = reader.GetDecimal(5);
+                        row.mprice = reader.GetDecimal(6).ToString();
+                        row.cost = reader.GetDecimal(7);
+                        row.income = reader.GetDecimal(8);
+                        row.netamt = reader.GetDecimal(8) * -1;
+                        row.fee = reader.GetDecimal(9);
+                        row.adjdate = "";
+                        row.wtype = "0";
+                        row.profit = reader.GetDecimal(10);
+                        row.ioflag = "0";
+                        lst_detailB.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+            return lst_detailB;
         }
     }
 }
