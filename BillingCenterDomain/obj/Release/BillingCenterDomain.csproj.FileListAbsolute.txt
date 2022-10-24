@@ -1,0 +1,11 @@
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Release\BillingCenterDomain.exe.config
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Release\BillingCenterDomain.exe
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Release\BillingCenterDomain.pdb
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Release\BillingCenterDomain.csproj.AssemblyReference.cache
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Release\BillingCenterDomain.csproj.SuggestedBindingRedirects.cache
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Release\BillingCenterDomain.Form1.resources
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Release\BillingCenterDomain.Properties.Resources.resources
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Release\BillingCenterDomain.csproj.GenerateResource.cache
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Release\BillingCenterDomain.csproj.CoreCompileInputs.cache
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Release\BillingCenterDomain.exe
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Release\BillingCenterDomain.pdb
