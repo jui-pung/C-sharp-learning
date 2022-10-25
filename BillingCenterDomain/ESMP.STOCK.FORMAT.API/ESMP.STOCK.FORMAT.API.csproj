@@ -44,6 +44,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="profit_accsum.cs" />
+    <Compile Include="profit_detail.cs" />
+    <Compile Include="profit_detail_out.cs" />
+    <Compile Include="profit_sum.cs" />
     <Compile Include="root.cs" />
     <Compile Include="unoffset_qtype_accsum.cs" />
     <Compile Include="unoffset_qtype_detail.cs" />

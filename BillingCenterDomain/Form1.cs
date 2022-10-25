@@ -17,13 +17,20 @@ namespace BillingCenterDomain
         int type;                                           //查詢與回覆格式設定
         string searchStr;                                   //查詢xml或json格式字串
         SqlSearch sqlSearch;                                //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)
-        GainLost gainLost;                                  //自訂GainLost類別 (ESMP.STOCK.TASK.API)
+        GainLost gainLost;                                  //自訂GainLost類別  (ESMP.STOCK.TASK.API)
+        GainPay gainPay;                                    //自訂GainPay類別   (ESMP.STOCK.TASK.API)
 
-                                                            //未實現損益
+        //未實現損益
         List<unoffset_qtype_detail> detailList;             //自訂unoffset_qtype_detail類別List (階層三:個股明細)
         List<unoffset_qtype_sum> sumList;                   //自訂unoffset_qtype_sum類別List    (階層二:個股未實現損益)
         List<unoffset_qtype_accsum> accsumList;             //自訂unoffset_qtype_accsum類別List (階層一:帳戶未實現損益)
-    
+
+        //已實現損益
+        List<profit_detail_out> detailOutList;              //自訂profit_detail_out類別List     (階層三:個股明細資料 (賣出))  
+        List<profit_detail> detailBuyList;                  //自訂profit_detail類別List         (階層三:個股明細資料 (買入))  
+        List<profit_sum> sumProfitList;                     //自訂profit_sum類別List            (階層二:個股已實現損益)  
+        List<profit_accsum> accsumProfitList;               //自訂profit_accsum類別List         (階層一:帳戶已實現損益)  
+
         public Form1()
         {
             InitializeComponent();
@@ -69,38 +76,40 @@ namespace BillingCenterDomain
                     txtSearchResultContent.Text = gainLost.resultErrListSerilizer(type);
                 }
             }
-            //else if (comboBoxQTYPE.Text == "0002" && txtBHNO.Text.Length == 4 && txtCSEQ.Text.Length == 7)
-            //{
-            //    offsetTask = new offset();
-            //    //取得查詢xml或json格式字串
-            //    searchStr = offsetTask.searchSerilizer(type);
-            //    txtSearchContent.Text = searchStr;
-            //    //取得查詢字串Element
-            //    var obj = offsetTask.GetElement(searchStr, type);
-            //    root SearchElement = obj as root;
-            //    //查詢開始...
-            //    detailOutList = new List<profit_detail_out>();
-            //    detailBuyList = new List<profit_detail>();
-            //    sumProfitList = new List<profit_sum>();
-            //    accsumProfitList = new List<profit_accsum>();
-            //    detailOutList = sqlTask.selectHCNRH(SearchElement);
-            //    detailOutList = sqlTask.selectHCNTD(SearchElement);
-            //    detailBuyList = sqlTask.selectHCNRH_B(SearchElement);
-            //    detailBuyList = sqlTask.selectHCNTD_B(SearchElement);
-            //    if (detailOutList.Count > 0)
-            //    {
-            //        detailOutList = offsetTask.searchDetails(detailOutList);
-            //        detailBuyList = offsetTask.searchDetails_B(detailBuyList);
-            //        sumProfitList = offsetTask.searchSum(detailOutList);
-            //        accsumProfitList = offsetTask.searchAccSum(sumProfitList);
-            //        //呈現查詢結果
-            //        resultListType2Serilizer();
-            //    }
-            //    else
-            //    {
-            //        resultErrListSerilizer();
-            //    }
-        
+            else if (comboBoxQTYPE.Text == "0002" && txtBHNO.Text.Length == 4 && txtCSEQ.Text.Length == 7)
+            {
+                gainPay = new GainPay();
+                //取得查詢xml或json格式字串
+                gainPay.getFormField(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, txtSDATE.Text, txtEDATE.Text);
+                searchStr = gainPay.searchSerilizer(type);
+                txtSearchContent.Text = searchStr;
+                //取得查詢字串Element
+                var obj = gainPay.GetElement(searchStr, type);
+                root SearchElement = obj as root;
+                //查詢開始...
+                detailOutList = new List<profit_detail_out>();
+                detailBuyList = new List<profit_detail>();
+                sumProfitList = new List<profit_sum>();
+                accsumProfitList = new List<profit_accsum>();
+                detailOutList = sqlSearch.selectHCNRH(SearchElement);
+                //detailOutList = sqlTask.selectHCNTD(SearchElement);
+                //detailBuyList = sqlTask.selectHCNRH_B(SearchElement);
+                //detailBuyList = sqlTask.selectHCNTD_B(SearchElement);
+                if (detailOutList.Count > 0)
+                {
+                    detailOutList = gainPay.searchDetails(detailOutList);
+                    //detailBuyList = offsetTask.searchDetails_B(detailBuyList);
+                    //sumProfitList = offsetTask.searchSum(detailOutList);
+                    //accsumProfitList = offsetTask.searchAccSum(sumProfitList);
+                    ////呈現查詢結果
+                    //resultListType2Serilizer();
+                }
+                //else
+                //{
+                //    resultErrListSerilizer();
+                //}
+
+            }
             else
                 MessageBox.Show("輸入格式錯誤 請重新輸入");
         

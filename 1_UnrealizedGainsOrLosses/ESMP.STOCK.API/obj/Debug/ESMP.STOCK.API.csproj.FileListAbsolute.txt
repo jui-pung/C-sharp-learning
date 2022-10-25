@@ -1,0 +1,6 @@
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\1_UnrealizedGainsOrLosses\ESMP.STOCK.API\bin\Debug\ESMP.STOCK.API.dll
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\1_UnrealizedGainsOrLosses\ESMP.STOCK.API\bin\Debug\ESMP.STOCK.API.pdb
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\1_UnrealizedGainsOrLosses\ESMP.STOCK.API\obj\Debug\ESMP.STOCK.API.csproj.AssemblyReference.cache
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\1_UnrealizedGainsOrLosses\ESMP.STOCK.API\obj\Debug\ESMP.STOCK.API.csproj.CoreCompileInputs.cache
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\1_UnrealizedGainsOrLosses\ESMP.STOCK.API\obj\Debug\ESMP.STOCK.API.dll
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\1_UnrealizedGainsOrLosses\ESMP.STOCK.API\obj\Debug\ESMP.STOCK.API.pdb
