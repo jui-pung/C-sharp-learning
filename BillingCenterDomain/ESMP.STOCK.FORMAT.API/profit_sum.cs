@@ -32,6 +32,6 @@ namespace ESMP.STOCK.FORMAT.API
         [XmlElement("profit_detail")]
         public List<profit_detail> profit_detail { get; set; }
         [XmlElement("profit_detail_out")]
-        public List<profit_detail_out> profit_detail_out { get; set; }
+        public profit_detail_out profit_detail_out { get; set; }
     }
 }

@@ -92,7 +92,7 @@
             this.txtEDATE.Name = "txtEDATE";
             this.txtEDATE.Size = new System.Drawing.Size(125, 36);
             this.txtEDATE.TabIndex = 29;
-            this.txtEDATE.Text = "20210131";
+            this.txtEDATE.Text = "20210121";
             // 
             // txtSDATE
             // 
@@ -159,7 +159,7 @@
             this.txtCSEQ.Name = "txtCSEQ";
             this.txtCSEQ.Size = new System.Drawing.Size(125, 36);
             this.txtCSEQ.TabIndex = 22;
-            this.txtCSEQ.Text = "0074647";
+            this.txtCSEQ.Text = "0123938";
             // 
             // txtBHNO
             // 

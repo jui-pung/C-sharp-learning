@@ -92,22 +92,22 @@ namespace BillingCenterDomain
                 sumProfitList = new List<profit_sum>();
                 accsumProfitList = new List<profit_accsum>();
                 detailOutList = sqlSearch.selectHCNRH(SearchElement);
-                //detailOutList = sqlTask.selectHCNTD(SearchElement);
-                //detailBuyList = sqlTask.selectHCNRH_B(SearchElement);
-                //detailBuyList = sqlTask.selectHCNTD_B(SearchElement);
+                detailOutList = sqlSearch.selectHCNTD(SearchElement);
+                detailBuyList = sqlSearch.selectHCNRH_B(SearchElement);
+                detailBuyList = sqlSearch.selectHCNTD_B(SearchElement);
                 if (detailOutList.Count > 0)
                 {
                     detailOutList = gainPay.searchDetails(detailOutList);
-                    //detailBuyList = offsetTask.searchDetails_B(detailBuyList);
-                    //sumProfitList = offsetTask.searchSum(detailOutList);
-                    //accsumProfitList = offsetTask.searchAccSum(sumProfitList);
-                    ////呈現查詢結果
-                    //resultListType2Serilizer();
+                    detailBuyList = gainPay.searchDetails_B(detailBuyList);
+                    sumProfitList = gainPay.searchSum(detailOutList);
+                    accsumProfitList = gainPay.searchAccSum(sumProfitList);
+                    //呈現查詢結果
+                    txtSearchResultContent.Text = gainPay.resultListSerilizer(detailBuyList, detailOutList, type);
                 }
-                //else
-                //{
-                //    resultErrListSerilizer();
-                //}
+                else
+                {
+                    txtSearchResultContent.Text = gainPay.resultErrListSerilizer(type);
+                }
 
             }
             else

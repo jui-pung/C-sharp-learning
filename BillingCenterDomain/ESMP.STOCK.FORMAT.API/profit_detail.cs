@@ -13,6 +13,9 @@ namespace ESMP.STOCK.FORMAT.API
         [XmlIgnore]
         [JsonIgnore]
         public string stock { get; set; }
+        public string sdseq { get; set; }
+        public string sdno { get; set; }
+        public string sdate { get; set; }
         public string tdate { get; set; }
         public string dseq { get; set; }
         public string dno { get; set; }
