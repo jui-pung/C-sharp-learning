@@ -57,21 +57,21 @@ namespace ESMP.STOCK.TASK.API.Tests
         [TestMethod()]
         public void searchAccSumTest()
         {
-            List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();
-            foreach (var item in detailList)
+            List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();
+            List<unoffset_qtype_accsum> accsumList = new List<unoffset_qtype_accsum>();
+
+            sumList.Add(new unoffset_qtype_sum() { stock = "4721", stocknm = "美琪瑪", ttype = "0", ttypename = "現買", bstype = "B", bqty = Convert.ToDecimal(40.0), cost = Convert.ToDecimal(734.00), avgprice = Convert.ToDecimal(18.35), lastprice = Convert.ToDecimal(105.5000), marketvalue = Convert.ToDecimal(4188.0), profit = Convert.ToDecimal(3454.00), pl_ratio = "470.57%", fee = Convert.ToDecimal(2.00), tax = Convert.ToDecimal(0.0), estimateAmt = Convert.ToDecimal(4220.0), estimateFee = Convert.ToDecimal(20.0), estimateTax = Convert.ToDecimal(12.0), amt = Convert.ToDecimal(732.0000) });
+            sumList.Add(new unoffset_qtype_sum() { stock = "5478", stocknm = "智  冠", ttype = "0", ttypename = "現買", bstype = "B", bqty = Convert.ToDecimal(152.0), cost = Convert.ToDecimal(5342.00), avgprice = Convert.ToDecimal(35.14), lastprice = Convert.ToDecimal(76.3000), marketvalue = Convert.ToDecimal(11543.0), profit = Convert.ToDecimal(6201.00), pl_ratio = "116.08%", fee = Convert.ToDecimal(7.00), tax = Convert.ToDecimal(0.0), estimateAmt = Convert.ToDecimal(11597.0), estimateFee = Convert.ToDecimal(20.0), estimateTax = Convert.ToDecimal(34.0), amt = Convert.ToDecimal(5335.2000) });
+
+            foreach (var item in accsumList)
             {
-                item.bqty = 2000;
-                item.mprice = Convert.ToDecimal(79.250);
-                item.lastprice = Convert.ToDecimal(24.5);
-                item.cost = Convert.ToDecimal(10000);
                 GainLost gainLost = new GainLost();
-                detailList = gainLost.searchDetails(detailList);
-                //Assert.AreEqual(item.mamt, 158500);
-                Assert.AreEqual(item.estimateAmt, Convert.ToDecimal(49000));
-                Assert.AreEqual(item.estimateFee, Convert.ToDecimal(69.82));
-                Assert.AreEqual(item.estimateTax, Convert.ToDecimal(147));
-                Assert.AreEqual(item.marketvalue, Convert.ToDecimal(48783.18));
-                Assert.AreEqual(item.profit, Convert.ToDecimal(38783.18));
+                accsumList = gainLost.searchAccSum(sumList);
+                Assert.AreEqual(item.estimateAmt, Convert.ToDecimal(15817.0));
+                Assert.AreEqual(item.estimateFee, Convert.ToDecimal(40.0));
+                Assert.AreEqual(item.estimateTax, Convert.ToDecimal(46.0));
+                Assert.AreEqual(item.marketvalue, Convert.ToDecimal(15731.0));
+                Assert.AreEqual(item.profit, Convert.ToDecimal(9655.00));
             }
         }
     }

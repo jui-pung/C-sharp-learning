@@ -19,6 +19,7 @@ namespace BillingCenterDomain
         SqlSearch sqlSearch;                                //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)
         GainLost gainLost;                                  //自訂GainLost類別  (ESMP.STOCK.TASK.API)
         GainPay gainPay;                                    //自訂GainPay類別   (ESMP.STOCK.TASK.API)
+        Bill bill;                                          //自訂Bill類別   (ESMP.STOCK.TASK.API)
 
         //未實現損益
         List<unoffset_qtype_detail> detailList;             //自訂unoffset_qtype_detail類別List (階層三:個股明細)
@@ -30,6 +31,11 @@ namespace BillingCenterDomain
         List<profit_detail> detailBuyList;                  //自訂profit_detail類別List         (階層三:個股明細資料 (買入))  
         List<profit_sum> sumProfitList;                     //自訂profit_sum類別List            (階層二:個股已實現損益)  
         List<profit_accsum> accsumProfitList;               //自訂profit_accsum類別List         (階層一:帳戶已實現損益)  
+
+        //對帳單
+        List<profile> profileList;                          //自訂profile類別List               (階層二:對帳單明細資料)  
+        List<billSum> billSumList;                          //自訂billSum類別List               (階層二:對帳單匯總資料)  
+        List<profile_sum> profileSumList;                   //自訂profile_sum類別List           (階層一:對帳單彙總資料)  
 
         public Form1()
         {
@@ -60,14 +66,13 @@ namespace BillingCenterDomain
                 if (detailList.Count > 0)
                 {
                     detailList = sqlSearch.selectMSTMB(SearchElement);
-                    var watch = System.Diagnostics.Stopwatch.StartNew();
-                    // the code that you want to measure comes here
+                    //var watch = System.Diagnostics.Stopwatch.StartNew();
                     detailList = gainLost.searchDetails(detailList);
                     sumList = gainLost.searchSum(detailList);
                     accsumList = gainLost.searchAccSum(sumList);
-                    watch.Stop();
-                    var elapsedMs = watch.ElapsedMilliseconds;
-                    Console.WriteLine(elapsedMs);
+                    //watch.Stop();
+                    //var elapsedMs = watch.ElapsedMilliseconds;
+                    //Console.WriteLine(elapsedMs);
                     //呈現查詢結果
                     txtSearchResultContent.Text = gainLost.resultListSerilizer(detailList, type);
                 }
@@ -76,7 +81,7 @@ namespace BillingCenterDomain
                     txtSearchResultContent.Text = gainLost.resultErrListSerilizer(type);
                 }
             }
-            else if (comboBoxQTYPE.Text == "0002" && txtBHNO.Text.Length == 4 && txtCSEQ.Text.Length == 7)
+            else if (comboBoxQTYPE.Text == "0002" && txtBHNO.Text.Length == 4 && txtCSEQ.Text.Length == 7 && txtEDATE.Text.Length == 8 && txtSDATE.Text.Length == 8)
             {
                 gainPay = new GainPay();
                 //取得查詢xml或json格式字串
@@ -108,6 +113,40 @@ namespace BillingCenterDomain
                 {
                     txtSearchResultContent.Text = gainPay.resultErrListSerilizer(type);
                 }
+
+            }
+            else if (comboBoxQTYPE.Text == "0003" && txtBHNO.Text.Length == 4 && txtCSEQ.Text.Length == 7 && txtEDATE.Text.Length == 8 && txtSDATE.Text.Length == 8)
+            {
+                bill = new Bill();
+                //取得查詢xml或json格式字串
+                bill.getFormField(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, txtSDATE.Text, txtEDATE.Text, txtStockSymbol.Text);
+                searchStr = bill.searchSerilizer(type);
+                txtSearchContent.Text = searchStr;
+                //取得查詢字串Element
+                var obj = bill.GetElement(searchStr, type);
+                root SearchElement = obj as root;
+                //查詢開始...
+                profileList = new List<profile>();
+                //detailBuyList = new List<profit_detail>();
+                //sumProfitList = new List<profit_sum>();
+                //accsumProfitList = new List<profit_accsum>();
+                profileList = sqlSearch.selectHCMIO(SearchElement);
+                //detailOutList = sqlSearch.selectHCNTD(SearchElement);
+                //detailBuyList = sqlSearch.selectHCNRH_B(SearchElement);
+                //detailBuyList = sqlSearch.selectHCNTD_B(SearchElement);
+                //if (detailOutList.Count > 0)
+                //{
+                //    detailOutList = gainPay.searchDetails(detailOutList);
+                //    detailBuyList = gainPay.searchDetails_B(detailBuyList);
+                //    sumProfitList = gainPay.searchSum(detailOutList);
+                //    accsumProfitList = gainPay.searchAccSum(sumProfitList);
+                //    //呈現查詢結果
+                //    txtSearchResultContent.Text = gainPay.resultListSerilizer(detailBuyList, detailOutList, type);
+                //}
+                //else
+                //{
+                //    txtSearchResultContent.Text = gainPay.resultErrListSerilizer(type);
+                //}
 
             }
             else

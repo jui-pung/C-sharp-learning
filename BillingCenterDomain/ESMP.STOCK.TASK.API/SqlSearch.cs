@@ -12,9 +12,13 @@ namespace ESMP.STOCK.TASK.API
     {
         static string sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
         SqlConnection sqlConn = new SqlConnection(sqlSet);
+        //未實現損益
         List<unoffset_qtype_detail> lst = new List<unoffset_qtype_detail>();
+        //已實現損益
         List<profit_detail_out> lst_detail = new List<profit_detail_out>();
         List<profit_detail> lst_detailB = new List<profit_detail>();
+        //對帳單查詢
+        List<profile> lst_profile = new List<profile>();
 
         //----------------------------------------------------------------------------------
         // function selectTCNUD() - 查詢 TCNUD TABLE 個股明細取得8個欄位值
@@ -269,7 +273,7 @@ namespace ESMP.STOCK.TASK.API
         }
 
         //----------------------------------------------------------------------------------
-        // function selectHCNRH_B() - 查詢 HCNRH TABLE 個股明細資料(買入)取得14個欄位值
+        // function selectHCNRH_B() - 查詢 HCNRH TABLE 個股明細資料(買入)取得17個欄位值
         //----------------------------------------------------------------------------------
         public List<profit_detail> selectHCNRH_B(object o)
         {
@@ -306,13 +310,13 @@ namespace ESMP.STOCK.TASK.API
                         row.mprice = reader.GetDecimal(6).ToString();
                         row.cost = reader.GetDecimal(7);
                         row.income = reader.GetDecimal(8);
-                        row.netamt = reader.GetDecimal(8) * -1;
+                        row.netamt = reader.GetDecimal(7) * -1;
                         row.fee = reader.GetDecimal(9);
                         row.adjdate = reader.GetString(10);
                         row.wtype = reader.GetString(11);
                         row.profit = reader.GetDecimal(12);
-                        if (!reader.IsDBNull(13))
-                            row.ioflag = reader.GetString(13);
+                        if (reader.IsDBNull(13))
+                            row.ioflag = " ";
                         row.sdseq = reader.GetString(14);
                         row.sdno = reader.GetString(15);
                         row.sdate = reader.GetString(16);
@@ -333,7 +337,7 @@ namespace ESMP.STOCK.TASK.API
         }
 
         //----------------------------------------------------------------------------------
-        // function selectHCNTD_B() - 查詢 HCNTD TABLE 個股明細資料(買入)取得11個欄位值
+        // function selectHCNTD_B() - 查詢 HCNTD TABLE 個股明細資料(買入)取得13個欄位值
         //----------------------------------------------------------------------------------
         public List<profit_detail> selectHCNTD_B(object o)
         {
@@ -378,6 +382,7 @@ namespace ESMP.STOCK.TASK.API
                         row.ioflag = "0";
                         row.sdseq = reader.GetString(11);
                         row.sdno = reader.GetString(12);
+                        row.sdate = reader.GetString(1);
                         lst_detailB.Add(row);
                     }
                     reader.Close();
@@ -392,6 +397,71 @@ namespace ESMP.STOCK.TASK.API
                 sqlConn.Close();
             }
             return lst_detailB;
+        }
+
+        //----------------------------------------------------------------------------------
+        // function selectHCMIO() - 查詢 HCMIO TABLE 對帳單明細資料 取得13個欄位值
+        //----------------------------------------------------------------------------------
+        public List<profile> selectHCMIO(object o)
+        {
+            root SearchElement = o as root;
+
+            try
+            {
+                sqlConn.Open();
+                string sqlQuery = @"SELECT STOCK, TDATE, DSEQ, DNO, TTYPE, BSTYPE, ETYPE, PRICE, QTY, AMT, FEE, TAX, NETAMT
+                                    FROM dbo.HCMIO
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE";
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
+                sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("沒有歷史對帳單明細資料");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new profile();
+                        row.stock = reader.GetString(0);
+                        row.mdate = reader.GetString(1);
+                        row.dseq = reader.GetString(2);
+                        row.dno = reader.GetString(3);
+                        row.ttype = reader.GetString(4);
+                        if (reader.GetString(4) == "0" && reader.GetString(5) == "B")
+                            row.ttypename = "現買";
+                        else if (reader.GetString(4) == "0" && reader.GetString(5) == "S")
+                            row.ttypename = "現賣";
+                        row.bstype = reader.GetString(5);
+                        if (reader.GetString(5) == "B")
+                            row.bstypename = "買";
+                        else if (reader.GetString(5) == "S")
+                            row.bstypename = "賣";
+                        row.etype = reader.GetString(6);
+                        row.mprice = reader.GetDecimal(7);
+                        row.mqty = reader.GetDecimal(8);
+                        row.mamt = reader.GetDecimal(9);
+                        row.fee = reader.GetDecimal(10);
+                        row.tax = reader.GetDecimal(11);
+                        row.netamt = reader.GetDecimal(12);
+                        lst_profile.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+            return lst_profile;
         }
     }
 }

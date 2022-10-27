@@ -44,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="billSum.cs" />
+    <Compile Include="profile.cs" />
+    <Compile Include="profile_sum.cs" />
     <Compile Include="profit_accsum.cs" />
     <Compile Include="profit_detail.cs" />
     <Compile Include="profit_detail_out.cs" />

@@ -58,7 +58,8 @@
             this.comboBoxQTYPE.FormattingEnabled = true;
             this.comboBoxQTYPE.Items.AddRange(new object[] {
             "0001",
-            "0002"});
+            "0002",
+            "0003"});
             this.comboBoxQTYPE.Location = new System.Drawing.Point(156, 44);
             this.comboBoxQTYPE.Name = "comboBoxQTYPE";
             this.comboBoxQTYPE.Size = new System.Drawing.Size(121, 32);
@@ -120,7 +121,7 @@
             this.txtStockSymbol.Name = "txtStockSymbol";
             this.txtStockSymbol.Size = new System.Drawing.Size(125, 36);
             this.txtStockSymbol.TabIndex = 26;
-            this.txtStockSymbol.Text = "2330";
+            this.txtStockSymbol.Text = " ";
             // 
             // label3
             // 

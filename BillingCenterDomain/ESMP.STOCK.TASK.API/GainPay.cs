@@ -110,6 +110,7 @@ namespace ESMP.STOCK.TASK.API
                 tax = g.Sum(s => s.tax),
                 wtype = g.First().wtype,
                 profit = g.Sum(s => s.profit),
+                ttypename2 = g.First().ttypename2
             }).ToList();
 
             //計算計算明細資料(賣出)的成交價金、報酬率
@@ -135,6 +136,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         public List<profit_sum> searchSum(List<profit_detail_out> detailList)
         {
+            //從個股明細資料 (賣出)List取得
             foreach (var item in detailList)
             {
                 var row = new profit_sum();
@@ -192,7 +194,6 @@ namespace ESMP.STOCK.TASK.API
         {
             //依照股票代號、賣委託書號 排序detailList
             List<profit_detail> sortedList = detailList.OrderBy(x => x.stock).ThenBy(n => n.sdseq).ThenBy(n => n.sdno).ToList();
-            //detailList.Sort((x, y) => x.stock.CompareTo(y.stock) + x.sdseq.CompareTo(y.sdseq));
             foreach (var item in accsumList)
             {
                 //處理第三階層反序列內容 
@@ -238,6 +239,7 @@ namespace ESMP.STOCK.TASK.API
                     cost = item.cost,
                     income = item.income,
                     profit = item.profit,
+                    pl_ratio = item.pl_ratio,
                     fee = item.fee,
                     tax = item.tax,
                     profit_sum = item.profit_sum

@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bill.cs" />
     <Compile Include="GainLost.cs" />
     <Compile Include="GainPay.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
