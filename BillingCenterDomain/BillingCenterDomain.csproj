@@ -80,6 +80,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="ESMP.STOCK.DB.TABLE.API\ESMP.STOCK.DB.TABLE.API.csproj">
+      <Project>{94576875-1771-4357-a4d7-fba46b943ba6}</Project>
+      <Name>ESMP.STOCK.DB.TABLE.API</Name>
+    </ProjectReference>
     <ProjectReference Include="ESMP.STOCK.FORMAT.API\ESMP.STOCK.FORMAT.API.csproj">
       <Project>{452c1390-c7d8-40d0-b5c1-09039154467e}</Project>
       <Name>ESMP.STOCK.FORMAT.API</Name>

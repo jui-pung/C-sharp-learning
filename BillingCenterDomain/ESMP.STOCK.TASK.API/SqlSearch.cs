@@ -1,4 +1,5 @@
-﻿using ESMP.STOCK.FORMAT.API;
+﻿using ESMP.STOCK.DB.TABLE.API;
+using ESMP.STOCK.FORMAT.API;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -155,14 +156,14 @@ namespace ESMP.STOCK.TASK.API
         //----------------------------------------------------------------------------------
         // function selectHCNRH() - 查詢 HCNRH TABLE 個股明細資料(賣出)取得13個欄位值
         //----------------------------------------------------------------------------------
-        public List<profit_detail_out> selectHCNRH(object o)
+        public List<HCNRH> selectHCNRH(object o)
         {
             root SearchElement = o as root;
 
             try
             {
                 sqlConn.Open();
-                string sqlQuery = @"SELECT STOCK, TDATE, SDSEQ, SDNO, SQTY, CQTY, SPRICE, COST, INCOME, SFEE, TAX, WTYPE, PROFIT
+                string sqlQuery = @"SELECT BHNO, TDATE, RDATE, CSEQ, BDSEQ, BDNO, SDSEQ, SDNO, STOCK, CQTY, BPRICE, BFEE, SPRICE, SFEE, TAX, INCOME, COST, PROFIT, ADJDATE, WTYPE, BQTY, SQTY, STINTAX, IOFLAG, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
                                     FROM dbo.HCNRH
                                     WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
                                     ORDER BY BHNO, CSEQ, STOCK, TDATE";
@@ -180,22 +181,27 @@ namespace ESMP.STOCK.TASK.API
                     }
                     while (reader.Read())
                     {
-                        var row = new profit_detail_out();
-                        row.stock = reader.GetString(0);
-                        row.tdate = reader.GetString(1);
-                        row.dseq = reader.GetString(2);
-                        row.dno = reader.GetString(3);
-                        row.mqty = reader.GetDecimal(4);
-                        row.cqty = reader.GetDecimal(5);
-                        row.mprice = reader.GetDecimal(6).ToString();
-                        row.cost = reader.GetDecimal(7);
-                        row.income = reader.GetDecimal(8);
-                        row.netamt = reader.GetDecimal(8);
-                        row.fee = reader.GetDecimal(9);
-                        row.tax = reader.GetDecimal(10);
-                        row.wtype = reader.GetString(11);
-                        row.profit = reader.GetDecimal(12);
-                        row.ttypename2 = "現賣";
+                        //ADJDATE, WTYPE, BQTY, SQTY, STINTAX, IOFLAG, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
+                        var row = new HCNRH();
+                        row.BHNO = reader.GetString(0);
+                        row.TDATE = reader.GetString(1);
+                        row.RDATE = reader.GetString(2);
+                        row.CSEQ = reader.GetString(3);
+                        row.BDSEQ = reader.GetString(4);
+                        row.BDNO = reader.GetString(5);
+                        row.SDSEQ = reader.GetString(6);
+                        row.SDNO = reader.GetString(7);
+                        row.STOCK = reader.GetString(8);
+                        row.CQTY = reader.GetDecimal(9);
+                        row.BPRICE = reader.GetDecimal(10);
+                        row.BFEE = reader.GetDecimal(11);
+                        row.SPRICE = reader.GetDecimal(12);
+                        row.SFEE = reader.GetDecimal(13);
+                        row.TAX = reader.GetDecimal(14);
+                        row.INCOME = reader.GetDecimal(15);
+                        row.COST = reader.GetDecimal(16);
+                        row.PROFIT = reader.GetDecimal(17);
+
                         lst_detail.Add(row);
                     }
                     reader.Close();
@@ -448,6 +454,91 @@ namespace ESMP.STOCK.TASK.API
                         row.fee = reader.GetDecimal(10);
                         row.tax = reader.GetDecimal(11);
                         row.netamt = reader.GetDecimal(12);
+                        lst_profile.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+            return lst_profile;
+        }
+
+        //----------------------------------------------------------------------------------
+        // function selectTMHIO() - 查詢 TMHIO TABLE 對帳單明細資料 取得9個欄位值
+        //----------------------------------------------------------------------------------
+        public List<profile> selectTMHIO(object o)
+        {
+            root SearchElement = o as root;
+
+            try
+            {
+                sqlConn.Open();
+                string sqlQuery = @"SELECT STOCK, TDATE, DSEQ, JRNUM, TTYPE, BSTYPE, ETYPE, PRICE, QTY
+                                    FROM dbo.TMHIO
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE";
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
+                sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("沒有當日交易明細資料");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new profile();
+                        row.stock = reader.GetString(0);
+                        row.mdate = reader.GetString(1);
+                        row.dseq = reader.GetString(2);
+                        row.dno = reader.GetString(3);
+                        row.ttype = reader.GetString(4);
+
+                        if (reader.GetString(4) == "0" && reader.GetString(5) == "B" && reader.GetString(6) == "0")
+                            row.ttypename = "現買";
+                        else if (reader.GetString(4) == "0" && reader.GetString(5) == "B" && reader.GetString(6) == "2")
+                            row.ttypename = "盤後零買";
+                        else if (reader.GetString(4) == "0" && reader.GetString(5) == "B" && reader.GetString(6) == "5")
+                            row.ttypename = "盤中零買";
+                        else if (reader.GetString(4) == "0" && reader.GetString(5) == "S" && reader.GetString(6) == "0")
+                            row.ttypename = "現賣";
+                        else if (reader.GetString(4) == "0" && reader.GetString(5) == "S" && reader.GetString(6) == "2")
+                            row.ttypename = "盤後零賣";
+                        else if (reader.GetString(4) == "0" && reader.GetString(5) == "S" && reader.GetString(6) == "5")
+                            row.ttypename = "盤中零賣";
+
+                        row.bstype = reader.GetString(5);
+
+                        if (reader.GetString(5) == "B")
+                            row.bstypename = "買";
+                        else if (reader.GetString(5) == "S")
+                            row.bstypename = "賣";
+
+                        if (reader.GetString(6) == "2")
+                            row.etype = "1";
+                        else
+                            row.etype = "0";
+
+                        row.mprice = reader.GetDecimal(7);
+                        row.mqty = reader.GetDecimal(8);
+                        row.mamt = decimal.Truncate(reader.GetDecimal(7) * reader.GetDecimal(8));
+
+                        if (decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(reader.GetDecimal(7) * reader.GetDecimal(8)) * 0.001425)) < 20)
+                            row.fee = 20;
+                        else
+                            row.fee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(reader.GetDecimal(7) * reader.GetDecimal(8)) * 0.001425));
+                        if(reader.GetString(5) == "S")
+                            row.tax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(reader.GetDecimal(7) * reader.GetDecimal(8)) * 0.003));
                         lst_profile.Add(row);
                     }
                     reader.Close();

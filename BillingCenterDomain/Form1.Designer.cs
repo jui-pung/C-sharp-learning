@@ -65,6 +65,7 @@
             this.comboBoxQTYPE.Size = new System.Drawing.Size(121, 32);
             this.comboBoxQTYPE.TabIndex = 32;
             this.comboBoxQTYPE.Text = "0001";
+            this.comboBoxQTYPE.SelectedIndexChanged += new System.EventHandler(this.comboBoxQTYPE_SelectedIndexChanged);
             // 
             // label5
             // 

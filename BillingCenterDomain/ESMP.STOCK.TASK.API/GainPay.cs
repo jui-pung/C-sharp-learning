@@ -14,28 +14,14 @@ namespace ESMP.STOCK.TASK.API
 {
     public class GainPay
     {
-        string QTYPE, BHNO, CSEQ, SDATE, EDATE;                             //使用者於Form輸入之欄位值
         SqlSearch sqlSearch = new SqlSearch();                              //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)                                           
         List<profit_sum> sumList = new List<profit_sum>();                  //自訂profit_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
         List<profit_accsum> accsumList = new List<profit_accsum>();         //自訂profit_accsum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
 
         //--------------------------------------------------------------------------------------------
-        //function getFormField() - 取得使用者於Form1輸入的欄位值 - comboBoxQTYPE, txtBHNO, txtCSEQ,
-        //                                                          txtSDATE, txtEDATE
-        //--------------------------------------------------------------------------------------------
-        public void getFormField(string comboBoxQTYPE, string txtBHNO, string txtCSEQ, string txtSDATE, string txtEDATE)
-        {
-            QTYPE = comboBoxQTYPE;
-            BHNO = txtBHNO;
-            CSEQ = txtCSEQ;
-            SDATE = txtSDATE;
-            EDATE = txtEDATE;
-        }
-
-        //--------------------------------------------------------------------------------------------
         //function SearchSerilizer() - 將輸入的查詢資訊序列化為xml格式字串
         //--------------------------------------------------------------------------------------------
-        public string searchSerilizer(int type)
+        public string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string SDATE, string EDATE, int type)
         {
             var root = new root()
             {
@@ -134,7 +120,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchSum() - 計算取得 查詢回復階層二 個股已實現損益
         //--------------------------------------------------------------------------------------------
-        public List<profit_sum> searchSum(List<profit_detail_out> detailList)
+        public List<profit_sum> searchSum(List<profit_detail_out> detailList, string BHNO, string CSEQ)
         {
             //從個股明細資料 (賣出)List取得
             foreach (var item in detailList)
@@ -180,7 +166,7 @@ namespace ESMP.STOCK.TASK.API
 
             accsumList.ForEach(x => x.pl_ratio = decimal.Round(((x.profit / x.cost) * 100), 2).ToString() + "%");
 
-            //依照股票代號、賣委託書號 排序sumList 並將List內容存放到accsumList的List<profit_sum> profit_sum
+            //依照股票代號、賣出委託書號、分單號 排序sumList 並將List內容存放到accsumList的List<profit_sum> profit_sum
             List<profit_sum> sortedList = sumList.OrderBy(x => x.stock).ThenBy(n => n.dseq).ThenBy(n => n.dno).ToList();
             accsumList.ForEach(x => x.profit_sum = sortedList);
 
@@ -226,7 +212,6 @@ namespace ESMP.STOCK.TASK.API
                             break;
                         }
                     }
-
                     item.profit_sum[i].profit_detail.RemoveAll(s => s == null);
                 }
 
