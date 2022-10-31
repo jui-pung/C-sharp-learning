@@ -9,3 +9,5 @@ C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.TASK
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.TASK.API\obj\Debug\ESMP.STOCK.TASK.API.csproj.CopyComplete
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.TASK.API\obj\Debug\ESMP.STOCK.TASK.API.dll
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.TASK.API\obj\Debug\ESMP.STOCK.TASK.API.pdb
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.TASK.API\bin\Debug\ESMP.STOCK.DB.TABLE.API.dll
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.TASK.API\bin\Debug\ESMP.STOCK.DB.TABLE.API.pdb

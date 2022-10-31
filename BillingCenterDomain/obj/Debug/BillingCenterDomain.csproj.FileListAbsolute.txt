@@ -16,3 +16,5 @@ C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.TASK.API.pdb
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\Newtonsoft.Json.xml
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Debug\BillingCenterDomain.csproj.CopyComplete
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.DB.TABLE.API.dll
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.DB.TABLE.API.pdb

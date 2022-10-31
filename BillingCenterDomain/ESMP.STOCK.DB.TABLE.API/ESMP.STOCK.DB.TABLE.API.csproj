@@ -43,7 +43,9 @@
   <ItemGroup>
     <Compile Include="HCNRH.cs" />
     <Compile Include="HCNTD.cs" />
+    <Compile Include="MSTMB.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TCNUD.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

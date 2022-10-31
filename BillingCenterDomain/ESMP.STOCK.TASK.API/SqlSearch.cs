@@ -13,21 +13,16 @@ namespace ESMP.STOCK.TASK.API
     {
         static string sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
         SqlConnection sqlConn = new SqlConnection(sqlSet);
-        //未實現損益
-        List<unoffset_qtype_detail> lst = new List<unoffset_qtype_detail>();
-        //已實現損益
-        List<profit_detail_out> lst_detail = new List<profit_detail_out>();
-        List<profit_detail> lst_detailB = new List<profit_detail>();
         //對帳單查詢
         List<profile> lst_profile = new List<profile>();
 
         //----------------------------------------------------------------------------------
-        // function selectTCNUD() - 查詢 TCNUD TABLE 個股明細取得8個欄位值
+        // function selectTCNUD() - 查詢 TCNUD TABLE
         //----------------------------------------------------------------------------------
-        public List<unoffset_qtype_detail> selectTCNUD(object o)
+        public List<TCNUD> selectTCNUD(object o)
         {
             root SearchElement = o as root;
-
+            List<TCNUD> dbTCNUD = new List<TCNUD>();
             try
             {
                 sqlConn.Open();
@@ -47,16 +42,16 @@ namespace ESMP.STOCK.TASK.API
                     }
                     while (reader.Read())
                     {
-                        var row = new unoffset_qtype_detail();
-                        row.stock = reader.GetString(0);
-                        row.tdate = reader.GetString(1);
-                        row.dseq = reader.GetString(2);
-                        row.dno = reader.GetString(3);
-                        row.bqty = reader.GetDecimal(4);
-                        row.mprice = reader.GetDecimal(5);
-                        row.fee = reader.GetDecimal(6);
-                        row.cost = reader.GetDecimal(7);
-                        lst.Add(row);
+                        var row = new TCNUD();
+                        row.STOCK = reader["STOCK"].ToString();
+                        row.TDATE = reader["TDATE"].ToString();
+                        row.DSEQ = reader["DSEQ"].ToString();
+                        row.DNO = reader["DNO"].ToString();
+                        row.BQTY = Convert.ToDecimal(reader["BQTY"].ToString());
+                        row.PRICE = Convert.ToDecimal(reader["PRICE"].ToString());
+                        row.FEE = Convert.ToDecimal(reader["FEE"].ToString());
+                        row.COST = Convert.ToDecimal(reader["COST"].ToString());
+                        dbTCNUD.Add(row);
                     }
                     reader.Close();
                 }
@@ -69,16 +64,60 @@ namespace ESMP.STOCK.TASK.API
             {
                 sqlConn.Close();
             }
-            return lst;
+            return dbTCNUD;
         }
 
+
         //----------------------------------------------------------------------------------
-        // function selectMSTMB() - 查詢 MSTMB TABLE 個股明細取得1個欄位值
+        // function selectMSTMB() - 查詢 MSTMB TABLE的STOCK,CPRICE
         //----------------------------------------------------------------------------------
-        public List<unoffset_qtype_detail> selectMSTMB(object o)
+        public List<MSTMB> selectMSTMB()
+        {
+            List<MSTMB> dbMSTMB = new List<MSTMB>();
+            try
+            {
+                sqlConn.Open();
+                string sqlQuery = @"SELECT STOCK, CPRICE
+                                    FROM MSTMB";
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("reader has no rows");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new MSTMB();
+                        row.STOCK = reader["STOCK"].ToString();
+                        if (reader.IsDBNull(1))
+                            row.CPRICE = 0;
+                        else
+                            row.CPRICE = Convert.ToDecimal(reader["CPRICE"].ToString());
+                        dbMSTMB.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+            return dbMSTMB;
+        }
+        #region selectCPRICE 舊的寫法
+        //----------------------------------------------------------------------------------
+        // function selectCPRICE() - 查詢 MSTMB TABLE的CPRICE
+        //----------------------------------------------------------------------------------
+        public List<unoffset_qtype_detail> selectCPRICE(object o)
         {
             root SearchElement = o as root;
-
+            //未實現損益
+            List<unoffset_qtype_detail> lst = new List<unoffset_qtype_detail>();
             try
             {
                 sqlConn.Open();
@@ -118,7 +157,40 @@ namespace ESMP.STOCK.TASK.API
             }
             return lst;
         }
-
+        #endregion
+        //----------------------------------------------------------------------------------
+        // function selectStockCprice() - 查詢 MSTMB TABLE 股票現價
+        //----------------------------------------------------------------------------------
+        public string selectStockCprice(string stockNo)
+        {
+            string result = "";
+            try
+            {
+                sqlConn.Open();
+                string sqlQuery = @"SELECT CPRICE
+                                    FROM MSTMB
+                                    WHERE STOCK = @STOCK";
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.AddWithValue("@STOCK", stockNo);
+                SqlDataReader Reader = sqlCmd.ExecuteReader();
+                if (Reader.HasRows)
+                {
+                    if (Reader.Read())
+                    {
+                        result = Reader["CPRICE"].ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+            return result;
+        }
         //----------------------------------------------------------------------------------
         // function selectStockName() - 查詢 MSTMB TABLE 股票名稱值
         //----------------------------------------------------------------------------------
@@ -154,11 +226,12 @@ namespace ESMP.STOCK.TASK.API
         }
 
         //----------------------------------------------------------------------------------
-        // function selectHCNRH() - 查詢 HCNRH TABLE 個股明細資料(賣出)取得13個欄位值
+        // function selectHCNRH() - 查詢 HCNRH TABLE 個股明細資料(沖銷)
         //----------------------------------------------------------------------------------
         public List<HCNRH> selectHCNRH(object o)
         {
             root SearchElement = o as root;
+            List<HCNRH> dbHCNRH = new List<HCNRH>();
 
             try
             {
@@ -181,28 +254,38 @@ namespace ESMP.STOCK.TASK.API
                     }
                     while (reader.Read())
                     {
-                        //ADJDATE, WTYPE, BQTY, SQTY, STINTAX, IOFLAG, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
                         var row = new HCNRH();
-                        row.BHNO = reader.GetString(0);
-                        row.TDATE = reader.GetString(1);
-                        row.RDATE = reader.GetString(2);
-                        row.CSEQ = reader.GetString(3);
-                        row.BDSEQ = reader.GetString(4);
-                        row.BDNO = reader.GetString(5);
-                        row.SDSEQ = reader.GetString(6);
-                        row.SDNO = reader.GetString(7);
-                        row.STOCK = reader.GetString(8);
-                        row.CQTY = reader.GetDecimal(9);
-                        row.BPRICE = reader.GetDecimal(10);
-                        row.BFEE = reader.GetDecimal(11);
-                        row.SPRICE = reader.GetDecimal(12);
-                        row.SFEE = reader.GetDecimal(13);
-                        row.TAX = reader.GetDecimal(14);
-                        row.INCOME = reader.GetDecimal(15);
-                        row.COST = reader.GetDecimal(16);
-                        row.PROFIT = reader.GetDecimal(17);
+                        row.BHNO = reader["BHNO"].ToString();
+                        row.TDATE = reader["TDATE"].ToString();
+                        row.RDATE = reader["RDATE"].ToString();
+                        row.CSEQ = reader["CSEQ"].ToString();
+                        row.BDSEQ = reader["BDSEQ"].ToString();
+                        row.BDNO = reader["BDNO"].ToString();
+                        row.SDSEQ = reader["SDSEQ"].ToString();
+                        row.SDNO = reader["SDNO"].ToString();
+                        row.STOCK = reader["STOCK"].ToString();
+                        row.CQTY = Convert.ToDecimal(reader["CQTY"].ToString());
+                        row.BPRICE = Convert.ToDecimal(reader["BPRICE"].ToString());
+                        row.BFEE = Convert.ToDecimal(reader["BFEE"].ToString());
+                        row.SPRICE = Convert.ToDecimal(reader["SPRICE"].ToString());
+                        row.SFEE = Convert.ToDecimal(reader["SFEE"].ToString());
+                        row.TAX = Convert.ToDecimal(reader["TAX"].ToString());
+                        row.INCOME = Convert.ToDecimal(reader["INCOME"].ToString());
+                        row.COST = Convert.ToDecimal(reader["COST"].ToString());
+                        row.PROFIT = Convert.ToDecimal(reader["PROFIT"].ToString());
+                        row.ADJDATE = reader["ADJDATE"].ToString();
+                        row.WTYPE = reader["WTYPE"].ToString();
+                        row.BQTY = Convert.ToDecimal(reader["BQTY"].ToString());
+                        row.SQTY = Convert.ToDecimal(reader["SQTY"].ToString());
+                        row.STINTAX = Convert.ToDecimal(reader["STINTAX"].ToString());
+                        row.IOFLAG = reader["IOFLAG"].ToString();
+                        row.TRDATE = reader["TRDATE"].ToString();
+                        row.TRTIME = reader["TRTIME"].ToString();
+                        row.MODDATE = reader["MODDATE"].ToString();
+                        row.MODTIME = reader["MODTIME"].ToString();
+                        row.MODUSER = reader["MODUSER"].ToString();
 
-                        lst_detail.Add(row);
+                        dbHCNRH.Add(row);
                     }
                     reader.Close();
                 }
@@ -215,20 +298,21 @@ namespace ESMP.STOCK.TASK.API
             {
                 sqlConn.Close();
             }
-            return lst_detail;
+            return dbHCNRH;
         }
 
         //----------------------------------------------------------------------------------
-        // function selectHCNTD() - 查詢 HCNTD TABLE 個股明細資料(賣出)取得12個欄位值
+        // function selectHCNTD() - 查詢 HCNTD TABLE 個股明細資料(當沖)
         //----------------------------------------------------------------------------------
-        public List<profit_detail_out> selectHCNTD(object o)
+        public List<HCNTD> selectHCNTD(object o)
         {
             root SearchElement = o as root;
+            List<HCNTD> dbHCNTD = new List<HCNTD>();
 
             try
             {
                 sqlConn.Open();
-                string sqlQuery = @"SELECT STOCK, TDATE, SDSEQ, SDNO, SQTY, CQTY, SPRICE, COST, INCOME, SFEE, TAX, PROFIT
+                string sqlQuery = @"SELECT BHNO, TDATE, CSEQ, BDSEQ, BDNO, SDSEQ, SDNO, STOCK, CQTY, BPRICE, BFEE, SPRICE, SFEE, TAX, INCOME, COST, PROFIT, BQTY, SQTY, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
                                     FROM dbo.HCNTD
                                     WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
                                     ORDER BY BHNO, CSEQ, STOCK, TDATE";
@@ -246,23 +330,33 @@ namespace ESMP.STOCK.TASK.API
                     }
                     while (reader.Read())
                     {
-                        var row = new profit_detail_out();
-                        row.stock = reader.GetString(0);
-                        row.tdate = reader.GetString(1);
-                        row.dseq = reader.GetString(2);
-                        row.dno = reader.GetString(3);
-                        row.mqty = reader.GetDecimal(4);
-                        row.cqty = reader.GetDecimal(5);
-                        row.mprice = reader.GetDecimal(6).ToString();
-                        row.cost = reader.GetDecimal(7);
-                        row.income = reader.GetDecimal(8);
-                        row.netamt = reader.GetDecimal(8);
-                        row.fee = reader.GetDecimal(9);
-                        row.tax = reader.GetDecimal(10);
-                        row.profit = reader.GetDecimal(11);
-                        row.wtype = "0";
-                        row.ttypename2 = "賣沖";
-                        lst_detail.Add(row);
+                        var row = new HCNTD();
+                        row.BHNO = reader["BHNO"].ToString();
+                        row.TDATE = reader["TDATE"].ToString();
+                        row.CSEQ = reader["CSEQ"].ToString();
+                        row.BDSEQ = reader["BDSEQ"].ToString();
+                        row.BDNO = reader["BDNO"].ToString();
+                        row.SDSEQ = reader["SDSEQ"].ToString();
+                        row.SDNO = reader["SDNO"].ToString();
+                        row.STOCK = reader["STOCK"].ToString();
+                        row.CQTY = Convert.ToDecimal(reader["CQTY"].ToString());
+                        row.BPRICE = Convert.ToDecimal(reader["BPRICE"].ToString());
+                        row.BFEE = Convert.ToDecimal(reader["BFEE"].ToString());
+                        row.SPRICE = Convert.ToDecimal(reader["SPRICE"].ToString());
+                        row.SFEE = Convert.ToDecimal(reader["SFEE"].ToString());
+                        row.TAX = Convert.ToDecimal(reader["TAX"].ToString());
+                        row.INCOME = Convert.ToDecimal(reader["INCOME"].ToString());
+                        row.COST = Convert.ToDecimal(reader["COST"].ToString());
+                        row.PROFIT = Convert.ToDecimal(reader["PROFIT"].ToString());
+                        row.BQTY = Convert.ToDecimal(reader["BQTY"].ToString());
+                        row.SQTY = Convert.ToDecimal(reader["SQTY"].ToString());
+                        row.TRDATE = reader["TRDATE"].ToString();
+                        row.TRTIME = reader["TRTIME"].ToString();
+                        row.MODDATE = reader["MODDATE"].ToString();
+                        row.MODTIME = reader["MODTIME"].ToString();
+                        row.MODUSER = reader["MODUSER"].ToString();
+
+                        dbHCNTD.Add(row);
                     }
                     reader.Close();
                 }
@@ -275,134 +369,7 @@ namespace ESMP.STOCK.TASK.API
             {
                 sqlConn.Close();
             }
-            return lst_detail;
-        }
-
-        //----------------------------------------------------------------------------------
-        // function selectHCNRH_B() - 查詢 HCNRH TABLE 個股明細資料(買入)取得17個欄位值
-        //----------------------------------------------------------------------------------
-        public List<profit_detail> selectHCNRH_B(object o)
-        {
-            root SearchElement = o as root;
-
-            try
-            {
-                sqlConn.Open();
-                string sqlQuery = @"SELECT STOCK, RDATE, BDSEQ, BDNO, BQTY, CQTY, BPRICE, COST, INCOME, BFEE, ADJDATE, WTYPE, PROFIT, IOFLAG, SDSEQ, SDNO, TDATE
-                                    FROM dbo.HCNRH
-                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
-                                    ORDER BY BHNO, CSEQ, STOCK, TDATE";
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
-                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
-                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
-                sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
-                sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
-
-                using (SqlDataReader reader = sqlCmd.ExecuteReader())
-                {
-                    if (!reader.HasRows)
-                    {
-                        Console.WriteLine("沒有沖銷資料");
-                    }
-                    while (reader.Read())
-                    {
-                        var row = new profit_detail();
-                        row.stock = reader.GetString(0);
-                        row.tdate = reader.GetString(1);
-                        row.dseq = reader.GetString(2);
-                        row.dno = reader.GetString(3);
-                        row.mqty = reader.GetDecimal(4);
-                        row.cqty = reader.GetDecimal(5);
-                        row.mprice = reader.GetDecimal(6).ToString();
-                        row.cost = reader.GetDecimal(7);
-                        row.income = reader.GetDecimal(8);
-                        row.netamt = reader.GetDecimal(7) * -1;
-                        row.fee = reader.GetDecimal(9);
-                        row.adjdate = reader.GetString(10);
-                        row.wtype = reader.GetString(11);
-                        row.profit = reader.GetDecimal(12);
-                        if (reader.IsDBNull(13))
-                            row.ioflag = " ";
-                        row.sdseq = reader.GetString(14);
-                        row.sdno = reader.GetString(15);
-                        row.sdate = reader.GetString(16);
-                        lst_detailB.Add(row);
-                    }
-                    reader.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                sqlConn.Close();
-            }
-            return lst_detailB;
-        }
-
-        //----------------------------------------------------------------------------------
-        // function selectHCNTD_B() - 查詢 HCNTD TABLE 個股明細資料(買入)取得13個欄位值
-        //----------------------------------------------------------------------------------
-        public List<profit_detail> selectHCNTD_B(object o)
-        {
-            root SearchElement = o as root;
-
-            try
-            {
-                sqlConn.Open();
-                string sqlQuery = @"SELECT STOCK, TDATE, BDSEQ, BDNO, BQTY, CQTY, BPRICE, COST, INCOME, BFEE, PROFIT, SDSEQ, SDNO
-                                    FROM dbo.HCNTD
-                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
-                                    ORDER BY BHNO, CSEQ, STOCK, TDATE";
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
-                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
-                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
-                sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
-                sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
-
-                using (SqlDataReader reader = sqlCmd.ExecuteReader())
-                {
-                    if (!reader.HasRows)
-                    {
-                        Console.WriteLine("沒有當沖資料");
-                    }
-                    while (reader.Read())
-                    {
-                        var row = new profit_detail();
-                        row.stock = reader.GetString(0);
-                        row.tdate = reader.GetString(1);
-                        row.dseq = reader.GetString(2);
-                        row.dno = reader.GetString(3);
-                        row.mqty = reader.GetDecimal(4);
-                        row.cqty = reader.GetDecimal(5);
-                        row.mprice = reader.GetDecimal(6).ToString();
-                        row.cost = reader.GetDecimal(7);
-                        row.income = reader.GetDecimal(8);
-                        row.netamt = reader.GetDecimal(8) * -1;
-                        row.fee = reader.GetDecimal(9);
-                        row.adjdate = "";
-                        row.wtype = "0";
-                        row.profit = reader.GetDecimal(10);
-                        row.ioflag = "0";
-                        row.sdseq = reader.GetString(11);
-                        row.sdno = reader.GetString(12);
-                        row.sdate = reader.GetString(1);
-                        lst_detailB.Add(row);
-                    }
-                    reader.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                sqlConn.Close();
-            }
-            return lst_detailB;
+            return dbHCNTD;
         }
 
         //----------------------------------------------------------------------------------
