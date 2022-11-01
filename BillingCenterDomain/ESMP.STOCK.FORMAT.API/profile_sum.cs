@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace ESMP.STOCK.FORMAT.API
 {
@@ -16,6 +17,7 @@ namespace ESMP.STOCK.FORMAT.API
         public decimal mqty { get; set; }
         public decimal mamt { get; set; }
         public billSum billSum { get; set; }
+        [XmlElement("profile")]
         public List<profile> profile { get; set; }
     }
 }

@@ -55,6 +55,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="BillTests.cs" />
     <Compile Include="GainLostTests.cs" />
     <Compile Include="GainPayTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -63,6 +64,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ESMP.STOCK.DB.TABLE.API\ESMP.STOCK.DB.TABLE.API.csproj">
+      <Project>{94576875-1771-4357-A4D7-FBA46B943BA6}</Project>
+      <Name>ESMP.STOCK.DB.TABLE.API</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ESMP.STOCK.FORMAT.API\ESMP.STOCK.FORMAT.API.csproj">
       <Project>{452C1390-C7D8-40D0-B5C1-09039154467E}</Project>
       <Name>ESMP.STOCK.FORMAT.API</Name>

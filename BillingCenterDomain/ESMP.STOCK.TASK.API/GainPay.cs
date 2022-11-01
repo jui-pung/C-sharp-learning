@@ -322,7 +322,7 @@ namespace ESMP.STOCK.TASK.API
             {
                 using (var stringwriter = new System.IO.StringWriter())
                 {
-                    var serializer = new XmlSerializer(typeof(unoffset_qtype_accsum));
+                    var serializer = new XmlSerializer(typeof(profit_accsum));
                     serializer.Serialize(stringwriter, accsumSer);
                     return stringwriter.ToString();
                 }

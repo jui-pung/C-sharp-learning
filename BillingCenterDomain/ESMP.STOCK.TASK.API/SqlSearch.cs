@@ -11,10 +11,8 @@ namespace ESMP.STOCK.TASK.API
 {
     public class SqlSearch
     {
-        static string sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        SqlConnection sqlConn = new SqlConnection(sqlSet);
-        //對帳單查詢
-        List<profile> lst_profile = new List<profile>();
+        static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
+        SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
         // function selectTCNUD() - 查詢 TCNUD TABLE
@@ -25,12 +23,12 @@ namespace ESMP.STOCK.TASK.API
             List<TCNUD> dbTCNUD = new List<TCNUD>();
             try
             {
-                sqlConn.Open();
+                _sqlConn.Open();
                 string sqlQuery = @"SELECT STOCK, TDATE, DSEQ, DNO, BQTY, PRICE, FEE, COST
                                     FROM dbo.TCNUD 
                                     WHERE BHNO = @BHNO AND CSEQ = @CSEQ
                                     ORDER BY BHNO, CSEQ, STOCK, TDATE";
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
                 sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
                 sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
 
@@ -62,7 +60,7 @@ namespace ESMP.STOCK.TASK.API
             }
             finally
             {
-                sqlConn.Close();
+                _sqlConn.Close();
             }
             return dbTCNUD;
         }
@@ -76,10 +74,10 @@ namespace ESMP.STOCK.TASK.API
             List<MSTMB> dbMSTMB = new List<MSTMB>();
             try
             {
-                sqlConn.Open();
+                _sqlConn.Open();
                 string sqlQuery = @"SELECT STOCK, CPRICE
                                     FROM MSTMB";
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
                 using (SqlDataReader reader = sqlCmd.ExecuteReader())
                 {
                     if (!reader.HasRows)
@@ -105,7 +103,7 @@ namespace ESMP.STOCK.TASK.API
             }
             finally
             {
-                sqlConn.Close();
+                _sqlConn.Close();
             }
             return dbMSTMB;
         }
@@ -120,12 +118,12 @@ namespace ESMP.STOCK.TASK.API
             List<unoffset_qtype_detail> lst = new List<unoffset_qtype_detail>();
             try
             {
-                sqlConn.Open();
+                _sqlConn.Open();
                 string sqlQuery = @"SELECT CPRICE
                                     FROM MSTMB M, TCNUD T 
                                     WHERE M.STOCK = T.STOCK AND BHNO = @BHNO AND CSEQ = @CSEQ
                                     ORDER BY T.BHNO, T.CSEQ, T.STOCK, T.TDATE";
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
                 sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
                 sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
 
@@ -153,7 +151,7 @@ namespace ESMP.STOCK.TASK.API
             }
             finally
             {
-                sqlConn.Close();
+                _sqlConn.Close();
             }
             return lst;
         }
@@ -166,11 +164,11 @@ namespace ESMP.STOCK.TASK.API
             string result = "";
             try
             {
-                sqlConn.Open();
+                _sqlConn.Open();
                 string sqlQuery = @"SELECT CPRICE
                                     FROM MSTMB
                                     WHERE STOCK = @STOCK";
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
                 sqlCmd.Parameters.AddWithValue("@STOCK", stockNo);
                 SqlDataReader Reader = sqlCmd.ExecuteReader();
                 if (Reader.HasRows)
@@ -187,7 +185,7 @@ namespace ESMP.STOCK.TASK.API
             }
             finally
             {
-                sqlConn.Close();
+                _sqlConn.Close();
             }
             return result;
         }
@@ -199,11 +197,11 @@ namespace ESMP.STOCK.TASK.API
             string result = "";
             try
             {
-                sqlConn.Open();
+                _sqlConn.Open();
                 string sqlQuery = @"SELECT CNAME
                                     FROM MSTMB
                                     WHERE STOCK = @STOCK";
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
                 sqlCmd.Parameters.AddWithValue("@STOCK", stockNo);
                 SqlDataReader Reader = sqlCmd.ExecuteReader();
                 if (Reader.HasRows)
@@ -220,7 +218,7 @@ namespace ESMP.STOCK.TASK.API
             }
             finally
             {
-                sqlConn.Close();
+                _sqlConn.Close();
             }
             return result;
         }
@@ -235,12 +233,12 @@ namespace ESMP.STOCK.TASK.API
 
             try
             {
-                sqlConn.Open();
+                _sqlConn.Open();
                 string sqlQuery = @"SELECT BHNO, TDATE, RDATE, CSEQ, BDSEQ, BDNO, SDSEQ, SDNO, STOCK, CQTY, BPRICE, BFEE, SPRICE, SFEE, TAX, INCOME, COST, PROFIT, ADJDATE, WTYPE, BQTY, SQTY, STINTAX, IOFLAG, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
                                     FROM dbo.HCNRH
                                     WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
                                     ORDER BY BHNO, CSEQ, STOCK, TDATE";
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
                 sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
                 sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
                 sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
@@ -296,7 +294,7 @@ namespace ESMP.STOCK.TASK.API
             }
             finally
             {
-                sqlConn.Close();
+                _sqlConn.Close();
             }
             return dbHCNRH;
         }
@@ -311,12 +309,12 @@ namespace ESMP.STOCK.TASK.API
 
             try
             {
-                sqlConn.Open();
+                _sqlConn.Open();
                 string sqlQuery = @"SELECT BHNO, TDATE, CSEQ, BDSEQ, BDNO, SDSEQ, SDNO, STOCK, CQTY, BPRICE, BFEE, SPRICE, SFEE, TAX, INCOME, COST, PROFIT, BQTY, SQTY, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
                                     FROM dbo.HCNTD
                                     WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
                                     ORDER BY BHNO, CSEQ, STOCK, TDATE";
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
                 sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
                 sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
                 sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
@@ -367,64 +365,99 @@ namespace ESMP.STOCK.TASK.API
             }
             finally
             {
-                sqlConn.Close();
+                _sqlConn.Close();
             }
             return dbHCNTD;
         }
 
         //----------------------------------------------------------------------------------
-        // function selectHCMIO() - 查詢 HCMIO TABLE 對帳單明細資料 取得13個欄位值
+        // function selectHCMIO() - 查詢 HCMIO TABLE 對帳單明細資料
         //----------------------------------------------------------------------------------
-        public List<profile> selectHCMIO(object o)
+        public List<HCMIO> selectHCMIO(object o)
         {
             root SearchElement = o as root;
-
+            List<HCMIO> dbHCMIO = new List<HCMIO>();
             try
             {
-                sqlConn.Open();
-                string sqlQuery = @"SELECT STOCK, TDATE, DSEQ, DNO, TTYPE, BSTYPE, ETYPE, PRICE, QTY, AMT, FEE, TAX, NETAMT
+                _sqlConn.Open();
+                if(SearchElement.stockSymbol.Length > 1)
+                {
+                    string sqlQuery = @"SELECT STOCK, TDATE, DSEQ, DNO, TTYPE, BSTYPE, ETYPE, PRICE, QTY, AMT, FEE, TAX, NETAMT
+                                    FROM dbo.HCMIO
+                                    WHERE STOCK = @STOCK AND BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE";
+                    SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                    sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                    sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                    sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
+                    sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
+
+                    using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                    {
+                        if (!reader.HasRows)
+                        {
+                            Console.WriteLine("沒有歷史對帳單明細資料");
+                        }
+                        while (reader.Read())
+                        {
+                            var row = new HCMIO();
+                            row.STOCK = reader["STOCK"].ToString();
+                            row.TDATE = reader["TDATE"].ToString();
+                            row.DSEQ = reader["DSEQ"].ToString();
+                            row.DNO = reader["DNO"].ToString();
+                            row.TTYPE = reader["TTYPE"].ToString();
+                            row.BSTYPE = reader["BSTYPE"].ToString();
+                            row.ETYPE = reader["ETYPE"].ToString();
+                            row.PRICE = Convert.ToDecimal(reader["PRICE"].ToString());
+                            row.QTY = Convert.ToDecimal(reader["QTY"].ToString());
+                            row.AMT = Convert.ToDecimal(reader["AMT"].ToString());
+                            row.FEE = Convert.ToDecimal(reader["FEE"].ToString());
+                            row.TAX = Convert.ToDecimal(reader["TAX"].ToString());
+                            row.NETAMT = Convert.ToDecimal(reader["NETAMT"].ToString());
+                            dbHCMIO.Add(row);
+                        }
+                        reader.Close();
+                    }
+                }
+                else
+                {
+                    string sqlQuery = @"SELECT STOCK, TDATE, DSEQ, DNO, TTYPE, BSTYPE, ETYPE, PRICE, QTY, AMT, FEE, TAX, NETAMT
                                     FROM dbo.HCMIO
                                     WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE";
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
-                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
-                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
-                sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
-                sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
+                    SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                    sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                    sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                    sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
+                    sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
 
-                using (SqlDataReader reader = sqlCmd.ExecuteReader())
-                {
-                    if (!reader.HasRows)
+                    using (SqlDataReader reader = sqlCmd.ExecuteReader())
                     {
-                        Console.WriteLine("沒有歷史對帳單明細資料");
+                        if (!reader.HasRows)
+                        {
+                            Console.WriteLine("沒有歷史對帳單明細資料");
+                        }
+                        while (reader.Read())
+                        {
+                            var row = new HCMIO();
+                            row.STOCK = reader["STOCK"].ToString();
+                            row.TDATE = reader["TDATE"].ToString();
+                            row.DSEQ = reader["DSEQ"].ToString();
+                            row.DNO = reader["DNO"].ToString();
+                            row.TTYPE = reader["TTYPE"].ToString();
+                            row.BSTYPE = reader["BSTYPE"].ToString();
+                            row.ETYPE = reader["ETYPE"].ToString();
+                            row.PRICE = Convert.ToDecimal(reader["PRICE"].ToString());
+                            row.QTY = Convert.ToDecimal(reader["QTY"].ToString());
+                            row.AMT = Convert.ToDecimal(reader["AMT"].ToString());
+                            row.FEE = Convert.ToDecimal(reader["FEE"].ToString());
+                            row.TAX = Convert.ToDecimal(reader["TAX"].ToString());
+                            row.NETAMT = Convert.ToDecimal(reader["NETAMT"].ToString());
+                            dbHCMIO.Add(row);
+                        }
+                        reader.Close();
                     }
-                    while (reader.Read())
-                    {
-                        var row = new profile();
-                        row.stock = reader.GetString(0);
-                        row.mdate = reader.GetString(1);
-                        row.dseq = reader.GetString(2);
-                        row.dno = reader.GetString(3);
-                        row.ttype = reader.GetString(4);
-                        if (reader.GetString(4) == "0" && reader.GetString(5) == "B")
-                            row.ttypename = "現買";
-                        else if (reader.GetString(4) == "0" && reader.GetString(5) == "S")
-                            row.ttypename = "現賣";
-                        row.bstype = reader.GetString(5);
-                        if (reader.GetString(5) == "B")
-                            row.bstypename = "買";
-                        else if (reader.GetString(5) == "S")
-                            row.bstypename = "賣";
-                        row.etype = reader.GetString(6);
-                        row.mprice = reader.GetDecimal(7);
-                        row.mqty = reader.GetDecimal(8);
-                        row.mamt = reader.GetDecimal(9);
-                        row.fee = reader.GetDecimal(10);
-                        row.tax = reader.GetDecimal(11);
-                        row.netamt = reader.GetDecimal(12);
-                        lst_profile.Add(row);
-                    }
-                    reader.Close();
                 }
+
             }
             catch (Exception ex)
             {
@@ -432,84 +465,91 @@ namespace ESMP.STOCK.TASK.API
             }
             finally
             {
-                sqlConn.Close();
+                _sqlConn.Close();
             }
-            return lst_profile;
+            return dbHCMIO;
         }
 
         //----------------------------------------------------------------------------------
-        // function selectTMHIO() - 查詢 TMHIO TABLE 對帳單明細資料 取得9個欄位值
+        // function selectTMHIO() - 查詢 TMHIO TABLE 對帳單明細資料
         //----------------------------------------------------------------------------------
-        public List<profile> selectTMHIO(object o)
+        public List<TMHIO> selectTMHIO(object o)
         {
             root SearchElement = o as root;
-
+            List<TMHIO> dbTMHIO = new List<TMHIO>();
             try
             {
-                sqlConn.Open();
-                string sqlQuery = @"SELECT STOCK, TDATE, DSEQ, JRNUM, TTYPE, BSTYPE, ETYPE, PRICE, QTY
+                _sqlConn.Open();
+                if (SearchElement.stockSymbol.Length > 1)
+                {
+                    string sqlQuery = @"SELECT STOCK, TDATE, DSEQ, JRNUM, TTYPE, BSTYPE, ETYPE, PRICE, QTY
+                                    FROM dbo.TMHIO
+                                    WHERE STOCK = @STOCK AND BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE";
+                    SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                    sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                    sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                    sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
+                    sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
+
+                    using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                    {
+                        if (!reader.HasRows)
+                        {
+                            Console.WriteLine("沒有當日此股票對帳單明細資料");
+                        }
+                        while (reader.Read())
+                        {
+                            var row = new TMHIO();
+                            row.STOCK = reader["STOCK"].ToString();
+                            row.TDATE = reader["TDATE"].ToString();
+                            row.DSEQ = reader["DSEQ"].ToString();
+                            row.JRNUM = reader["JRNUM"].ToString();
+                            row.TTYPE = reader["TTYPE"].ToString();
+                            row.BSTYPE = reader["BSTYPE"].ToString();
+                            row.ETYPE = reader["ETYPE"].ToString();
+                            row.PRICE = Convert.ToDecimal(reader["PRICE"].ToString());
+                            row.QTY = Convert.ToDecimal(reader["QTY"].ToString());
+                            dbTMHIO.Add(row);
+                        }
+                        reader.Close();
+                    }
+                }
+                else
+                {
+                    string sqlQuery = @"SELECT STOCK, TDATE, DSEQ, JRNUM, TTYPE, BSTYPE, ETYPE, PRICE, QTY
                                     FROM dbo.TMHIO
                                     WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE";
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
-                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
-                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
-                sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
-                sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
+                    SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                    sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                    sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                    sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
+                    sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
 
-                using (SqlDataReader reader = sqlCmd.ExecuteReader())
-                {
-                    if (!reader.HasRows)
+                    using (SqlDataReader reader = sqlCmd.ExecuteReader())
                     {
-                        Console.WriteLine("沒有當日交易明細資料");
+                        if (!reader.HasRows)
+                        {
+                            Console.WriteLine("沒有當日對帳單明細資料");
+                        }
+                        while (reader.Read())
+                        {
+                            var row = new TMHIO();
+                            row.STOCK = reader["STOCK"].ToString();
+                            row.TDATE = reader["TDATE"].ToString();
+                            row.DSEQ = reader["DSEQ"].ToString();
+                            row.JRNUM = reader["JRNUM"].ToString();
+                            row.TTYPE = reader["TTYPE"].ToString();
+                            row.BSTYPE = reader["BSTYPE"].ToString();
+                            row.ETYPE = reader["ETYPE"].ToString();
+                            row.PRICE = Convert.ToDecimal(reader["PRICE"].ToString());
+                            row.QTY = Convert.ToDecimal(reader["QTY"].ToString());
+                            dbTMHIO.Add(row);
+                        }
+                        reader.Close();
                     }
-                    while (reader.Read())
-                    {
-                        var row = new profile();
-                        row.stock = reader.GetString(0);
-                        row.mdate = reader.GetString(1);
-                        row.dseq = reader.GetString(2);
-                        row.dno = reader.GetString(3);
-                        row.ttype = reader.GetString(4);
-
-                        if (reader.GetString(4) == "0" && reader.GetString(5) == "B" && reader.GetString(6) == "0")
-                            row.ttypename = "現買";
-                        else if (reader.GetString(4) == "0" && reader.GetString(5) == "B" && reader.GetString(6) == "2")
-                            row.ttypename = "盤後零買";
-                        else if (reader.GetString(4) == "0" && reader.GetString(5) == "B" && reader.GetString(6) == "5")
-                            row.ttypename = "盤中零買";
-                        else if (reader.GetString(4) == "0" && reader.GetString(5) == "S" && reader.GetString(6) == "0")
-                            row.ttypename = "現賣";
-                        else if (reader.GetString(4) == "0" && reader.GetString(5) == "S" && reader.GetString(6) == "2")
-                            row.ttypename = "盤後零賣";
-                        else if (reader.GetString(4) == "0" && reader.GetString(5) == "S" && reader.GetString(6) == "5")
-                            row.ttypename = "盤中零賣";
-
-                        row.bstype = reader.GetString(5);
-
-                        if (reader.GetString(5) == "B")
-                            row.bstypename = "買";
-                        else if (reader.GetString(5) == "S")
-                            row.bstypename = "賣";
-
-                        if (reader.GetString(6) == "2")
-                            row.etype = "1";
-                        else
-                            row.etype = "0";
-
-                        row.mprice = reader.GetDecimal(7);
-                        row.mqty = reader.GetDecimal(8);
-                        row.mamt = decimal.Truncate(reader.GetDecimal(7) * reader.GetDecimal(8));
-
-                        if (decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(reader.GetDecimal(7) * reader.GetDecimal(8)) * 0.001425)) < 20)
-                            row.fee = 20;
-                        else
-                            row.fee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(reader.GetDecimal(7) * reader.GetDecimal(8)) * 0.001425));
-                        if(reader.GetString(5) == "S")
-                            row.tax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(reader.GetDecimal(7) * reader.GetDecimal(8)) * 0.003));
-                        lst_profile.Add(row);
-                    }
-                    reader.Close();
                 }
+
             }
             catch (Exception ex)
             {
@@ -517,9 +557,9 @@ namespace ESMP.STOCK.TASK.API
             }
             finally
             {
-                sqlConn.Close();
+                _sqlConn.Close();
             }
-            return lst_profile;
-        }
+            return dbTMHIO;
+        }  
     }
 }

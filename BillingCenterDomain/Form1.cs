@@ -15,22 +15,10 @@ namespace BillingCenterDomain
 {
     public partial class Form1 : Form
     {
-        int type;                                           //查詢與回覆格式設定
-        string searchStr;                                   //查詢xml或json格式字串
-        SqlSearch sqlSearch;                                //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)
-        GainLost gainLost;                                  //自訂GainLost類別  (ESMP.STOCK.TASK.API)
-        GainPay gainPay;                                    //自訂GainPay類別   (ESMP.STOCK.TASK.API)
-        Bill bill;                                          //自訂Bill類別   (ESMP.STOCK.TASK.API)
-
-        //未實現損益
+        int _type;                                           //查詢與回覆格式設定
+        string _searchStr;                                   //查詢xml或json格式字串
+        SqlSearch _sqlSearch;                                //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)
         
-        
-
-        //對帳單
-        List<profile> profileList;                          //自訂profile類別List               (階層二:對帳單明細資料)  
-        billSum billsum;                                    //自訂billSum類別class              (階層二:對帳單匯總資料)  
-        profile_sum profileSum;                             //自訂profile_sum類別Class          (階層一:對帳單彙總資料)  
-
         public Form1()
         {
             InitializeComponent();
@@ -40,7 +28,7 @@ namespace BillingCenterDomain
         {
             txtSearchContent.Clear();
             txtSearchResultContent.Clear();
-            sqlSearch = new SqlSearch();
+            _sqlSearch = new SqlSearch();
 
             //未實現損益查詢
             if (comboBoxQTYPE.Text == "0001" && txtBHNO.Text.Length == 4 && txtCSEQ.Text.Length == 7)
@@ -53,26 +41,23 @@ namespace BillingCenterDomain
                 List<unoffset_qtype_accsum> accsumList = new List<unoffset_qtype_accsum>();     //自訂unoffset_qtype_accsum類別List (階層一:帳戶未實現損益)
 
                 //取得查詢xml或json格式字串
-                searchStr = gainLost.searchSerilizer(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, type);
-                txtSearchContent.Text = searchStr;
+                _searchStr = gainLost.searchSerilizer(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, _type);
+                txtSearchContent.Text = _searchStr;
                 //取得查詢字串Element
-                var obj = gainLost.GetElement(searchStr, type);
+                var obj = gainLost.GetElement(_searchStr, _type);
                 root SearchElement = obj as root;
                 //查詢開始...
-                TCNUDList = sqlSearch.selectTCNUD(SearchElement);
+                TCNUDList = _sqlSearch.selectTCNUD(SearchElement);
                 if (TCNUDList.Count > 0)
                 {
                     sumList = gainLost.searchSum(TCNUDList);
-                    //accsumList = gainLost.searchAccSum(sumList);
-                    //watch.Stop();
-                    //var elapsedMs = watch.ElapsedMilliseconds;
-                    //Console.WriteLine(elapsedMs);
+                    accsumList = gainLost.searchAccSum(sumList);
                     //呈現查詢結果
-                    txtSearchResultContent.Text = gainLost.resultListSerilizer(detailList, type);
+                    txtSearchResultContent.Text = gainLost.resultListSerilizer(accsumList, _type);
                 }
                 else
                 {
-                    txtSearchResultContent.Text = gainLost.resultErrListSerilizer(type);
+                    txtSearchResultContent.Text = gainLost.resultErrListSerilizer(_type);
                 }
             }
             //已實現損益查詢
@@ -88,14 +73,14 @@ namespace BillingCenterDomain
                 List<profit_accsum> accsumProfitList = new List<profit_accsum>();               //自訂profit_accsum類別List         (階層一:帳戶已實現損益)  
 
                 //取得查詢xml或json格式字串
-                searchStr = gainPay.searchSerilizer(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, txtSDATE.Text, txtEDATE.Text, type);
-                txtSearchContent.Text = searchStr;
+                _searchStr = gainPay.searchSerilizer(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, txtSDATE.Text, txtEDATE.Text, _type);
+                txtSearchContent.Text = _searchStr;
                 //取得查詢字串Element
-                var obj = gainPay.GetElement(searchStr, type);
+                var obj = gainPay.GetElement(_searchStr, _type);
                 root SearchElement = obj as root;
                 //查詢開始...
-                HCNRHList = sqlSearch.selectHCNRH(SearchElement);
-                HCNTDList = sqlSearch.selectHCNTD(SearchElement);
+                HCNRHList = _sqlSearch.selectHCNRH(SearchElement);
+                HCNTDList = _sqlSearch.selectHCNTD(SearchElement);
                 if (HCNRHList.Count > 0 || HCNTDList.Count > 0)
                 {
                     sumProfitList_HCNRH = gainPay.searchSum_HCNRH(HCNRHList, txtBHNO.Text, txtCSEQ.Text);
@@ -104,40 +89,44 @@ namespace BillingCenterDomain
                     sumProfitList = sumProfitList_HCNRH.Concat(sumProfitList_HCNTD).ToList();
                     accsumProfitList = gainPay.searchAccSum(sumProfitList);
                     //呈現查詢結果
-                    txtSearchResultContent.Text = gainPay.resultListSerilizer(accsumProfitList, type);
+                    txtSearchResultContent.Text = gainPay.resultListSerilizer(accsumProfitList, _type);
                 }
                 else
                 {
-                    txtSearchResultContent.Text = gainPay.resultErrListSerilizer(type);
+                    txtSearchResultContent.Text = gainPay.resultErrListSerilizer(_type);
                 }
             }
             //對帳單查詢
             else if (comboBoxQTYPE.Text == "0003" && txtBHNO.Text.Length == 4 && txtCSEQ.Text.Length == 7 && txtEDATE.Text.Length == 8 && txtSDATE.Text.Length == 8)
             {
-                bill = new Bill();
+                //宣告物件
+                Bill bill = new Bill();                                     //自訂Bill類別                  (ESMP.STOCK.TASK.API)
+                List<HCMIO> HCMIOList = new List<HCMIO>();                  //自訂HCMIO類別List             (ESMP.STOCK.DB.TABLE.API)
+                List<TMHIO> TMHIOList = new List<TMHIO>();                  //自訂TMHIO類別List             (ESMP.STOCK.DB.TABLE.API)
+                List<profile> profileList = new List<profile>();            //自訂profile類別List           (階層二:對帳單明細資料)  
+                billSum billsum = new billSum();                            //自訂billSum類別class          (階層二:對帳單匯總資料)  
+                profile_sum profileSum = new profile_sum();                 //自訂profile_sum類別Class      (階層一:對帳單彙總資料)  
+
                 //取得查詢xml或json格式字串
-                searchStr = bill.searchSerilizer(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, txtSDATE.Text, txtEDATE.Text, txtStockSymbol.Text, type);
-                txtSearchContent.Text = searchStr;
+                _searchStr = bill.searchSerilizer(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, txtSDATE.Text, txtEDATE.Text, txtStockSymbol.Text, _type);
+                txtSearchContent.Text = _searchStr;
                 //取得查詢字串Element
-                var obj = bill.GetElement(searchStr, type);
+                var obj = bill.GetElement(_searchStr, _type);
                 root SearchElement = obj as root;
                 //查詢開始...
-                profileList = new List<profile>();
-                billsum = new billSum();
-                profileSum = new profile_sum();
-                profileList = sqlSearch.selectHCMIO(SearchElement);
-                profileList = sqlSearch.selectTMHIO(SearchElement);
-                if (profileList.Count > 0)
+                HCMIOList = _sqlSearch.selectHCMIO(SearchElement);
+                TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
+                if (HCMIOList.Count > 0 || TMHIOList.Count > 0)
                 {
-                    profileList = bill.searchDetails(profileList, txtBHNO.Text, txtCSEQ.Text);
+                    profileList = bill.searchDetails(HCMIOList, TMHIOList, txtBHNO.Text, txtCSEQ.Text);
                     billsum = bill.searchSum(profileList);
-                    profileSum = bill.searchProfileSum(profileList);
+                    profileSum = bill.searchProfileSum(profileList, billsum);
                     //呈現查詢結果
-                    txtSearchResultContent.Text = bill.resultListSerilizer(type);
+                    txtSearchResultContent.Text = bill.resultListSerilizer(profileSum, _type);
                 }
                 else
                 {
-                    txtSearchResultContent.Text = bill.resultErrListSerilizer(type);
+                    txtSearchResultContent.Text = bill.resultErrListSerilizer(_type);
                 }
             }
             else
@@ -148,13 +137,13 @@ namespace BillingCenterDomain
         private void radioBtnXml_CheckedChanged(object sender, EventArgs e)
         {
             if (radioBtnXml.Checked)
-                type = 0;
+                _type = 0;
         }
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {
             if (radioBtnJson.Checked)
-                type = 1;
+                _type = 1;
         }
 
         private void comboBoxQTYPE_SelectedIndexChanged(object sender, EventArgs e)
@@ -165,7 +154,7 @@ namespace BillingCenterDomain
                 txtCSEQ.Text = "0098047";
                 txtSDATE.Text = "20221001";
                 txtEDATE.Text = "20221031";
-                txtStockSymbol.Text = "2330";
+                txtStockSymbol.Text = "3041";
             }
         }
     }
