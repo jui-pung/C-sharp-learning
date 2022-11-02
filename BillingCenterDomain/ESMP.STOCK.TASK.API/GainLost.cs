@@ -22,13 +22,14 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function SearchSerilizer() - 將輸入的查詢資訊序列化為xml格式字串
         //--------------------------------------------------------------------------------------------
-        public string searchSerilizer(string QTYPE, string BHNO, string CSEQ, int type)
+        public string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string stockSymbol, int type)
         {
             var root = new root()
             {
                 qtype = QTYPE,
                 bhno = BHNO,
-                cseq = CSEQ
+                cseq = CSEQ,
+                stockSymbol = stockSymbol
             };
             if (type == 0)
             {
@@ -180,6 +181,36 @@ namespace ESMP.STOCK.TASK.API
             return accsumList;
         }
 
+        //--------------------------------------------------------------------------------------------
+        //function getTMHIO() - 將QTYPE"0001"查詢結果 序列化為xml或json格式字串
+        //--------------------------------------------------------------------------------------------
+        public List<TCNUD> getTMHIO(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList)
+        {
+            foreach (var item in TMHIOList)
+            {
+                var row = new TCNUD();
+                row.TDATE = item.TDATE;
+                row.STOCK = item.STOCK;
+                row.PRICE = item.PRICE;
+                row.QTY = item.QTY;
+                row.BQTY = item.QTY;
+                row.FEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(item.PRICE) * decimal.ToDouble(item.QTY) * 0.001425));
+                if(item.ETYPE == "2" && row.FEE < 1)
+                {
+                    row.FEE = 1;
+                }
+                else if(item.ETYPE == "0" && row.FEE < 20)
+                {
+                    row.FEE = 20;
+                }
+                row.COST = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(item.PRICE) * decimal.ToDouble(item.QTY))) + row.FEE;
+                row.DSEQ = item.DSEQ;
+                row.DNO = item.JRNUM;
+                row.WTYPE = "0";
+                TCNUDList.Add(row);
+            }
+            return TCNUDList;
+        }
         //--------------------------------------------------------------------------------------------
         //function resultListSerilizer() - 將QTYPE"0001"查詢結果 序列化為xml或json格式字串
         //--------------------------------------------------------------------------------------------

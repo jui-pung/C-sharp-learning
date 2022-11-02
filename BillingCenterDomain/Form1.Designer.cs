@@ -64,7 +64,6 @@
             this.comboBoxQTYPE.Name = "comboBoxQTYPE";
             this.comboBoxQTYPE.Size = new System.Drawing.Size(121, 32);
             this.comboBoxQTYPE.TabIndex = 32;
-            this.comboBoxQTYPE.Text = "0001";
             this.comboBoxQTYPE.SelectedIndexChanged += new System.EventHandler(this.comboBoxQTYPE_SelectedIndexChanged);
             // 
             // label5
@@ -94,7 +93,6 @@
             this.txtEDATE.Name = "txtEDATE";
             this.txtEDATE.Size = new System.Drawing.Size(125, 36);
             this.txtEDATE.TabIndex = 29;
-            this.txtEDATE.Text = "20210121";
             // 
             // txtSDATE
             // 
@@ -103,7 +101,6 @@
             this.txtSDATE.Name = "txtSDATE";
             this.txtSDATE.Size = new System.Drawing.Size(125, 36);
             this.txtSDATE.TabIndex = 28;
-            this.txtSDATE.Text = "20210101";
             // 
             // label4
             // 
@@ -122,7 +119,6 @@
             this.txtStockSymbol.Name = "txtStockSymbol";
             this.txtStockSymbol.Size = new System.Drawing.Size(125, 36);
             this.txtStockSymbol.TabIndex = 26;
-            this.txtStockSymbol.Text = " ";
             // 
             // label3
             // 
@@ -161,7 +157,6 @@
             this.txtCSEQ.Name = "txtCSEQ";
             this.txtCSEQ.Size = new System.Drawing.Size(125, 36);
             this.txtCSEQ.TabIndex = 22;
-            this.txtCSEQ.Text = "0123938";
             // 
             // txtBHNO
             // 
@@ -170,7 +165,6 @@
             this.txtBHNO.Name = "txtBHNO";
             this.txtBHNO.Size = new System.Drawing.Size(125, 36);
             this.txtBHNO.TabIndex = 21;
-            this.txtBHNO.Text = "592S";
             // 
             // radioBtnJson
             // 

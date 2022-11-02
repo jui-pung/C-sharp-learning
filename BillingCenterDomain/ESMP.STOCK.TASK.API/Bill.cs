@@ -28,7 +28,7 @@ namespace ESMP.STOCK.TASK.API
                 cseq = CSEQ,
                 sdate = SDATE,
                 edate = EDATE,
-                stockSymbol = stockSymbol,
+                stockSymbol = stockSymbol
             };
             if (type == 0)
             {
@@ -146,7 +146,18 @@ namespace ESMP.STOCK.TASK.API
                 row.mprice = item.PRICE;
                 row.mqty = item.QTY;
                 row.mamt = item.PRICE * item.QTY;
+                
                 row.fee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.mprice) * decimal.ToDouble(row.mqty) * 0.001425));
+                //零股最小手續費
+                if (row.etype == "1" && row.fee < 1)
+                {
+                    row.fee = 1;
+                }
+                //整股最小手續費
+                else if (row.etype == "0" && row.fee < 20)
+                {
+                    row.fee = 20;
+                }
                 if (item.BSTYPE == "S")
                 {
                     row.tax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.mprice) * decimal.ToDouble(row.mqty) * 0.003));

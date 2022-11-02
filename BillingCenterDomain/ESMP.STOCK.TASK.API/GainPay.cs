@@ -22,7 +22,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function SearchSerilizer() - 將輸入的查詢資訊序列化為xml格式字串
         //--------------------------------------------------------------------------------------------
-        public string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string SDATE, string EDATE, int type)
+        public string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string SDATE, string EDATE, string stockSymbol, int type)
         {
             var root = new root()
             {
@@ -30,7 +30,8 @@ namespace ESMP.STOCK.TASK.API
                 bhno = BHNO,
                 cseq = CSEQ,
                 sdate = SDATE,
-                edate = EDATE
+                edate = EDATE,
+                stockSymbol = stockSymbol,
             };
             if (type == 0)
             {
@@ -137,8 +138,8 @@ namespace ESMP.STOCK.TASK.API
                 profitSum.tdate = detail_out.tdate;
                 profitSum.dseq = detail_out.dseq;
                 profitSum.dno = detail_out.dno;
-                profitSum.stock = grp_HCNRH[0].First().STOCK;
-                profitSum.stocknm = sqlSearch.selectStockName(grp_HCNRH[0].First().STOCK);
+                profitSum.stock = grp_HCNRH[i].First().STOCK;
+                profitSum.stocknm = sqlSearch.selectStockName(grp_HCNRH[i].First().STOCK);
                 profitSum.cqty = detail_out.cqty;
                 profitSum.mprice = detail_out.mprice;
                 profitSum.fee = detail_out.fee;
@@ -218,8 +219,8 @@ namespace ESMP.STOCK.TASK.API
                 profitSum.tdate = detail_out.tdate;
                 profitSum.dseq = detail_out.dseq;
                 profitSum.dno = detail_out.dno;
-                profitSum.stock = grp_HCNTD[0].First().STOCK;
-                profitSum.stocknm = sqlSearch.selectStockName(grp_HCNTD[0].First().STOCK);
+                profitSum.stock = grp_HCNTD[i].First().STOCK;
+                profitSum.stocknm = sqlSearch.selectStockName(grp_HCNTD[i].First().STOCK);
                 profitSum.cqty = detail_out.cqty;
                 profitSum.mprice = detail_out.mprice;
                 profitSum.fee = detail_out.fee;
