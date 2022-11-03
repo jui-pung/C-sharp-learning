@@ -45,8 +45,10 @@
     <Compile Include="HCNRH.cs" />
     <Compile Include="HCNTD.cs" />
     <Compile Include="MSTMB.cs" />
+    <Compile Include="MSYS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TCNUD.cs" />
+    <Compile Include="TCSIO.cs" />
     <Compile Include="TMHIO.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -2,6 +2,7 @@
 using ESMP.STOCK.FORMAT.API;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -526,7 +527,7 @@ namespace ESMP.STOCK.TASK.API
                 {
                     if (!reader.HasRows)
                     {
-                        Console.WriteLine("沒有當日此股票對帳單明細資料");
+                        Console.WriteLine("沒有當日對帳單明細資料");
                     }
                     while (reader.Read())
                     {
@@ -554,6 +555,108 @@ namespace ESMP.STOCK.TASK.API
                 _sqlConn.Close();
             }
             return dbTMHIO;
-        }  
+        }
+
+        //----------------------------------------------------------------------------------
+        // function selectTCSIO() - 查詢 TCSIO TABLE 當日現股匯撥檔資料
+        //----------------------------------------------------------------------------------
+        public List<TCSIO> selectTCSIO(object o)
+        {
+            root SearchElement = o as root;
+            List<TCSIO> dbTCSIO = new List<TCSIO>();
+            string sqlQuery = "";
+            try
+            {
+                _sqlConn.Open();
+                if (SearchElement.qtype == "0001" && SearchElement.stockSymbol.Length > 1)
+                {
+                    sqlQuery = @"SELECT TDATE, BHNO, DSEQ, DNO, CSEQ, STOCK, BSTYPE, QTY, IOFLAG, REMARK, JRNUM, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
+                                FROM dbo.TCSIO
+                                WHERE STOCK = @STOCK AND BHNO = @BHNO AND CSEQ = @CSEQ";
+                }
+                else if (SearchElement.qtype == "0001")
+                {
+                    sqlQuery = @"SELECT TDATE, BHNO, DSEQ, DNO, CSEQ, STOCK, BSTYPE, QTY, IOFLAG, REMARK, JRNUM, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
+                                FROM dbo.TCSIO
+                                WHERE BHNO = @BHNO AND CSEQ = @CSEQ";
+                }
+
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("沒有當日現股匯撥檔資料");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new TCSIO();
+                        row.TDATE = reader["TDATE"].ToString();
+                        row.BHNO = reader["BHNO"].ToString();
+                        row.DSEQ = reader["DSEQ"].ToString();
+                        row.DNO = reader["DNO"].ToString();
+                        row.CSEQ = reader["CSEQ"].ToString();
+                        row.STOCK = reader["STOCK"].ToString();
+                        row.BSTYPE = reader["BSTYPE"].ToString();
+                        row.QTY = Convert.ToDecimal(reader["QTY"].ToString());
+                        row.IOFLAG = reader["IOFLAG"].ToString();
+                        row.REMARK = reader["REMARK"].ToString();
+                        row.JRNUM = reader["JRNUM"].ToString();
+                        row.TRDATE = reader["TRDATE"].ToString();
+                        row.TRTIME = reader["TRTIME"].ToString();
+                        row.MODDATE = reader["MODDATE"].ToString();
+                        row.MODTIME = reader["MODTIME"].ToString();
+                        row.MODUSER = reader["MODUSER"].ToString();
+                        dbTCSIO.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+            return dbTCSIO;
+        }
+
+        //建立ioflagname字典
+        public Dictionary<string, string> createIoflagameDic()
+        {
+            SqlDataAdapter da;
+            DataTable dt_dictionary = new DataTable();
+            Dictionary<string, string> ioflagNameDic = new Dictionary<string, string>();
+            dt_dictionary.Clear();
+            ioflagNameDic.Clear();
+            try
+            {
+                _sqlConn.Open();
+                SqlCommand command = new SqlCommand("SELECT VARNAME, VALUE FROM dbo.MSYS", _sqlConn);
+                da = new SqlDataAdapter(command);
+                da.Fill(dt_dictionary);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+
+            foreach (DataRow dtRow in dt_dictionary.Rows)
+            {
+                ioflagNameDic.Add(dtRow["VARNAME"].ToString(), dtRow["VALUE"].ToString());
+            }
+            return ioflagNameDic;
+        }
+
     }
 }

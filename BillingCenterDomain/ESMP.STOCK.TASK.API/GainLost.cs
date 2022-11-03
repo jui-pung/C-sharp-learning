@@ -182,7 +182,7 @@ namespace ESMP.STOCK.TASK.API
         }
 
         //--------------------------------------------------------------------------------------------
-        //function getTMHIO() - 將QTYPE"0001"查詢結果 序列化為xml或json格式字串
+        //function getTMHIO() - 將TMHIOList資料加入新增至TMHIOList
         //--------------------------------------------------------------------------------------------
         public List<TCNUD> getTMHIO(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList)
         {
@@ -211,6 +211,30 @@ namespace ESMP.STOCK.TASK.API
             }
             return TCNUDList;
         }
+
+        //--------------------------------------------------------------------------------------------
+        //function getTMHIO() - 將TMHIOList資料加入新增至TMHIOList
+        //--------------------------------------------------------------------------------------------
+        public List<TCNUD> getTCSIO(List<TCNUD> TCNUDList, List<TCSIO> TCSIOList)
+        {
+            foreach (var item in TCSIOList)
+            {
+                var row = new TCNUD();
+                row.TDATE = item.TDATE;
+                row.BHNO = item.BHNO;
+                row.CSEQ = item.CSEQ;
+                row.STOCK = item.STOCK;
+                row.QTY = item.QTY;
+                row.BQTY = item.QTY;
+                row.DSEQ = item.DSEQ;
+                row.DNO = item.DNO;
+                row.WTYPE = "A";
+                row.IOFLAG = item.IOFLAG;
+                TCNUDList.Add(row);
+            }
+            return TCNUDList;
+        }
+
         //--------------------------------------------------------------------------------------------
         //function resultListSerilizer() - 將QTYPE"0001"查詢結果 序列化為xml或json格式字串
         //--------------------------------------------------------------------------------------------

@@ -158,15 +158,18 @@ namespace ESMP.STOCK.TASK.API
                 {
                     row.fee = 20;
                 }
+                //賣出資料計算交易稅 淨收付
                 if (item.BSTYPE == "S")
                 {
                     row.tax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.mprice) * decimal.ToDouble(row.mqty) * 0.003));
                     row.netamt = row.mamt - row.fee - row.tax;
                 }
+                //買入資料計算淨收付
                 else if (item.BSTYPE == "B")
                     row.netamt = ((row.mamt + row.fee) * -1);
                 profileTMHIOList.Add(row);
             }
+            //合併歷史與當日資料
             profileList = profileHCMIOList.Concat(profileTMHIOList).ToList();
             return profileList;
         }
@@ -202,6 +205,7 @@ namespace ESMP.STOCK.TASK.API
             profileSum.tax = profileList.Sum(x => x.tax);
             profileSum.mqty = profileList.Sum(x => x.mqty);
             profileSum.mamt = profileList.Sum(x => x.mamt);
+            //存入第二階層資料
             profileSum.billSum = billsum;
             profileSum.profile = profileList;
             return profileSum;

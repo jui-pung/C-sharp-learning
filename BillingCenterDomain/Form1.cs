@@ -18,10 +18,13 @@ namespace BillingCenterDomain
         int _type;                                           //查詢與回覆格式設定
         string _searchStr;                                   //查詢xml或json格式字串
         SqlSearch _sqlSearch;                                //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)
-        
+        Dictionary<string, string> _ioflagNameDic;
         public Form1()
         {
             InitializeComponent();
+            _sqlSearch = new SqlSearch();
+            _ioflagNameDic = new Dictionary<string, string>();
+            _ioflagNameDic = _sqlSearch.createIoflagameDic();
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
@@ -37,10 +40,11 @@ namespace BillingCenterDomain
                 GainLost gainLost = new GainLost();                                             //自訂GainLost類別   (ESMP.STOCK.TASK.API)
                 List<TCNUD> TCNUDList = new List<TCNUD>();                                      //自訂TCNUD類別List (ESMP.STOCK.DB.TABLE.API)
                 List<TMHIO> TMHIOList = new List<TMHIO>();                                      //自訂TMHIO類別List (ESMP.STOCK.DB.TABLE.API)
+                List<TCSIO> TCSIOList = new List<TCSIO>();                                      //自訂TCSIO類別List (ESMP.STOCK.DB.TABLE.API)
                 List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();     //自訂unoffset_qtype_detail類別List (階層三:個股明細)
                 List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();              //自訂unoffset_qtype_sum類別List    (階層二:個股未實現損益)
                 List<unoffset_qtype_accsum> accsumList = new List<unoffset_qtype_accsum>();     //自訂unoffset_qtype_accsum類別List (階層一:帳戶未實現損益)
-
+                
                 //取得查詢xml或json格式字串
                 _searchStr = gainLost.searchSerilizer(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, txtStockSymbol.Text, _type);
                 txtSearchContent.Text = _searchStr;
@@ -50,8 +54,11 @@ namespace BillingCenterDomain
                 //查詢開始...
                 TCNUDList = _sqlSearch.selectTCNUD(SearchElement);
                 TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
+                TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
                 //新增提供今日買進現股資料TMHIOList
                 TCNUDList = gainLost.getTMHIO(TCNUDList, TMHIOList);
+                //新增當日現股匯入資料TCSIOList
+                TCNUDList = gainLost.getTCSIO(TCNUDList, TCSIOList);
                 if (TCNUDList.Count > 0)
                 {
                     sumList = gainLost.searchSum(TCNUDList);
