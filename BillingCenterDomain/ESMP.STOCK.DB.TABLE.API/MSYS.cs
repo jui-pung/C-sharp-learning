@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ESMP.STOCK.DB.TABLE.API
+namespace ESMP.STOCK.DB.TABLE
 {
     public class MSYS
     {

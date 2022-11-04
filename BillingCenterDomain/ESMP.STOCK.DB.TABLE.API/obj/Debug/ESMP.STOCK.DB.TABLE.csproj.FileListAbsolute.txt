@@ -1,0 +1,6 @@
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.DB.TABLE.API\bin\Debug\ESMP.STOCK.DB.TABLE.dll
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.DB.TABLE.API\bin\Debug\ESMP.STOCK.DB.TABLE.pdb
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.DB.TABLE.API\obj\Debug\ESMP.STOCK.DB.TABLE.csproj.AssemblyReference.cache
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.DB.TABLE.API\obj\Debug\ESMP.STOCK.DB.TABLE.csproj.CoreCompileInputs.cache
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.DB.TABLE.API\obj\Debug\ESMP.STOCK.DB.TABLE.dll
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.DB.TABLE.API\obj\Debug\ESMP.STOCK.DB.TABLE.pdb

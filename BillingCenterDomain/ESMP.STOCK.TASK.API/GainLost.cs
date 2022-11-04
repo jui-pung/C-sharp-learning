@@ -1,5 +1,5 @@
-﻿using ESMP.STOCK.DB.TABLE.API;
-using ESMP.STOCK.FORMAT.API;
+﻿using ESMP.STOCK.DB.TABLE;
+using ESMP.STOCK.FORMAT;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -76,7 +76,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchSum() - 計算取得 查詢回復階層二的個股未實現損益與個股明細
         //--------------------------------------------------------------------------------------------
-        public List<unoffset_qtype_sum> searchSum(List<TCNUD> dbTCNUD)
+        public List<unoffset_qtype_sum> searchSum(List<TCNUD> dbTCNUD, Dictionary<string, string> ioflagNameDic)
         {
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TCNUD
@@ -98,17 +98,29 @@ namespace ESMP.STOCK.TASK.API
                     row.lastprice = Convert.ToDecimal(sqlSearch.selectStockCprice(item.STOCK));
                     row.fee = item.FEE;
                     row.cost = item.COST;
+                    //匯撥來源說明
+                    if (item.WTYPE == "A")
+                    {
+                        row.ioflag = item.IOFLAG;
+                        if (item.IOFLAG.Substring(0,1) == "0")
+                        {
+                            item.IOFLAG = item.IOFLAG.Substring(1);
+                        }
+                        string ionameResult;
+                        ioflagNameDic.TryGetValue(item.IOFLAG, out ionameResult);
+                        row.ioname = ionameResult;
+                    }
                     detailList.Add(row);
                 }
                 detailList.ForEach(p => p.mamt = p.bqty * p.mprice);
                 detailList.ForEach(p => p.estimateAmt = decimal.Truncate(p.lastprice * p.bqty));
                 detailList.ForEach(p => p.estimateFee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(p.estimateAmt) * 0.001425)));
-                if (detailList.TrueForAll(p => p.estimateFee < 20))
-                    detailList.ForEach(p => p.estimateFee = 20);
+                detailList.Where(x => x.estimateFee < 20).ToList().ForEach(p => p.estimateFee = 20);
                 detailList.ForEach(p => p.estimateTax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(p.estimateAmt) * 0.003)));
                 detailList.ForEach(p => p.marketvalue = p.estimateAmt - p.estimateFee - p.estimateTax);
                 detailList.ForEach(p => p.profit = p.marketvalue - p.cost);
-                detailList.ForEach(p => p.pl_ratio = decimal.Round(((p.profit / p.cost) * 100), 2).ToString() + "%");
+                detailList.Where(x => x.cost > 0).ToList().ForEach(p => p.pl_ratio = decimal.Round(((p.profit / p.cost) * 100), 2).ToString() + "%");
+                detailList.Where(x => x.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
 
                 //取得個股未實現損益 List (第二階層)
                 unoffset_qtype_sum row_Sum = new unoffset_qtype_sum();

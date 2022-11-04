@@ -1,5 +1,5 @@
-﻿using ESMP.STOCK.DB.TABLE.API;
-using ESMP.STOCK.FORMAT.API;
+﻿using ESMP.STOCK.DB.TABLE;
+using ESMP.STOCK.FORMAT;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -149,11 +149,11 @@ namespace ESMP.STOCK.TASK.API
                 profitSum.profit = detail_out.profit;
                 profitSum.pl_ratio = decimal.Round(((profitSum.profit / profitSum.cost) * 100), 2).ToString() + "%";
                 profitSum.ttypename2 = "現賣";
+                profitSum.profit_detail = lst_detail;
+                profitSum.profit_detail_out = detail_out;
                 sumList.Add(profitSum);
 
                 //第三階層資料存入第二階層List
-                sumList[i].profit_detail = lst_detail;
-                sumList[i].profit_detail_out = detail_out;
             }
             return sumList;
         }

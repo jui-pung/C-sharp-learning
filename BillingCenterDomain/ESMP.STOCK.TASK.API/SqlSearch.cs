@@ -1,5 +1,5 @@
-﻿using ESMP.STOCK.DB.TABLE.API;
-using ESMP.STOCK.FORMAT.API;
+﻿using ESMP.STOCK.DB.TABLE;
+using ESMP.STOCK.FORMAT;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -26,13 +26,16 @@ namespace ESMP.STOCK.TASK.API
             try
             {
                 _sqlConn.Open();
-                if(SearchElement.stockSymbol.Length > 1)
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
                 {
                     //加入查詢股票代號
                     sqlQuery = @"SELECT STOCK, TDATE, DSEQ, DNO, BQTY, PRICE, FEE, COST
                                 FROM dbo.TCNUD 
                                 WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND STOCK = @STOCK
-                                ORDER BY BHNO, CSEQ, STOCK, TDATE";    
+                                ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
                 }
                 else
                 {
@@ -41,10 +44,10 @@ namespace ESMP.STOCK.TASK.API
                                 WHERE BHNO = @BHNO AND CSEQ = @CSEQ
                                 ORDER BY BHNO, CSEQ, STOCK, TDATE";
                 }
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                sqlCmd.CommandText = sqlQuery;
                 sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
                 sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
-                sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
+                
 
                 using (SqlDataReader reader = sqlCmd.ExecuteReader())
                 {
@@ -79,7 +82,7 @@ namespace ESMP.STOCK.TASK.API
             return dbTCNUD;
         }
 
-
+        # region selectMSTMB
         //----------------------------------------------------------------------------------
         // function selectMSTMB() - 查詢 MSTMB TABLE的STOCK,CPRICE
         //----------------------------------------------------------------------------------
@@ -121,6 +124,7 @@ namespace ESMP.STOCK.TASK.API
             }
             return dbMSTMB;
         }
+        #endregion
         #region selectCPRICE 舊的寫法
         //----------------------------------------------------------------------------------
         // function selectCPRICE() - 查詢 MSTMB TABLE的CPRICE
@@ -627,36 +631,7 @@ namespace ESMP.STOCK.TASK.API
             return dbTCSIO;
         }
 
-        //建立ioflagname字典
-        public Dictionary<string, string> createIoflagameDic()
-        {
-            SqlDataAdapter da;
-            DataTable dt_dictionary = new DataTable();
-            Dictionary<string, string> ioflagNameDic = new Dictionary<string, string>();
-            dt_dictionary.Clear();
-            ioflagNameDic.Clear();
-            try
-            {
-                _sqlConn.Open();
-                SqlCommand command = new SqlCommand("SELECT VARNAME, VALUE FROM dbo.MSYS", _sqlConn);
-                da = new SqlDataAdapter(command);
-                da.Fill(dt_dictionary);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                _sqlConn.Close();
-            }
-
-            foreach (DataRow dtRow in dt_dictionary.Rows)
-            {
-                ioflagNameDic.Add(dtRow["VARNAME"].ToString(), dtRow["VALUE"].ToString());
-            }
-            return ioflagNameDic;
-        }
+        
 
     }
 }

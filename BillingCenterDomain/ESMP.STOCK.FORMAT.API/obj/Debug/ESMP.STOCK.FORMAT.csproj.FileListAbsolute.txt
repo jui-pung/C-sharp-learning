@@ -1,0 +1,9 @@
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.FORMAT.API\bin\Debug\ESMP.STOCK.FORMAT.dll
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.FORMAT.API\bin\Debug\ESMP.STOCK.FORMAT.pdb
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.FORMAT.API\bin\Debug\Newtonsoft.Json.dll
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.FORMAT.API\bin\Debug\Newtonsoft.Json.xml
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.FORMAT.API\obj\Debug\ESMP.STOCK.FORMAT.csproj.AssemblyReference.cache
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.FORMAT.API\obj\Debug\ESMP.STOCK.FORMAT.csproj.CoreCompileInputs.cache
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.FORMAT.API\obj\Debug\ESMP.STOCK.FORMAT.csproj.CopyComplete
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.FORMAT.API\obj\Debug\ESMP.STOCK.FORMAT.dll
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\ESMP.STOCK.FORMAT.API\obj\Debug\ESMP.STOCK.FORMAT.pdb

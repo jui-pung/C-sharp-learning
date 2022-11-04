@@ -48,16 +48,17 @@
     <Compile Include="GainLost.cs" />
     <Compile Include="GainPay.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Singleton.cs" />
     <Compile Include="SqlSearch.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ESMP.STOCK.DB.TABLE.API\ESMP.STOCK.DB.TABLE.API.csproj">
-      <Project>{94576875-1771-4357-a4d7-fba46b943ba6}</Project>
-      <Name>ESMP.STOCK.DB.TABLE.API</Name>
+    <ProjectReference Include="..\ESMP.STOCK.DB.TABLE.API\ESMP.STOCK.DB.TABLE.csproj">
+      <Project>{94576875-1771-4357-A4D7-FBA46B943BA6}</Project>
+      <Name>ESMP.STOCK.DB.TABLE</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ESMP.STOCK.FORMAT.API\ESMP.STOCK.FORMAT.API.csproj">
+    <ProjectReference Include="..\ESMP.STOCK.FORMAT.API\ESMP.STOCK.FORMAT.csproj">
       <Project>{452C1390-C7D8-40D0-B5C1-09039154467E}</Project>
-      <Name>ESMP.STOCK.FORMAT.API</Name>
+      <Name>ESMP.STOCK.FORMAT</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -9,12 +9,12 @@ C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Debug\Billi
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Debug\BillingCenterDomain.csproj.CoreCompileInputs.cache
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Debug\BillingCenterDomain.exe
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Debug\BillingCenterDomain.pdb
-C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.FORMAT.API.dll
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.TASK.API.dll
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\Newtonsoft.Json.dll
-C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.FORMAT.API.pdb
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.TASK.API.pdb
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\Newtonsoft.Json.xml
 C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\obj\Debug\BillingCenterDomain.csproj.CopyComplete
-C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.DB.TABLE.API.dll
-C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.DB.TABLE.API.pdb
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.DB.TABLE.dll
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.FORMAT.dll
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.DB.TABLE.pdb
+C:\Users\juipe\Desktop\systex_git_labs\Demo1\BillingCenterDomain\bin\Debug\ESMP.STOCK.FORMAT.pdb

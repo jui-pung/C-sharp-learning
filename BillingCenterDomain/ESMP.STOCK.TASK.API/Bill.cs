@@ -1,5 +1,5 @@
-﻿using ESMP.STOCK.DB.TABLE.API;
-using ESMP.STOCK.FORMAT.API;
+﻿using ESMP.STOCK.DB.TABLE;
+using ESMP.STOCK.FORMAT;
 using Newtonsoft.Json;
 using System;
 using System.Collections;

@@ -119,6 +119,7 @@
             this.txtStockSymbol.Name = "txtStockSymbol";
             this.txtStockSymbol.Size = new System.Drawing.Size(125, 36);
             this.txtStockSymbol.TabIndex = 26;
+            this.txtStockSymbol.Text = " ";
             // 
             // label3
             // 

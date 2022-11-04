@@ -1,5 +1,5 @@
-﻿using ESMP.STOCK.DB.TABLE.API;
-using ESMP.STOCK.FORMAT.API;
+﻿using ESMP.STOCK.DB.TABLE;
+using ESMP.STOCK.FORMAT;
 using ESMP.STOCK.TASK.API;
 using System;
 using System.Collections.Generic;
@@ -22,9 +22,8 @@ namespace BillingCenterDomain
         public Form1()
         {
             InitializeComponent();
-            _sqlSearch = new SqlSearch();
             _ioflagNameDic = new Dictionary<string, string>();
-            _ioflagNameDic = _sqlSearch.createIoflagameDic();
+            _ioflagNameDic = Singleton.Instance.createIoflagameDic();
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
@@ -61,7 +60,7 @@ namespace BillingCenterDomain
                 TCNUDList = gainLost.getTCSIO(TCNUDList, TCSIOList);
                 if (TCNUDList.Count > 0)
                 {
-                    sumList = gainLost.searchSum(TCNUDList);
+                    sumList = gainLost.searchSum(TCNUDList, _ioflagNameDic);
                     accsumList = gainLost.searchAccSum(sumList);
                     //呈現查詢結果
                     txtSearchResultContent.Text = gainLost.resultListSerilizer(accsumList, _type);

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ESMP.STOCK.FORMAT.API
+namespace ESMP.STOCK.FORMAT
 {
     public class billSum
     {

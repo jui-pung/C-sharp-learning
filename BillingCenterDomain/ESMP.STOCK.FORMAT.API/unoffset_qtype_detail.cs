@@ -2,13 +2,10 @@
 using System.Xml.Serialization;
 using JsonIgnoreAttribute = Newtonsoft.Json.JsonIgnoreAttribute;
 
-namespace ESMP.STOCK.FORMAT.API
+namespace ESMP.STOCK.FORMAT
 {
     public class unoffset_qtype_detail
     {
-        [XmlIgnore]
-        [JsonIgnore]
-        public string stock { get; set; }
         public string tdate { get; set; }
         public string ttype { get; set; } = "0";
         public string ttypename { get; set; } = "現買";
@@ -28,5 +25,8 @@ namespace ESMP.STOCK.FORMAT.API
         public decimal estimateTax { get; set; }
         public decimal profit { get; set; }
         public string pl_ratio { get; set; }
+        public string wtype { get; set; }
+        public string ioflag { get; set; }
+        public string ioname { get; set; }
     }
 }

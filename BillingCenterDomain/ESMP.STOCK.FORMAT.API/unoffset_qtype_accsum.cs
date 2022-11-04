@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace ESMP.STOCK.FORMAT.API
+namespace ESMP.STOCK.FORMAT
 {
     public class unoffset_qtype_accsum
     {
