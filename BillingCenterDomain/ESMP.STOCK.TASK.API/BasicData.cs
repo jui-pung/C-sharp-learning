@@ -8,29 +8,18 @@ using System.Threading.Tasks;
 
 namespace ESMP.STOCK.TASK.API
 {
-    public class Singleton
+    public class BasicData
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        SqlConnection _sqlConn = new SqlConnection(_sqlSet);
-        private static Singleton _instance = null;
         private static object chekLock = new object();
-        private Singleton(){ }
-        public static Singleton Instance
-        {
-            get
-            {
-                lock (chekLock)
-                {
-                    if (_instance == null)
-                        _instance = new Singleton();
-                    return _instance;
-                }
-            }
-        }
-
         private static Dictionary<string, string> _MsysDict = null;
-        public Dictionary<string, string> MsysDict
-        { get
+        private BasicData()
+        {
+
+        }
+        public static Dictionary<string, string> MsysDict
+        { 
+            get
             {
                 if(_MsysDict == null)
                 {
@@ -39,30 +28,34 @@ namespace ESMP.STOCK.TASK.API
                         if( _MsysDict == null)
                         {
                             _MsysDict = new Dictionary<string, string>();
+                            _MsysDict = createIoflagameDic();
                         }   
                     }
                 }
                 return _MsysDict;
             } 
         }
-
         public static string getIoflagName(string ioflag)
         {
-            if(ioflag == "0167")
+            if (ioflag == "0167")
             {
                 ioflag = "167";
             }
-            if(_MsysDict.ContainsKey(ioflag))
+            if (ioflag == "0256")
+            {
+                ioflag = "256";
+            }
+            if (_MsysDict.ContainsKey(ioflag))
             {
                 return _MsysDict[ioflag];
             }
-            else 
+            else
                 return string.Empty;
         }
 
-
-        public Dictionary<string, string> createIoflagameDic()
+        private static Dictionary<string, string> createIoflagameDic()
         {
+            SqlConnection sqlConn = new SqlConnection(_sqlSet);
             SqlDataAdapter da;
             DataTable dt_dictionary = new DataTable();
             Dictionary<string, string> ioflagNameDic = new Dictionary<string, string>();
@@ -70,8 +63,8 @@ namespace ESMP.STOCK.TASK.API
             ioflagNameDic.Clear();
             try
             {
-                _sqlConn.Open();
-                SqlCommand command = new SqlCommand("SELECT VARNAME, VALUE FROM dbo.MSYS", _sqlConn);
+                sqlConn.Open();
+                SqlCommand command = new SqlCommand("SELECT VARNAME, VALUE FROM dbo.MSYS", sqlConn);
                 da = new SqlDataAdapter(command);
                 da.Fill(dt_dictionary);
             }
@@ -81,7 +74,7 @@ namespace ESMP.STOCK.TASK.API
             }
             finally
             {
-                _sqlConn.Close();
+                sqlConn.Close();
             }
 
             foreach (DataRow dtRow in dt_dictionary.Rows)

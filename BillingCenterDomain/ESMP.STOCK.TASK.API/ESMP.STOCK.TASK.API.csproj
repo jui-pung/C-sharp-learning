@@ -48,7 +48,7 @@
     <Compile Include="GainLost.cs" />
     <Compile Include="GainPay.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Singleton.cs" />
+    <Compile Include="BasicData.cs" />
     <Compile Include="SqlSearch.cs" />
   </ItemGroup>
   <ItemGroup>

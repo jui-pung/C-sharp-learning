@@ -60,111 +60,112 @@
             "0001",
             "0002",
             "0003"});
-            this.comboBoxQTYPE.Location = new System.Drawing.Point(156, 44);
+            this.comboBoxQTYPE.Location = new System.Drawing.Point(96, 28);
+            this.comboBoxQTYPE.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.comboBoxQTYPE.Name = "comboBoxQTYPE";
-            this.comboBoxQTYPE.Size = new System.Drawing.Size(121, 32);
+            this.comboBoxQTYPE.Size = new System.Drawing.Size(76, 23);
             this.comboBoxQTYPE.TabIndex = 32;
             this.comboBoxQTYPE.SelectedIndexChanged += new System.EventHandler(this.comboBoxQTYPE_SelectedIndexChanged);
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(529, 116);
-            this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label5.Location = new System.Drawing.Point(326, 72);
+            this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(96, 24);
+            this.label5.Size = new System.Drawing.Size(62, 15);
             this.label5.TabIndex = 31;
             this.label5.Text = "EDATE :";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(293, 116);
-            this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label6.Location = new System.Drawing.Point(180, 72);
+            this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(95, 24);
+            this.label6.Size = new System.Drawing.Size(61, 15);
             this.label6.TabIndex = 30;
             this.label6.Text = "SDATE :";
             // 
             // txtEDATE
             // 
-            this.txtEDATE.Location = new System.Drawing.Point(632, 109);
-            this.txtEDATE.Margin = new System.Windows.Forms.Padding(4);
+            this.txtEDATE.Location = new System.Drawing.Point(389, 68);
+            this.txtEDATE.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtEDATE.Name = "txtEDATE";
-            this.txtEDATE.Size = new System.Drawing.Size(125, 36);
+            this.txtEDATE.Size = new System.Drawing.Size(78, 25);
             this.txtEDATE.TabIndex = 29;
             // 
             // txtSDATE
             // 
-            this.txtSDATE.Location = new System.Drawing.Point(396, 109);
-            this.txtSDATE.Margin = new System.Windows.Forms.Padding(4);
+            this.txtSDATE.Location = new System.Drawing.Point(244, 68);
+            this.txtSDATE.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtSDATE.Name = "txtSDATE";
-            this.txtSDATE.Size = new System.Drawing.Size(125, 36);
+            this.txtSDATE.Size = new System.Drawing.Size(78, 25);
             this.txtSDATE.TabIndex = 28;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(776, 51);
-            this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label4.Location = new System.Drawing.Point(478, 32);
+            this.label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(133, 24);
+            this.label4.Size = new System.Drawing.Size(84, 15);
             this.label4.TabIndex = 27;
             this.label4.Text = "stockSymbol:";
             // 
             // txtStockSymbol
             // 
-            this.txtStockSymbol.Location = new System.Drawing.Point(921, 44);
-            this.txtStockSymbol.Margin = new System.Windows.Forms.Padding(4);
+            this.txtStockSymbol.Location = new System.Drawing.Point(567, 28);
+            this.txtStockSymbol.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtStockSymbol.Name = "txtStockSymbol";
-            this.txtStockSymbol.Size = new System.Drawing.Size(125, 36);
+            this.txtStockSymbol.Size = new System.Drawing.Size(78, 25);
             this.txtStockSymbol.TabIndex = 26;
             this.txtStockSymbol.Text = " ";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(56, 51);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label3.Location = new System.Drawing.Point(34, 32);
+            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(95, 24);
+            this.label3.Size = new System.Drawing.Size(61, 15);
             this.label3.TabIndex = 25;
             this.label3.Text = "QTYPE :";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(529, 51);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label2.Location = new System.Drawing.Point(326, 32);
+            this.label2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(80, 24);
+            this.label2.Size = new System.Drawing.Size(51, 15);
             this.label2.TabIndex = 24;
             this.label2.Text = "CSEQ :";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(293, 51);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(180, 32);
+            this.label1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(85, 24);
+            this.label1.Size = new System.Drawing.Size(54, 15);
             this.label1.TabIndex = 23;
             this.label1.Text = "BHNO :";
             // 
             // txtCSEQ
             // 
-            this.txtCSEQ.Location = new System.Drawing.Point(632, 44);
-            this.txtCSEQ.Margin = new System.Windows.Forms.Padding(4);
+            this.txtCSEQ.Location = new System.Drawing.Point(389, 28);
+            this.txtCSEQ.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtCSEQ.Name = "txtCSEQ";
-            this.txtCSEQ.Size = new System.Drawing.Size(125, 36);
+            this.txtCSEQ.Size = new System.Drawing.Size(78, 25);
             this.txtCSEQ.TabIndex = 22;
             // 
             // txtBHNO
             // 
-            this.txtBHNO.Location = new System.Drawing.Point(396, 44);
-            this.txtBHNO.Margin = new System.Windows.Forms.Padding(4);
+            this.txtBHNO.Location = new System.Drawing.Point(244, 28);
+            this.txtBHNO.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtBHNO.Name = "txtBHNO";
-            this.txtBHNO.Size = new System.Drawing.Size(125, 36);
+            this.txtBHNO.Size = new System.Drawing.Size(78, 25);
             this.txtBHNO.TabIndex = 21;
             // 
             // radioBtnJson
@@ -172,7 +173,8 @@
             this.radioBtnJson.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.radioBtnJson.AutoSize = true;
             this.radioBtnJson.Font = new System.Drawing.Font("新細明體", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.radioBtnJson.Location = new System.Drawing.Point(827, 180);
+            this.radioBtnJson.Location = new System.Drawing.Point(475, 112);
+            this.radioBtnJson.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.radioBtnJson.Name = "radioBtnJson";
             this.radioBtnJson.Size = new System.Drawing.Size(88, 26);
             this.radioBtnJson.TabIndex = 35;
@@ -187,7 +189,8 @@
             this.radioBtnXml.AutoSize = true;
             this.radioBtnXml.Checked = true;
             this.radioBtnXml.Font = new System.Drawing.Font("新細明體", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.radioBtnXml.Location = new System.Drawing.Point(736, 180);
+            this.radioBtnXml.Location = new System.Drawing.Point(420, 112);
+            this.radioBtnXml.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.radioBtnXml.Name = "radioBtnXml";
             this.radioBtnXml.Size = new System.Drawing.Size(85, 26);
             this.radioBtnXml.TabIndex = 34;
@@ -199,10 +202,10 @@
             // btnSearch
             // 
             this.btnSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSearch.Location = new System.Drawing.Point(922, 164);
-            this.btnSearch.Margin = new System.Windows.Forms.Padding(4);
+            this.btnSearch.Location = new System.Drawing.Point(567, 102);
+            this.btnSearch.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.btnSearch.Name = "btnSearch";
-            this.btnSearch.Size = new System.Drawing.Size(124, 44);
+            this.btnSearch.Size = new System.Drawing.Size(76, 28);
             this.btnSearch.TabIndex = 33;
             this.btnSearch.Text = "search";
             this.btnSearch.UseVisualStyleBackColor = true;
@@ -215,19 +218,21 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(43, 240);
+            this.tabControl1.Location = new System.Drawing.Point(26, 150);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1023, 582);
+            this.tabControl1.Size = new System.Drawing.Size(630, 364);
             this.tabControl1.TabIndex = 36;
             // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.txtSearchResultContent);
-            this.tabPage1.Location = new System.Drawing.Point(8, 39);
+            this.tabPage1.Location = new System.Drawing.Point(8, 30);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1007, 535);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage1.Size = new System.Drawing.Size(614, 326);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Search Result Content   ";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -238,21 +243,22 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearchResultContent.Font = new System.Drawing.Font("微軟正黑體", 10.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.txtSearchResultContent.Location = new System.Drawing.Point(4, 0);
-            this.txtSearchResultContent.Margin = new System.Windows.Forms.Padding(4);
+            this.txtSearchResultContent.Location = new System.Drawing.Point(2, 0);
+            this.txtSearchResultContent.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtSearchResultContent.Multiline = true;
             this.txtSearchResultContent.Name = "txtSearchResultContent";
             this.txtSearchResultContent.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtSearchResultContent.Size = new System.Drawing.Size(996, 531);
+            this.txtSearchResultContent.Size = new System.Drawing.Size(614, 333);
             this.txtSearchResultContent.TabIndex = 6;
             // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.txtSearchContent);
-            this.tabPage2.Location = new System.Drawing.Point(8, 39);
+            this.tabPage2.Location = new System.Drawing.Point(8, 30);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1007, 535);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage2.Size = new System.Drawing.Size(614, 326);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Search Content   ";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -263,18 +269,18 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearchContent.Font = new System.Drawing.Font("微軟正黑體", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.txtSearchContent.Location = new System.Drawing.Point(4, 4);
-            this.txtSearchContent.Margin = new System.Windows.Forms.Padding(4);
+            this.txtSearchContent.Location = new System.Drawing.Point(2, 2);
+            this.txtSearchContent.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.txtSearchContent.Multiline = true;
             this.txtSearchContent.Name = "txtSearchContent";
-            this.txtSearchContent.Size = new System.Drawing.Size(999, 527);
+            this.txtSearchContent.Size = new System.Drawing.Size(616, 331);
             this.txtSearchContent.TabIndex = 5;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(13F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1105, 852);
+            this.ClientSize = new System.Drawing.Size(680, 532);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.radioBtnJson);
             this.Controls.Add(this.radioBtnXml);
@@ -291,6 +297,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtCSEQ);
             this.Controls.Add(this.txtBHNO);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Form1";
             this.Text = "Form1";
             this.tabControl1.ResumeLayout(false);

@@ -13,6 +13,7 @@ namespace ESMP.STOCK.TASK.API
     public class SqlSearch
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
+        static int _dateDiff = -21;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
@@ -40,7 +41,7 @@ namespace ESMP.STOCK.TASK.API
                 else
                 {
                     sqlQuery = @"SELECT STOCK, TDATE, DSEQ, DNO, BQTY, PRICE, FEE, COST
-                                FROM dbo.TCNUD 
+                                FROM dbo.TCNUD
                                 WHERE BHNO = @BHNO AND CSEQ = @CSEQ
                                 ORDER BY BHNO, CSEQ, STOCK, TDATE";
                 }
@@ -255,12 +256,15 @@ namespace ESMP.STOCK.TASK.API
             try
             {
                 _sqlConn.Open();
-                if(SearchElement.stockSymbol.Length > 1)
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
                 {
                     sqlQuery = @"SELECT BHNO, TDATE, RDATE, CSEQ, BDSEQ, BDNO, SDSEQ, SDNO, STOCK, CQTY, BPRICE, BFEE, SPRICE, SFEE, TAX, INCOME, COST, PROFIT, ADJDATE, WTYPE, BQTY, SQTY, STINTAX, IOFLAG, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
                                     FROM dbo.HCNRH
                                     WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND STOCK = @STOCK AND TDATE BETWEEN @SDATE AND @EDATE
                                     ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
                 }
                 else
                 {
@@ -269,13 +273,12 @@ namespace ESMP.STOCK.TASK.API
                                     WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
                                     ORDER BY BHNO, CSEQ, STOCK, TDATE";
                 }
-                
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+
+                sqlCmd.CommandText = sqlQuery;
                 sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
                 sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
                 sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
                 sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
-                sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
 
                 using (SqlDataReader reader = sqlCmd.ExecuteReader())
                 {
@@ -343,12 +346,15 @@ namespace ESMP.STOCK.TASK.API
             try
             {
                 _sqlConn.Open();
-                if(SearchElement.stockSymbol.Length > 1)
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
                 {
                     sqlQuery = @"SELECT BHNO, TDATE, CSEQ, BDSEQ, BDNO, SDSEQ, SDNO, STOCK, CQTY, BPRICE, BFEE, SPRICE, SFEE, TAX, INCOME, COST, PROFIT, BQTY, SQTY, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
                                 FROM dbo.HCNTD
                                 WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND STOCK = @STOCK AND TDATE BETWEEN @SDATE AND @EDATE
                                 ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
                 }
                 else
                 {
@@ -357,12 +363,11 @@ namespace ESMP.STOCK.TASK.API
                                 WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
                                 ORDER BY BHNO, CSEQ, STOCK, TDATE";
                 }
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                sqlCmd.CommandText = sqlQuery;
                 sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
                 sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
                 sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
                 sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
-                sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
 
                 using (SqlDataReader reader = sqlCmd.ExecuteReader())
                 {
@@ -425,11 +430,14 @@ namespace ESMP.STOCK.TASK.API
             try
             {
                 _sqlConn.Open();
-                if(SearchElement.stockSymbol.Length > 1)
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
                 {
                     sqlQuery = @"SELECT STOCK, TDATE, DSEQ, DNO, TTYPE, BSTYPE, ETYPE, PRICE, QTY, AMT, FEE, TAX, NETAMT
                                 FROM dbo.HCMIO
                                 WHERE STOCK = @STOCK AND BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
                 }
                 else
                 {
@@ -437,13 +445,12 @@ namespace ESMP.STOCK.TASK.API
                                 FROM dbo.HCMIO
                                 WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE";
                 }
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                sqlCmd.CommandText = sqlQuery;
                 sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
                 sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
                 sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
                 sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
-                sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
-
+                
                 using (SqlDataReader reader = sqlCmd.ExecuteReader())
                 {
                     if (!reader.HasRows)
@@ -493,40 +500,25 @@ namespace ESMP.STOCK.TASK.API
             try
             {
                 _sqlConn.Open();
-                if (SearchElement.qtype == "0001" && SearchElement.stockSymbol.Length > 1)
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
                 {
                     sqlQuery = @"SELECT STOCK, TDATE, DSEQ, JRNUM, TTYPE, BSTYPE, ETYPE, PRICE, QTY
                                 FROM dbo.TMHIO
-                                WHERE STOCK = @STOCK AND BHNO = @BHNO AND CSEQ = @CSEQ";
+                                WHERE STOCK = @STOCK AND BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE = CONVERT(varchar,(DATEADD(dd, @DATEDIFF, GETDATE())), 112)";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
                 }
-                else if (SearchElement.qtype == "0001")
+                else
                 {
                     sqlQuery = @"SELECT STOCK, TDATE, DSEQ, JRNUM, TTYPE, BSTYPE, ETYPE, PRICE, QTY
                                 FROM dbo.TMHIO
-                                WHERE BHNO = @BHNO AND CSEQ = @CSEQ";
+                                WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE = CONVERT(varchar,(DATEADD(dd, @DATEDIFF, GETDATE())), 112)";
                 }
-                else if (SearchElement.qtype == "0003" && SearchElement.stockSymbol.Length > 1)
-                {
-                    sqlQuery = @"SELECT STOCK, TDATE, DSEQ, JRNUM, TTYPE, BSTYPE, ETYPE, PRICE, QTY
-                                FROM dbo.TMHIO
-                                WHERE STOCK = @STOCK AND BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE";
-                }
-                else if (SearchElement.qtype == "0003")
-                {
-                    sqlQuery = @"SELECT STOCK, TDATE, DSEQ, JRNUM, TTYPE, BSTYPE, ETYPE, PRICE, QTY
-                                FROM dbo.TMHIO
-                                WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE";
-                }
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                sqlCmd.CommandText = sqlQuery;
                 sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
                 sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
-                if(SearchElement.sdate != null && SearchElement.edate != null)
-                {
-                    sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
-                    sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
-                }
-                sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
-
+                sqlCmd.Parameters.AddWithValue("@DATEDIFF", _dateDiff);
                 using (SqlDataReader reader = sqlCmd.ExecuteReader())
                 {
                     if (!reader.HasRows)
@@ -572,23 +564,25 @@ namespace ESMP.STOCK.TASK.API
             try
             {
                 _sqlConn.Open();
-                if (SearchElement.qtype == "0001" && SearchElement.stockSymbol.Length > 1)
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
                 {
                     sqlQuery = @"SELECT TDATE, BHNO, DSEQ, DNO, CSEQ, STOCK, BSTYPE, QTY, IOFLAG, REMARK, JRNUM, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
                                 FROM dbo.TCSIO
-                                WHERE STOCK = @STOCK AND BHNO = @BHNO AND CSEQ = @CSEQ";
+                                WHERE STOCK = @STOCK AND BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE = CONVERT(varchar,(DATEADD(dd, @DATEDIFF, GETDATE())), 112)";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
                 }
-                else if (SearchElement.qtype == "0001")
+                else
                 {
                     sqlQuery = @"SELECT TDATE, BHNO, DSEQ, DNO, CSEQ, STOCK, BSTYPE, QTY, IOFLAG, REMARK, JRNUM, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
                                 FROM dbo.TCSIO
-                                WHERE BHNO = @BHNO AND CSEQ = @CSEQ";
+                                WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE = CONVERT(varchar,(DATEADD(dd, @DATEDIFF, GETDATE())), 112)";
                 }
-
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                sqlCmd.CommandText = sqlQuery;
                 sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
                 sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
-                sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
+                sqlCmd.Parameters.AddWithValue("@DATEDIFF", _dateDiff);
 
                 using (SqlDataReader reader = sqlCmd.ExecuteReader())
                 {

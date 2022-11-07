@@ -17,12 +17,56 @@ namespace ESMP.STOCK.TASK.API
     //處理未實現損益查詢
     public class GainLost
     {
-        SqlSearch sqlSearch = new SqlSearch();                              //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)                                           
+        int _type;                                          //查詢與回覆格式設定
+        string _searchStr;                                  //查詢xml或json格式字串
+        SqlSearch _sqlSearch = new SqlSearch();             //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)                                           
+        //--------------------------------------------------------------------------------------------
+        //function getGainLostSearch() - 未實現損益查詢的對外接口function
+        //--------------------------------------------------------------------------------------------
+        public (string,string) getGainLostSearch(string QTYPE, string BHNO, string CSEQ, string stockSymbol, int type)
+        {
+            //宣告物件 變數
+            _type = type;
+            List<TCNUD> TCNUDList = new List<TCNUD>();                                      //自訂TCNUD類別List (ESMP.STOCK.DB.TABLE.API)
+            List<TMHIO> TMHIOList = new List<TMHIO>();                                      //自訂TMHIO類別List (ESMP.STOCK.DB.TABLE.API)
+            List<TCSIO> TCSIOList = new List<TCSIO>();                                      //自訂TCSIO類別List (ESMP.STOCK.DB.TABLE.API)
+            List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();     //自訂unoffset_qtype_detail類別List (階層三:個股明細)
+            List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();              //自訂unoffset_qtype_sum類別List    (階層二:個股未實現損益)
+            List<unoffset_qtype_accsum> accsumList = new List<unoffset_qtype_accsum>();     //自訂unoffset_qtype_accsum類別List (階層一:帳戶未實現損益)
+            string txtSearchContent = "";
+            string txtSearchResultContent = "";
 
+            //取得查詢xml或json格式字串
+            _searchStr = searchSerilizer(QTYPE, BHNO, CSEQ, stockSymbol, _type);
+            txtSearchContent = _searchStr;
+            //取得查詢字串Element
+            var obj = GetElement(_searchStr, _type);
+            root SearchElement = obj as root;
+            //查詢開始...
+            TCNUDList = _sqlSearch.selectTCNUD(SearchElement);
+            TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
+            TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
+            //新增提供今日買進現股資料TMHIOList
+            TCNUDList = getTMHIO(TCNUDList, TMHIOList);
+            //新增當日現股匯入資料TCSIOList
+            TCNUDList = getTCSIO(TCNUDList, TCSIOList);
+            if (TCNUDList.Count > 0)
+            {
+                sumList = searchSum(TCNUDList);
+                accsumList = searchAccSum(sumList);
+                //查詢結果
+                txtSearchResultContent = resultListSerilizer(accsumList, _type);
+            }
+            else
+            {
+                txtSearchResultContent = resultErrListSerilizer(_type);
+            }
+            return (txtSearchContent, txtSearchResultContent);
+        }
         //--------------------------------------------------------------------------------------------
         //function SearchSerilizer() - 將輸入的查詢資訊序列化為xml格式字串
         //--------------------------------------------------------------------------------------------
-        public string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string stockSymbol, int type)
+        private string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string stockSymbol, int type)
         {
             var root = new root()
             {
@@ -54,7 +98,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function GetElement() - 取得xml格式字串 Element
         //--------------------------------------------------------------------------------------------
-        public object GetElement(string Content, int type)
+        private object GetElement(string Content, int type)
         {
             root root = new root();
             if (type == 0)
@@ -76,7 +120,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchSum() - 計算取得 查詢回復階層二的個股未實現損益與個股明細
         //--------------------------------------------------------------------------------------------
-        public List<unoffset_qtype_sum> searchSum(List<TCNUD> dbTCNUD, Dictionary<string, string> ioflagNameDic)
+        private List<unoffset_qtype_sum> searchSum(List<TCNUD> dbTCNUD)
         {
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TCNUD
@@ -95,20 +139,14 @@ namespace ESMP.STOCK.TASK.API
                     row.dno = item.DNO;
                     row.bqty = item.BQTY;
                     row.mprice = item.PRICE;
-                    row.lastprice = Convert.ToDecimal(sqlSearch.selectStockCprice(item.STOCK));
+                    row.lastprice = Convert.ToDecimal(_sqlSearch.selectStockCprice(item.STOCK));
                     row.fee = item.FEE;
                     row.cost = item.COST;
                     //匯撥來源說明
                     if (item.WTYPE == "A")
                     {
                         row.ioflag = item.IOFLAG;
-                        if (item.IOFLAG.Substring(0,1) == "0")
-                        {
-                            item.IOFLAG = item.IOFLAG.Substring(1);
-                        }
-                        string ionameResult;
-                        ioflagNameDic.TryGetValue(item.IOFLAG, out ionameResult);
-                        row.ioname = ionameResult;
+                        row.ioname = BasicData.getIoflagName(item.IOFLAG);
                     }
                     detailList.Add(row);
                 }
@@ -125,7 +163,7 @@ namespace ESMP.STOCK.TASK.API
                 //取得個股未實現損益 List (第二階層)
                 unoffset_qtype_sum row_Sum = new unoffset_qtype_sum();
                 row_Sum.stock = grp_TCNUD[i].First().STOCK;
-                row_Sum.stocknm = sqlSearch.selectStockName(row_Sum.stock);
+                row_Sum.stocknm = _sqlSearch.selectStockName(row_Sum.stock);
                 row_Sum.bqty = detailList.Sum(x => x.bqty);
                 row_Sum.cost = detailList.Sum(x => x.cost);
                 row_Sum.lastprice = detailList.First().lastprice;
@@ -150,7 +188,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchAccSum() - 計算取得 查詢回復階層一 帳戶未實現損益
         //--------------------------------------------------------------------------------------------
-        public List<unoffset_qtype_accsum> searchAccSum(List<unoffset_qtype_sum> sumList)
+        private List<unoffset_qtype_accsum> searchAccSum(List<unoffset_qtype_sum> sumList)
         {
             List<unoffset_qtype_accsum> accsumList = new List<unoffset_qtype_accsum>(); //自訂unoffset_qtype_accsum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             #region 方法一: foreach彙總帳戶未實現損益
@@ -196,7 +234,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function getTMHIO() - 將TMHIOList資料加入新增至TMHIOList
         //--------------------------------------------------------------------------------------------
-        public List<TCNUD> getTMHIO(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList)
+        private List<TCNUD> getTMHIO(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList)
         {
             foreach (var item in TMHIOList)
             {
@@ -227,7 +265,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function getTMHIO() - 將TMHIOList資料加入新增至TMHIOList
         //--------------------------------------------------------------------------------------------
-        public List<TCNUD> getTCSIO(List<TCNUD> TCNUDList, List<TCSIO> TCSIOList)
+        private List<TCNUD> getTCSIO(List<TCNUD> TCNUDList, List<TCSIO> TCSIOList)
         {
             foreach (var item in TCSIOList)
             {
@@ -250,7 +288,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function resultListSerilizer() - 將QTYPE"0001"查詢結果 序列化為xml或json格式字串
         //--------------------------------------------------------------------------------------------
-        public string resultListSerilizer(List<unoffset_qtype_accsum> accsumList, int type)
+        private string resultListSerilizer(List<unoffset_qtype_accsum> accsumList, int type)
         {
             foreach (var item in accsumList)
             {
@@ -329,7 +367,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function resultErrListSerilizer() - 將查詢失敗結果 序列化為xml或json格式字串
         //--------------------------------------------------------------------------------------------
-        public string resultErrListSerilizer(int type)
+        private string resultErrListSerilizer(int type)
         {
             //透過unoffset_qtype_accsum自訂類別反序列 -> accsumSer
             var accsumSer = new unoffset_qtype_accsum()

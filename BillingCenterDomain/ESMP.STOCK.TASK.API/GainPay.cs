@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -17,12 +18,54 @@ namespace ESMP.STOCK.TASK.API
 {
     public class GainPay
     {
-        SqlSearch sqlSearch = new SqlSearch();                              //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)                                           
-        
+        int _type;                                          //查詢與回覆格式設定
+        string _searchStr;                                  //查詢xml或json格式字串
+        SqlSearch _sqlSearch = new SqlSearch();             //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)                                           
+
+        //--------------------------------------------------------------------------------------------
+        //function getGainPaySearch() - 已實現損益查詢的對外接口function
+        //--------------------------------------------------------------------------------------------
+        public (string,string) getGainPaySearch(string QTYPE, string BHNO, string CSEQ, string SDATE, string EDATE, string stockSymbol, int type)
+        {
+            _type = type;
+            List<HCNRH> HCNRHList = new List<HCNRH>();                                      //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
+            List<HCNTD> HCNTDList = new List<HCNTD>();                                      //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
+            List<profit_sum> sumProfitList_HCNRH = new List<profit_sum>();                  //自訂profit_sum類別List            (階層二:個股已實現損益)  
+            List<profit_sum> sumProfitList_HCNTD = new List<profit_sum>();                  //自訂profit_sum類別List            (階層二:個股已實現損益)  
+            List<profit_sum> sumProfitList = new List<profit_sum>();                        //自訂profit_sum類別List            (階層二:個股已實現損益)  
+            List<profit_accsum> accsumProfitList = new List<profit_accsum>();               //自訂profit_accsum類別List         (階層一:帳戶已實現損益)  
+            string txtSearchContent = "";
+            string txtSearchResultContent = "";
+
+            //取得查詢xml或json格式字串
+            _searchStr = searchSerilizer(QTYPE, BHNO, CSEQ, SDATE, EDATE, stockSymbol, _type);
+            txtSearchContent = _searchStr;
+            //取得查詢字串Element
+            var obj = GetElement(_searchStr, _type);
+            root SearchElement = obj as root;
+            //查詢開始...
+            HCNRHList = _sqlSearch.selectHCNRH(SearchElement);
+            HCNTDList = _sqlSearch.selectHCNTD(SearchElement);
+            if (HCNRHList.Count > 0 || HCNTDList.Count > 0)
+            {
+                sumProfitList_HCNRH = searchSum_HCNRH(HCNRHList, BHNO, CSEQ);
+                sumProfitList_HCNTD = searchSum_HCNTD(HCNTDList, BHNO, CSEQ);
+                //合併沖銷與當沖資料
+                sumProfitList = sumProfitList_HCNRH.Concat(sumProfitList_HCNTD).ToList();
+                accsumProfitList = searchAccSum(sumProfitList);
+                //呈現查詢結果
+                txtSearchResultContent = resultListSerilizer(accsumProfitList, _type);
+            }
+            else
+            {
+                txtSearchResultContent = resultErrListSerilizer(_type);
+            }
+            return (txtSearchContent, txtSearchResultContent);
+        }
         //--------------------------------------------------------------------------------------------
         //function SearchSerilizer() - 將輸入的查詢資訊序列化為xml格式字串
         //--------------------------------------------------------------------------------------------
-        public string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string SDATE, string EDATE, string stockSymbol, int type)
+        private string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string SDATE, string EDATE, string stockSymbol, int type)
         {
             var root = new root()
             {
@@ -56,7 +99,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function GetElement() - 取得xml格式字串 Element
         //--------------------------------------------------------------------------------------------
-        public object GetElement(string Content, int type)
+        private object GetElement(string Content, int type)
         {
             root root = new root();
             if (type == 0)
@@ -78,7 +121,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchSum_HCNRH() - 計算取得 查詢回復階層二 個股已實現損益(沖銷)
         //--------------------------------------------------------------------------------------------
-        public List<profit_sum> searchSum_HCNRH(List<HCNRH> dbHCNRH, string BHNO, string CSEQ)
+        private List<profit_sum> searchSum_HCNRH(List<HCNRH> dbHCNRH, string BHNO, string CSEQ)
         {
             List<profit_sum> sumList = new List<profit_sum>();              //自訂profit_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             
@@ -139,7 +182,7 @@ namespace ESMP.STOCK.TASK.API
                 profitSum.dseq = detail_out.dseq;
                 profitSum.dno = detail_out.dno;
                 profitSum.stock = grp_HCNRH[i].First().STOCK;
-                profitSum.stocknm = sqlSearch.selectStockName(grp_HCNRH[i].First().STOCK);
+                profitSum.stocknm = _sqlSearch.selectStockName(grp_HCNRH[i].First().STOCK);
                 profitSum.cqty = detail_out.cqty;
                 profitSum.mprice = detail_out.mprice;
                 profitSum.fee = detail_out.fee;
@@ -161,7 +204,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchSum_HCNTD() - 計算取得 查詢回復階層二 個股已實現損益(當沖)
         //--------------------------------------------------------------------------------------------
-        public List<profit_sum> searchSum_HCNTD(List<HCNTD> dbHCNTD, string BHNO, string CSEQ)
+        private List<profit_sum> searchSum_HCNTD(List<HCNTD> dbHCNTD, string BHNO, string CSEQ)
         {
             List<profit_sum> sumList = new List<profit_sum>();              //自訂profit_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
 
@@ -220,7 +263,7 @@ namespace ESMP.STOCK.TASK.API
                 profitSum.dseq = detail_out.dseq;
                 profitSum.dno = detail_out.dno;
                 profitSum.stock = grp_HCNTD[i].First().STOCK;
-                profitSum.stocknm = sqlSearch.selectStockName(grp_HCNTD[i].First().STOCK);
+                profitSum.stocknm = _sqlSearch.selectStockName(grp_HCNTD[i].First().STOCK);
                 profitSum.cqty = detail_out.cqty;
                 profitSum.mprice = detail_out.mprice;
                 profitSum.fee = detail_out.fee;
@@ -242,7 +285,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchAccSum() - 計算取得 查詢回復階層一 帳戶已實現損益
         //--------------------------------------------------------------------------------------------
-        public List<profit_accsum> searchAccSum(List<profit_sum> sumList)
+        private List<profit_accsum> searchAccSum(List<profit_sum> sumList)
         {
             List<profit_accsum> accsumList = new List<profit_accsum>();         //自訂profit_accsum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
 
@@ -267,7 +310,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function resultListSerilizer() - 將QTYPE"0002"查詢結果 序列化為xml或json格式字串
         //--------------------------------------------------------------------------------------------
-        public string resultListSerilizer(List<profit_accsum> accsumList, int type)
+        private string resultListSerilizer(List<profit_accsum> accsumList, int type)
         {
             foreach (var item in accsumList)
             {
@@ -310,7 +353,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function resultErrListSerilizer() - 將查詢失敗結果 序列化為xml或json格式字串
         //--------------------------------------------------------------------------------------------
-        public string resultErrListSerilizer(int type)
+        private string resultErrListSerilizer(int type)
         {
             //透過profit_accsum自訂類別反序列 -> accsumSer
             var accsumSer = new profit_accsum()
