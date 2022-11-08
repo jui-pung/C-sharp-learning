@@ -13,7 +13,7 @@ namespace ESMP.STOCK.TASK.API
     public class SqlSearch
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        static int _dateDiff = -21;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
+        static int _dateDiff = -22;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ namespace ESMP.STOCK.TASK.API
                     sqlQuery = @"SELECT STOCK, TDATE, DSEQ, DNO, BQTY, PRICE, FEE, COST
                                 FROM dbo.TCNUD 
                                 WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND STOCK = @STOCK
-                                ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                                ORDER BY BHNO, CSEQ, STOCK, TDATE, WTYPE, DNO";
                     sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
                 }
                 else
@@ -43,7 +43,7 @@ namespace ESMP.STOCK.TASK.API
                     sqlQuery = @"SELECT STOCK, TDATE, DSEQ, DNO, BQTY, PRICE, FEE, COST
                                 FROM dbo.TCNUD
                                 WHERE BHNO = @BHNO AND CSEQ = @CSEQ
-                                ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                                ORDER BY BHNO, CSEQ, STOCK, TDATE, WTYPE, DNO";
                 }
                 sqlCmd.CommandText = sqlQuery;
                 sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);

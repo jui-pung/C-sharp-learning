@@ -217,7 +217,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchSum() - 計算取得 查詢回復階層二 對帳單匯總
         //--------------------------------------------------------------------------------------------
-        private billSum searchSum(List<profile> detailList)
+        public billSum searchSum(List<profile> detailList)
         {
             billSum billsum = new billSum();            //自訂profile_Sum類別Class (ESMP.STOCK.FORMAT.API) -函式回傳使用
 

@@ -285,7 +285,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchAccSum() - 計算取得 查詢回復階層一 帳戶已實現損益
         //--------------------------------------------------------------------------------------------
-        private List<profit_accsum> searchAccSum(List<profit_sum> sumList)
+        public List<profit_accsum> searchAccSum(List<profit_sum> sumList)
         {
             List<profit_accsum> accsumList = new List<profit_accsum>();         //自訂profit_accsum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
 

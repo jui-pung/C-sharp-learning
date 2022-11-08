@@ -46,10 +46,13 @@ namespace ESMP.STOCK.TASK.API
             TCNUDList = _sqlSearch.selectTCNUD(SearchElement);
             TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
             TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
-            //新增提供今日買進現股資料TMHIOList
-            TCNUDList = getTMHIO(TCNUDList, TMHIOList);
             //新增當日現股匯入資料TCSIOList
             TCNUDList = getTCSIO(TCNUDList, TCSIOList);
+            //今日賣出現股扣除現股餘額資料
+            TCNUDList = getTMHIO_Sell(TCNUDList, TMHIOList);
+            //新增提供今日買進現股資料TMHIOList
+            TCNUDList = getTMHIO_Buy(TCNUDList, TMHIOList);
+            
             if (TCNUDList.Count > 0)
             {
                 sumList = searchSum(TCNUDList);
@@ -120,7 +123,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchSum() - 計算取得 查詢回復階層二的個股未實現損益與個股明細
         //--------------------------------------------------------------------------------------------
-        private List<unoffset_qtype_sum> searchSum(List<TCNUD> dbTCNUD)
+        public List<unoffset_qtype_sum> searchSum(List<TCNUD> dbTCNUD)
         {
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TCNUD
@@ -188,7 +191,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchAccSum() - 計算取得 查詢回復階層一 帳戶未實現損益
         //--------------------------------------------------------------------------------------------
-        private List<unoffset_qtype_accsum> searchAccSum(List<unoffset_qtype_sum> sumList)
+        public List<unoffset_qtype_accsum> searchAccSum(List<unoffset_qtype_sum> sumList)
         {
             List<unoffset_qtype_accsum> accsumList = new List<unoffset_qtype_accsum>(); //自訂unoffset_qtype_accsum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             #region 方法一: foreach彙總帳戶未實現損益
@@ -232,38 +235,62 @@ namespace ESMP.STOCK.TASK.API
         }
 
         //--------------------------------------------------------------------------------------------
-        //function getTMHIO() - 將TMHIOList資料加入新增至TMHIOList
+        //function getTMHIO_Buy() - 將TMHIOList買進資料加入新增至TCNUDList
         //--------------------------------------------------------------------------------------------
-        private List<TCNUD> getTMHIO(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList)
+        private List<TCNUD> getTMHIO_Buy(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList)
         {
             foreach (var item in TMHIOList)
             {
-                var row = new TCNUD();
-                row.TDATE = item.TDATE;
-                row.STOCK = item.STOCK;
-                row.PRICE = item.PRICE;
-                row.QTY = item.QTY;
-                row.BQTY = item.QTY;
-                row.FEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(item.PRICE) * decimal.ToDouble(item.QTY) * 0.001425));
-                if(item.ETYPE == "2" && row.FEE < 1)
+                if(item.BSTYPE == "B")
                 {
-                    row.FEE = 1;
+                    var row = new TCNUD();
+                    row.TDATE = item.TDATE;
+                    row.STOCK = item.STOCK;
+                    row.PRICE = item.PRICE;
+                    row.QTY = item.QTY;
+                    row.BQTY = item.QTY;
+                    row.FEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(item.PRICE) * decimal.ToDouble(item.QTY) * 0.001425));
+                    if (item.ETYPE == "2" && row.FEE < 1)
+                    {
+                        row.FEE = 1;
+                    }
+                    else if (item.ETYPE == "0" && row.FEE < 20)
+                    {
+                        row.FEE = 20;
+                    }
+                    row.COST = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(item.PRICE) * decimal.ToDouble(item.QTY))) + row.FEE;
+                    row.DSEQ = item.DSEQ;
+                    row.DNO = item.JRNUM;
+                    row.WTYPE = "0";
+                    TCNUDList.Add(row);
                 }
-                else if(item.ETYPE == "0" && row.FEE < 20)
-                {
-                    row.FEE = 20;
-                }
-                row.COST = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(item.PRICE) * decimal.ToDouble(item.QTY))) + row.FEE;
-                row.DSEQ = item.DSEQ;
-                row.DNO = item.JRNUM;
-                row.WTYPE = "0";
-                TCNUDList.Add(row);
             }
             return TCNUDList;
         }
 
         //--------------------------------------------------------------------------------------------
-        //function getTMHIO() - 將TMHIOList資料加入新增至TMHIOList
+        //function getTMHIO_Sell() - 將TMHIOList賣出資料扣除現股餘額資料
+        //--------------------------------------------------------------------------------------------
+        private List<TCNUD> getTMHIO_Sell(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList)
+        {
+            TMHIOList.RemoveAll(r => r.BSTYPE == "B");
+            TMHIOList = TMHIOList.OrderBy(x => x.STOCK).ToList();
+            foreach (var itemTCNUD in TCNUDList)
+            {
+                foreach (var itemTMHIO in TMHIOList)
+                {
+                    if(itemTCNUD.STOCK == itemTMHIO.STOCK && itemTCNUD.BQTY != 0)
+                    {
+                        itemTCNUD.BQTY = itemTCNUD.BQTY - itemTMHIO.QTY;
+                        itemTMHIO.QTY = itemTMHIO.QTY - itemTMHIO.QTY;
+                    }
+                }
+            }
+            return TCNUDList;
+        }
+
+        //--------------------------------------------------------------------------------------------
+        //function getTMHIO_Buy() - 將TMHIOList資料加入新增至TMHIOList
         //--------------------------------------------------------------------------------------------
         private List<TCNUD> getTCSIO(List<TCNUD> TCNUDList, List<TCSIO> TCSIOList)
         {

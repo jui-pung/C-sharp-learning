@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ESMP.STOCK.FORMAT.API;
+using ESMP.STOCK.FORMAT;
 using ESMP.STOCK.DB.TABLE;
 
 namespace ESMP.STOCK.TASK.API.Tests
@@ -24,7 +24,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             //detailList.Add(new unoffset_qtype_detail() { tdate = "20220308", ttype = "0", ttypename = "現買", bstype = "B", dseq = "i0602", dno = "0000001", bqty = Convert.ToDecimal(1000.0), mprice = Convert.ToDecimal(89.1000), mamt = Convert.ToDecimal(89100.0000), lastprice = Convert.ToDecimal(65.0000), marketvalue = Convert.ToDecimal(64713.0), fee = Convert.ToDecimal(126.00), tax = Convert.ToDecimal(0.0), cost = Convert.ToDecimal(89226.00), estimateAmt = Convert.ToDecimal(65000.0), estimateFee = Convert.ToDecimal(92.0), estimateTax = Convert.ToDecimal(195.0), profit = Convert.ToDecimal(-24513.00), pl_ratio = "-27.47%" });
             //detailList.Add(new unoffset_qtype_detail() { tdate = "20220427", ttype = "0", ttypename = "現買", bstype = "B", dseq = "t0493", dno = "0000001", bqty = Convert.ToDecimal(1000.0), mprice = Convert.ToDecimal(83.0000), mamt = Convert.ToDecimal(83000.0000), lastprice = Convert.ToDecimal(65.0000), marketvalue = Convert.ToDecimal(64713.0), fee = Convert.ToDecimal(118.00), tax = Convert.ToDecimal(0.0), cost = Convert.ToDecimal(83118.00), estimateAmt = Convert.ToDecimal(65000.0), estimateFee = Convert.ToDecimal(92.0), estimateTax = Convert.ToDecimal(195.0), profit = Convert.ToDecimal(-18405.00), pl_ratio = "-22.14%" });
             GainLost gainLost = new GainLost();
-            //sumList = gainLost.searchSum(dbTCNUD);
+            sumList = gainLost.searchSum(dbTCNUD);
             detailList = sumList[0].unoffset_qtype_detail;
             foreach (var item in detailList)
             {

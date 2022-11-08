@@ -61,7 +61,7 @@
             "0002",
             "0003"});
             this.comboBoxQTYPE.Location = new System.Drawing.Point(96, 28);
-            this.comboBoxQTYPE.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.comboBoxQTYPE.Margin = new System.Windows.Forms.Padding(2);
             this.comboBoxQTYPE.Name = "comboBoxQTYPE";
             this.comboBoxQTYPE.Size = new System.Drawing.Size(76, 23);
             this.comboBoxQTYPE.TabIndex = 32;
@@ -90,7 +90,7 @@
             // txtEDATE
             // 
             this.txtEDATE.Location = new System.Drawing.Point(389, 68);
-            this.txtEDATE.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtEDATE.Margin = new System.Windows.Forms.Padding(2);
             this.txtEDATE.Name = "txtEDATE";
             this.txtEDATE.Size = new System.Drawing.Size(78, 25);
             this.txtEDATE.TabIndex = 29;
@@ -98,7 +98,7 @@
             // txtSDATE
             // 
             this.txtSDATE.Location = new System.Drawing.Point(244, 68);
-            this.txtSDATE.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtSDATE.Margin = new System.Windows.Forms.Padding(2);
             this.txtSDATE.Name = "txtSDATE";
             this.txtSDATE.Size = new System.Drawing.Size(78, 25);
             this.txtSDATE.TabIndex = 28;
@@ -116,7 +116,7 @@
             // txtStockSymbol
             // 
             this.txtStockSymbol.Location = new System.Drawing.Point(567, 28);
-            this.txtStockSymbol.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtStockSymbol.Margin = new System.Windows.Forms.Padding(2);
             this.txtStockSymbol.Name = "txtStockSymbol";
             this.txtStockSymbol.Size = new System.Drawing.Size(78, 25);
             this.txtStockSymbol.TabIndex = 26;
@@ -155,7 +155,7 @@
             // txtCSEQ
             // 
             this.txtCSEQ.Location = new System.Drawing.Point(389, 28);
-            this.txtCSEQ.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtCSEQ.Margin = new System.Windows.Forms.Padding(2);
             this.txtCSEQ.Name = "txtCSEQ";
             this.txtCSEQ.Size = new System.Drawing.Size(78, 25);
             this.txtCSEQ.TabIndex = 22;
@@ -163,7 +163,7 @@
             // txtBHNO
             // 
             this.txtBHNO.Location = new System.Drawing.Point(244, 28);
-            this.txtBHNO.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtBHNO.Margin = new System.Windows.Forms.Padding(2);
             this.txtBHNO.Name = "txtBHNO";
             this.txtBHNO.Size = new System.Drawing.Size(78, 25);
             this.txtBHNO.TabIndex = 21;
@@ -174,7 +174,7 @@
             this.radioBtnJson.AutoSize = true;
             this.radioBtnJson.Font = new System.Drawing.Font("新細明體", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.radioBtnJson.Location = new System.Drawing.Point(475, 112);
-            this.radioBtnJson.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.radioBtnJson.Margin = new System.Windows.Forms.Padding(2);
             this.radioBtnJson.Name = "radioBtnJson";
             this.radioBtnJson.Size = new System.Drawing.Size(88, 26);
             this.radioBtnJson.TabIndex = 35;
@@ -190,7 +190,7 @@
             this.radioBtnXml.Checked = true;
             this.radioBtnXml.Font = new System.Drawing.Font("新細明體", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.radioBtnXml.Location = new System.Drawing.Point(420, 112);
-            this.radioBtnXml.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.radioBtnXml.Margin = new System.Windows.Forms.Padding(2);
             this.radioBtnXml.Name = "radioBtnXml";
             this.radioBtnXml.Size = new System.Drawing.Size(85, 26);
             this.radioBtnXml.TabIndex = 34;
@@ -203,7 +203,7 @@
             // 
             this.btnSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSearch.Location = new System.Drawing.Point(567, 102);
-            this.btnSearch.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnSearch.Margin = new System.Windows.Forms.Padding(2);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(76, 28);
             this.btnSearch.TabIndex = 33;
@@ -219,7 +219,7 @@
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Location = new System.Drawing.Point(26, 150);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(2);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(630, 364);
@@ -229,9 +229,9 @@
             // 
             this.tabPage1.Controls.Add(this.txtSearchResultContent);
             this.tabPage1.Location = new System.Drawing.Point(8, 30);
-            this.tabPage1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(2);
             this.tabPage1.Size = new System.Drawing.Size(614, 326);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Search Result Content   ";
@@ -244,20 +244,20 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearchResultContent.Font = new System.Drawing.Font("微軟正黑體", 10.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.txtSearchResultContent.Location = new System.Drawing.Point(2, 0);
-            this.txtSearchResultContent.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtSearchResultContent.Margin = new System.Windows.Forms.Padding(2);
             this.txtSearchResultContent.Multiline = true;
             this.txtSearchResultContent.Name = "txtSearchResultContent";
             this.txtSearchResultContent.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtSearchResultContent.Size = new System.Drawing.Size(614, 333);
+            this.txtSearchResultContent.Size = new System.Drawing.Size(0, 0);
             this.txtSearchResultContent.TabIndex = 6;
             // 
             // tabPage2
             // 
             this.tabPage2.Controls.Add(this.txtSearchContent);
             this.tabPage2.Location = new System.Drawing.Point(8, 30);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(2);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(2);
             this.tabPage2.Size = new System.Drawing.Size(614, 326);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Search Content   ";
@@ -270,7 +270,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearchContent.Font = new System.Drawing.Font("微軟正黑體", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.txtSearchContent.Location = new System.Drawing.Point(2, 2);
-            this.txtSearchContent.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtSearchContent.Margin = new System.Windows.Forms.Padding(2);
             this.txtSearchContent.Multiline = true;
             this.txtSearchContent.Name = "txtSearchContent";
             this.txtSearchContent.Size = new System.Drawing.Size(616, 331);
@@ -297,7 +297,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtCSEQ);
             this.Controls.Add(this.txtBHNO);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
             this.Text = "Form1";
             this.tabControl1.ResumeLayout(false);

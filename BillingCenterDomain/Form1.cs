@@ -16,7 +16,6 @@ namespace BillingCenterDomain
     public partial class Form1 : Form
     {
         int _type;                                           //查詢與回覆格式設定
-        string _searchStr;                                   //查詢xml或json格式字串
         SqlSearch _sqlSearch;                                //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)
         public Form1()
         {
@@ -72,7 +71,7 @@ namespace BillingCenterDomain
             if (comboBoxQTYPE.Text == "0001")
             {
                 txtBHNO.Text = "592S";
-                txtCSEQ.Text = "0057758";
+                txtCSEQ.Text = "0079192";
                 txtSDATE.Text = "";
                 txtEDATE.Text = "";
                 txtSDATE.Enabled = false;

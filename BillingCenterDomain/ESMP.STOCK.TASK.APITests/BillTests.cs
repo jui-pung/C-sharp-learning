@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ESMP.STOCK.FORMAT.API;
+using ESMP.STOCK.FORMAT;
 
 namespace ESMP.STOCK.TASK.API.Tests
 {

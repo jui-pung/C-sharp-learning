@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ESMP.STOCK.TASK.API
 {
-    public class BasicData
+    public sealed class BasicData
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
         private static object chekLock = new object();
