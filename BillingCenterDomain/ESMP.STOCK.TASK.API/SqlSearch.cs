@@ -13,7 +13,7 @@ namespace ESMP.STOCK.TASK.API
     public class SqlSearch
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        static int _dateDiff = -22;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
+        static int _dateDiff = -23;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ namespace ESMP.STOCK.TASK.API
                 if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
                 {
                     //加入查詢股票代號
-                    sqlQuery = @"SELECT STOCK, TDATE, DSEQ, DNO, BQTY, PRICE, FEE, COST
+                    sqlQuery = @"SELECT BHNO, CSEQ, STOCK, TDATE, DSEQ, DNO, QTY, BQTY, PRICE, FEE, COST
                                 FROM dbo.TCNUD 
                                 WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND STOCK = @STOCK
                                 ORDER BY BHNO, CSEQ, STOCK, TDATE, WTYPE, DNO";
@@ -40,7 +40,7 @@ namespace ESMP.STOCK.TASK.API
                 }
                 else
                 {
-                    sqlQuery = @"SELECT STOCK, TDATE, DSEQ, DNO, BQTY, PRICE, FEE, COST
+                    sqlQuery = @"SELECT BHNO, CSEQ, STOCK, TDATE, DSEQ, DNO, QTY, BQTY, PRICE, FEE, COST
                                 FROM dbo.TCNUD
                                 WHERE BHNO = @BHNO AND CSEQ = @CSEQ
                                 ORDER BY BHNO, CSEQ, STOCK, TDATE, WTYPE, DNO";
@@ -59,10 +59,13 @@ namespace ESMP.STOCK.TASK.API
                     while (reader.Read())
                     {
                         var row = new TCNUD();
+                        row.BHNO = reader["BHNO"].ToString();
+                        row.CSEQ = reader["CSEQ"].ToString();
                         row.STOCK = reader["STOCK"].ToString();
                         row.TDATE = reader["TDATE"].ToString();
                         row.DSEQ = reader["DSEQ"].ToString();
                         row.DNO = reader["DNO"].ToString();
+                        row.QTY = Convert.ToDecimal(reader["QTY"].ToString());
                         row.BQTY = Convert.ToDecimal(reader["BQTY"].ToString());
                         row.PRICE = Convert.ToDecimal(reader["PRICE"].ToString());
                         row.FEE = Convert.ToDecimal(reader["FEE"].ToString());

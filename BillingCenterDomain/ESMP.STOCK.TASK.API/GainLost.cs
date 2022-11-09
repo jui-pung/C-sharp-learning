@@ -273,19 +273,140 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         private List<TCNUD> getTMHIO_Sell(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList)
         {
+            List<HCNRH> HCNRHList = new List<HCNRH>();
             TMHIOList.RemoveAll(r => r.BSTYPE == "B");
             TMHIOList = TMHIOList.OrderBy(x => x.STOCK).ToList();
-            foreach (var itemTCNUD in TCNUDList)
+            decimal currQty = 0;            //記錄此筆賣單的賣出股數
+            string currStockNo = "";        //紀錄此筆賣單的賣出股票代號
+            decimal currBqty = 0;           //紀錄現股沖銷股數
+            //迴圈歷遍所有當日賣單
+            for (int i = 0; i < TMHIOList.Count; i++)       
             {
-                foreach (var itemTMHIO in TMHIOList)
+                //目前迴圈處理賣單的賣出股數與股票代號
+                currQty = TMHIOList[i].QTY;
+                currStockNo = TMHIOList[i].STOCK;
+                //迴圈歷遍現股庫存
+                for (int j = 0; j < TCNUDList.Count; j++)
                 {
-                    if(itemTCNUD.STOCK == itemTMHIO.STOCK && itemTCNUD.BQTY != 0)
+                    //判斷處理的此筆賣單股票代號與現股庫存股票代號是否相同 否 ->下一筆現股庫存
+                    if (TCNUDList[j].STOCK != currStockNo)
+                        continue;
+                    //是 -> 沖銷現股
+                    //計算目前賣單已沖銷股數 現股沖銷股數
+                    decimal temp = currQty;
+                    currQty = temp - TCNUDList[j].BQTY;         //(currQty == 0 代表賣單已沖銷完成)  (currQty > 0 代表賣單未沖銷完成) (currQty < 0 代表賣單不夠沖銷)
+                    currBqty = TCNUDList[j].BQTY - temp;        //(currBqty == 0 代表現股已沖銷完成) (currBqty > 0 代表此筆現股沖銷完成) (currBqty < 0 代表此筆現股沖銷股數不足)
+
+                    //代表此筆賣單未沖銷完成 現股沖銷股數不足接續下一筆庫存現股沖銷 ex.一筆賣單資料賣出三張台積電 買進現股庫存資料三張台積電分三天買進各一張 三筆現股庫存
+                    if (currQty > 0 && currBqty < 0)
                     {
-                        itemTCNUD.BQTY = itemTCNUD.BQTY - itemTMHIO.QTY;
-                        itemTMHIO.QTY = itemTMHIO.QTY - itemTMHIO.QTY;
+                        //CQTY紀錄本次沖銷股數
+                        TCNUDList[j].CQTY = TCNUDList[j].BQTY;
+                        TCNUDList[j].flag = true;
+                        #region 增加HCNRH資料 已實現損益
+                        var row = new HCNRH();
+                        row.BQTY = TCNUDList[j].BQTY;
+                        row.SQTY = TMHIOList[i].QTY;
+                        row.BHNO = TCNUDList[j].BHNO;
+                        row.TDATE = TMHIOList[i].TDATE;
+                        row.RDATE = TCNUDList[j].TDATE;
+                        row.CSEQ = TCNUDList[j].CSEQ;
+                        row.BDSEQ = TCNUDList[j].DSEQ;
+                        row.BDNO = TCNUDList[j].DNO;
+                        row.SDSEQ = TMHIOList[i].DSEQ;
+                        row.SDNO = TMHIOList[i].JRNUM;
+                        row.STOCK = TCNUDList[j].STOCK;
+                        row.CQTY = TCNUDList[j].CQTY;
+                        row.BPRICE = TCNUDList[j].PRICE;
+                        row.BFEE = TCNUDList[j].FEE;
+                        row.SPRICE = TMHIOList[i].PRICE;
+                        row.SFEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.CQTY) * decimal.ToDouble(row.SPRICE) * 0.001425));
+                        row.TAX = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.CQTY) * decimal.ToDouble(row.SPRICE) * 0.003));
+                        row.INCOME = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.CQTY) * decimal.ToDouble(row.SPRICE))) - (row.SFEE + row.TAX);
+                        row.COST = TCNUDList[j].COST;
+                        row.PROFIT = row.INCOME - row.COST;
+                        row.ADJDATE = "";
+                        row.WTYPE = TCNUDList[j].WTYPE;
+                        HCNRHList.Add(row);
+                        #endregion
+                        continue;
+                    }
+                    //代表此筆賣單已沖銷完成 現股沖銷股數剩下
+                    else if (currQty < 0 && currBqty > 0)
+                    {
+                        decimal currBFEE;
+                        decimal currCOST;
+                        decimal currBQTY;
+                        TCNUDList[j].CQTY = temp;
+                        currBQTY = TCNUDList[j].BQTY;
+                        currBFEE = decimal.Round(Convert.ToDecimal(decimal.ToDouble(TCNUDList[j].CQTY) / decimal.ToDouble(currBQTY) * decimal.ToDouble(TCNUDList[j].FEE)));
+                        currCOST = decimal.Truncate(TCNUDList[j].CQTY * TCNUDList[j].PRICE + TCNUDList[j].FEE);
+                        TCNUDList[j].BQTY = TCNUDList[j].BQTY - TCNUDList[j].CQTY;
+                        TCNUDList[j].FEE = TCNUDList[j].FEE - currBFEE;
+                        TCNUDList[j].COST = TCNUDList[j].COST - currCOST;
+
+                        var row = new HCNRH();
+                        row.BQTY = TCNUDList[j].QTY;
+                        row.SQTY = TMHIOList[i].QTY;
+                        row.BHNO = TCNUDList[j].BHNO;
+                        row.TDATE = TMHIOList[i].TDATE;
+                        row.RDATE = TCNUDList[j].TDATE;
+                        row.CSEQ = TCNUDList[j].CSEQ;
+                        row.BDSEQ = TCNUDList[j].DSEQ;
+                        row.BDNO = TCNUDList[j].DNO;
+                        row.SDSEQ = TMHIOList[i].DSEQ;
+                        row.SDNO = TMHIOList[i].JRNUM;
+                        row.STOCK = TCNUDList[j].STOCK;
+                        row.CQTY = TCNUDList[j].CQTY;
+                        row.BPRICE = TCNUDList[j].PRICE;
+                        row.BFEE = currBFEE;
+                        row.SPRICE = TMHIOList[i].PRICE;
+                        row.SFEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.CQTY) * decimal.ToDouble(row.SPRICE) * 0.001425));
+                        row.TAX = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.CQTY) * decimal.ToDouble(row.SPRICE) * 0.003));
+                        row.INCOME = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.CQTY) * decimal.ToDouble(row.SPRICE))) - (row.SFEE + row.TAX);
+                        row.COST = currCOST;
+                        row.PROFIT = row.INCOME - row.COST;
+                        row.ADJDATE = "";
+                        row.WTYPE = TCNUDList[j].WTYPE;
+                        HCNRHList.Add(row);
+                        break;
+                    }
+                    //代表此筆賣單已沖銷完成 現股沖銷股數沒有剩下(沒有部份沖銷)
+                    if (currQty == 0 && currBqty == 0)
+                    {
+                        TCNUDList[j].CQTY = TCNUDList[j].BQTY;
+                        TCNUDList[j].flag = true;
+                        #region 增加HCNRH資料 已實現損益
+                        var row = new HCNRH();
+                        row.BQTY = TCNUDList[j].QTY;
+                        row.SQTY = TMHIOList[i].QTY;
+                        row.BHNO = TCNUDList[j].BHNO;
+                        row.TDATE = TMHIOList[i].TDATE;
+                        row.RDATE = TCNUDList[j].TDATE;
+                        row.CSEQ = TCNUDList[j].CSEQ;
+                        row.BDSEQ = TCNUDList[j].DSEQ;
+                        row.BDNO = TCNUDList[j].DNO;
+                        row.SDSEQ = TMHIOList[i].DSEQ;
+                        row.SDNO = TMHIOList[i].JRNUM;
+                        row.STOCK = TCNUDList[j].STOCK;
+                        row.CQTY = TCNUDList[j].CQTY;
+                        row.BPRICE = TCNUDList[j].PRICE;
+                        row.BFEE = TCNUDList[j].FEE;
+                        row.SPRICE = TMHIOList[i].PRICE;
+                        row.SFEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.CQTY) * decimal.ToDouble(row.SPRICE) * 0.001425));
+                        row.TAX = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.CQTY) * decimal.ToDouble(row.SPRICE) * 0.003));
+                        row.INCOME = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.CQTY) * decimal.ToDouble(row.SPRICE))) - (row.SFEE + row.TAX);
+                        row.COST = TCNUDList[j].COST;
+                        row.PROFIT = row.INCOME - row.COST;
+                        row.ADJDATE = "";
+                        row.WTYPE = TCNUDList[j].WTYPE;
+                        HCNRHList.Add(row);
+                        #endregion
+                        break;
                     }
                 }
             }
+            TCNUDList.RemoveAll(x => x.CQTY != 0);
             return TCNUDList;
         }
 

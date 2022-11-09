@@ -71,7 +71,7 @@ namespace BillingCenterDomain
             if (comboBoxQTYPE.Text == "0001")
             {
                 txtBHNO.Text = "592S";
-                txtCSEQ.Text = "0079192";
+                txtCSEQ.Text = "0107938";
                 txtSDATE.Text = "";
                 txtEDATE.Text = "";
                 txtSDATE.Enabled = false;

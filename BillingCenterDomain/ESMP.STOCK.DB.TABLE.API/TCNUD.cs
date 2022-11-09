@@ -15,6 +15,7 @@ namespace ESMP.STOCK.DB.TABLE
         public decimal PRICE { get; set; } = 0;
         public decimal QTY { get; set; }
         public decimal BQTY { get; set; }
+        public decimal CQTY { get; set; }
         public decimal FEE { get; set; } = 0;
         public decimal COST { get; set; } = 0;
         public string DSEQ { get; set; }
@@ -27,5 +28,6 @@ namespace ESMP.STOCK.DB.TABLE
         public string MODTIME { get; set; }
         public string MODUSER { get; set; }
         public string IOFLAG { get; set; }
+        public Boolean flag { get; set; } = false;
     }
 }
