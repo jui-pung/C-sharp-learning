@@ -288,15 +288,15 @@ namespace ESMP.STOCK.TASK.API
                 //迴圈歷遍現股庫存
                 for (int j = 0; j < TCNUDList.Count; j++)
                 {
-                    //判斷處理的此筆賣單股票代號與現股庫存股票代號是否相同 否 ->下一筆現股庫存
-                    if (TCNUDList[j].STOCK != currStockNo)
+                    //判斷處理的此筆賣單股票代號與現股庫存股票代號是否相同 現股庫存是否沖銷完成 否 ->下一筆現股庫存
+                    if (TCNUDList[j].STOCK != currStockNo || TCNUDList[j].flag)
                         continue;
                     //是 -> 沖銷現股
                     //計算目前賣單已沖銷股數 現股沖銷股數
                     decimal temp = currQty;
                     currQty = temp - TCNUDList[j].BQTY;         //(currQty == 0 代表賣單已沖銷完成)  (currQty > 0 代表賣單未沖銷完成) (currQty < 0 代表賣單不夠沖銷)
                     currBqty = TCNUDList[j].BQTY - temp;        //(currBqty == 0 代表現股已沖銷完成) (currBqty > 0 代表此筆現股沖銷完成) (currBqty < 0 代表此筆現股沖銷股數不足)
-
+                    
                     //代表此筆賣單未沖銷完成 現股沖銷股數不足接續下一筆庫存現股沖銷 ex.一筆賣單資料賣出三張台積電 買進現股庫存資料三張台積電分三天買進各一張 三筆現股庫存
                     if (currQty > 0 && currBqty < 0)
                     {
@@ -334,19 +334,21 @@ namespace ESMP.STOCK.TASK.API
                     //代表此筆賣單已沖銷完成 現股沖銷股數剩下
                     else if (currQty < 0 && currBqty > 0)
                     {
-                        decimal currBFEE;
-                        decimal currCOST;
-                        decimal currBQTY;
                         TCNUDList[j].CQTY = temp;
-                        currBQTY = TCNUDList[j].BQTY;
-                        currBFEE = decimal.Round(Convert.ToDecimal(decimal.ToDouble(TCNUDList[j].CQTY) / decimal.ToDouble(currBQTY) * decimal.ToDouble(TCNUDList[j].FEE)));
-                        currCOST = decimal.Truncate(TCNUDList[j].CQTY * TCNUDList[j].PRICE + TCNUDList[j].FEE);
-                        TCNUDList[j].BQTY = TCNUDList[j].BQTY - TCNUDList[j].CQTY;
-                        TCNUDList[j].FEE = TCNUDList[j].FEE - currBFEE;
-                        TCNUDList[j].COST = TCNUDList[j].COST - currCOST;
+                        //計算此筆部分沖銷手續費 交易稅 成本
+                        decimal currBQTY = TCNUDList[j].BQTY;       //原始剩餘股數 
+                        decimal currCQTY = TCNUDList[j].CQTY;       //此筆沖銷股數
+                        decimal currBFEE = decimal.Round(TCNUDList[j].FEE * (currCQTY / currBQTY));
+                        decimal currCOST = decimal.Truncate(TCNUDList[j].PRICE * currCQTY) + currBFEE;
+
+                        decimal originalSFEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(TMHIOList[i].QTY) * decimal.ToDouble(TMHIOList[i].PRICE) * 0.001425));
+                        decimal currSFEE = decimal.Round(originalSFEE * (currCQTY / TMHIOList[i].QTY));
+                        decimal originalTAX = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(TMHIOList[i].QTY) * decimal.ToDouble(TMHIOList[i].PRICE) * 0.003));
+                        decimal currTAX = decimal.Round(originalTAX * (currCQTY / TMHIOList[i].QTY));
+                        decimal currINCOME = decimal.Truncate(TMHIOList[i].PRICE * currCQTY) - currSFEE - currTAX;
 
                         var row = new HCNRH();
-                        row.BQTY = TCNUDList[j].QTY;
+                        row.BQTY = TCNUDList[j].BQTY;
                         row.SQTY = TMHIOList[i].QTY;
                         row.BHNO = TCNUDList[j].BHNO;
                         row.TDATE = TMHIOList[i].TDATE;
@@ -361,24 +363,30 @@ namespace ESMP.STOCK.TASK.API
                         row.BPRICE = TCNUDList[j].PRICE;
                         row.BFEE = currBFEE;
                         row.SPRICE = TMHIOList[i].PRICE;
-                        row.SFEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.CQTY) * decimal.ToDouble(row.SPRICE) * 0.001425));
-                        row.TAX = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.CQTY) * decimal.ToDouble(row.SPRICE) * 0.003));
-                        row.INCOME = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.CQTY) * decimal.ToDouble(row.SPRICE))) - (row.SFEE + row.TAX);
+                        row.SFEE = currSFEE;
+                        row.TAX = currTAX;
+                        row.INCOME = currINCOME;
                         row.COST = currCOST;
                         row.PROFIT = row.INCOME - row.COST;
                         row.ADJDATE = "";
                         row.WTYPE = TCNUDList[j].WTYPE;
                         HCNRHList.Add(row);
+
+                        //剩餘庫存股數
+                        TCNUDList[j].BQTY = currBQTY - currCQTY;
+                        TCNUDList[j].FEE = TCNUDList[j].FEE - currBFEE;
+                        TCNUDList[j].COST = TCNUDList[j].COST - currCOST;
+                        
                         break;
                     }
                     //代表此筆賣單已沖銷完成 現股沖銷股數沒有剩下(沒有部份沖銷)
                     if (currQty == 0 && currBqty == 0)
                     {
-                        TCNUDList[j].CQTY = TCNUDList[j].BQTY;
+                        TCNUDList[j].CQTY = temp;
                         TCNUDList[j].flag = true;
                         #region 增加HCNRH資料 已實現損益
                         var row = new HCNRH();
-                        row.BQTY = TCNUDList[j].QTY;
+                        row.BQTY = TCNUDList[j].BQTY;
                         row.SQTY = TMHIOList[i].QTY;
                         row.BHNO = TCNUDList[j].BHNO;
                         row.TDATE = TMHIOList[i].TDATE;
@@ -406,7 +414,7 @@ namespace ESMP.STOCK.TASK.API
                     }
                 }
             }
-            TCNUDList.RemoveAll(x => x.CQTY != 0);
+            TCNUDList.RemoveAll(x => x.flag);
             return TCNUDList;
         }
 
