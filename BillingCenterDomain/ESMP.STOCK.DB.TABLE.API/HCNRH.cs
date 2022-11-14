@@ -39,6 +39,5 @@ namespace ESMP.STOCK.DB.TABLE
         public string MODTIME { get; set; }
         public string MODUSER { get; set; }
 
-        
     }
 }

@@ -13,7 +13,7 @@ namespace ESMP.STOCK.TASK.API
     public class SqlSearch
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        static int _dateDiff = -24;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
+        static int _dateDiff = -28;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
@@ -181,9 +181,9 @@ namespace ESMP.STOCK.TASK.API
         //----------------------------------------------------------------------------------
         // function selectStockCprice() - 查詢 MSTMB TABLE 股票現價
         //----------------------------------------------------------------------------------
-        public string selectStockCprice(string stockNo)
+        public decimal selectStockCprice(string stockNo)
         {
-            string result = "";
+            decimal result = 0;
             try
             {
                 _sqlConn.Open();
@@ -198,9 +198,9 @@ namespace ESMP.STOCK.TASK.API
                     if (Reader.Read())
                     {
                         if (!Reader.IsDBNull(0))
-                            result = Reader["CPRICE"].ToString();
+                            result = Convert.ToDecimal(Reader["CPRICE"].ToString());
                         else
-                            result = "0";
+                            result = 10;          //現價如果是空值, 假設現價為10
                     }
                 }
             }
@@ -507,14 +507,14 @@ namespace ESMP.STOCK.TASK.API
                 sqlCmd.Connection = _sqlConn;
                 if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
                 {
-                    sqlQuery = @"SELECT STOCK, TDATE, DSEQ, JRNUM, TTYPE, BSTYPE, ETYPE, PRICE, QTY
+                    sqlQuery = @"SELECT TDATE, BHNO, DSEQ, JRNUM, MTYPE, CSEQ, TTYPE, ETYPE, BSTYPE, STOCK, QTY, PRICE, SALES, ORGIN, MTIME, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER																						
                                 FROM dbo.TMHIO
                                 WHERE STOCK = @STOCK AND BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE = CONVERT(varchar,(DATEADD(dd, @DATEDIFF, GETDATE())), 112)";
                     sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
                 }
                 else
                 {
-                    sqlQuery = @"SELECT STOCK, TDATE, DSEQ, JRNUM, TTYPE, BSTYPE, ETYPE, PRICE, QTY
+                    sqlQuery = @"SELECT TDATE, BHNO, DSEQ, JRNUM, MTYPE, CSEQ, TTYPE, ETYPE, BSTYPE, STOCK, QTY, PRICE, SALES, ORGIN, MTIME, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER																						
                                 FROM dbo.TMHIO
                                 WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE = CONVERT(varchar,(DATEADD(dd, @DATEDIFF, GETDATE())), 112)";
                 }
@@ -531,15 +531,26 @@ namespace ESMP.STOCK.TASK.API
                     while (reader.Read())
                     {
                         var row = new TMHIO();
-                        row.STOCK = reader["STOCK"].ToString();
                         row.TDATE = reader["TDATE"].ToString();
+                        row.BHNO = reader["BHNO"].ToString();
+                        row.CSEQ = reader["CSEQ"].ToString();
                         row.DSEQ = reader["DSEQ"].ToString();
                         row.JRNUM = reader["JRNUM"].ToString();
+                        row.MTYPE = reader["MTYPE"].ToString();
                         row.TTYPE = reader["TTYPE"].ToString();
-                        row.BSTYPE = reader["BSTYPE"].ToString();
                         row.ETYPE = reader["ETYPE"].ToString();
-                        row.PRICE = Convert.ToDecimal(reader["PRICE"].ToString());
+                        row.BSTYPE = reader["BSTYPE"].ToString();
+                        row.STOCK = reader["STOCK"].ToString();
                         row.QTY = Convert.ToDecimal(reader["QTY"].ToString());
+                        row.PRICE = Convert.ToDecimal(reader["PRICE"].ToString());
+                        row.SALES = reader["SALES"].ToString();
+                        row.ORGIN = reader["ORGIN"].ToString();
+                        row.MTIME = reader["MTIME"].ToString();
+                        row.TRDATE = reader["TRDATE"].ToString();
+                        row.TRTIME = reader["TRTIME"].ToString();
+                        row.MODDATE = reader["MODDATE"].ToString();
+                        row.MODTIME = reader["MODTIME"].ToString();
+                        row.MODUSER = reader["MODUSER"].ToString();
                         dbTMHIO.Add(row);
                     }
                     reader.Close();

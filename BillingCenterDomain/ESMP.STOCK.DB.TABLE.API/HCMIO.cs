@@ -20,6 +20,7 @@ namespace ESMP.STOCK.DB.TABLE
         public string BSTYPE { get; set; }
         public decimal PRICE { get; set; }
         public decimal QTY { get; set; }
+        public decimal BQTY { get; set; }
         public decimal AMT { get; set; }
         public decimal FEE { get; set; }
         public decimal TAX { get; set; }

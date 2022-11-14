@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bill.cs" />
+    <Compile Include="ESMPData.cs" />
     <Compile Include="GainLost.cs" />
     <Compile Include="GainPay.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

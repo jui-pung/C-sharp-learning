@@ -28,6 +28,5 @@ namespace ESMP.STOCK.DB.TABLE
         public string MODTIME { get; set; }
         public string MODUSER { get; set; }
         public string IOFLAG { get; set; }
-        public Boolean flag { get; set; } = false;
     }
 }
