@@ -129,11 +129,11 @@ namespace ESMP.STOCK.TASK.API
             var grp_HCNRH = dbHCNRH.GroupBy(d => new { d.TDATE, d.SDSEQ, d.SDNO }).Select(grp => grp.ToList()).ToList();
 
             //迴圈處理grp_HCNRH群組資料 存入個股彙總資料 List
-            for (int i = 0; i < grp_HCNRH.Count; i++)
+            foreach (var grp_HCNRH_item in grp_HCNRH)
             {
                 //取得個股明細資料 (買入) List (第三階層)
                 List<profit_detail> lst_detail = new List<profit_detail>();
-                foreach (var item in grp_HCNRH[i])
+                foreach (var item in grp_HCNRH_item)
                 {
                     var row = new profit_detail();
                     row.tdate = item.RDATE;
@@ -159,19 +159,19 @@ namespace ESMP.STOCK.TASK.API
 
                 //取得個股明細資料 (賣出) Class (第三階層)
                 profit_detail_out detail_out = new profit_detail_out();
-                detail_out.tdate = grp_HCNRH[i].First().TDATE;
-                detail_out.dseq = grp_HCNRH[i].First().SDSEQ;
-                detail_out.dno = grp_HCNRH[i].First().SDNO;
-                detail_out.mqty = grp_HCNRH[i].First().SQTY;
-                detail_out.cqty = grp_HCNRH[i].Sum(s => s.CQTY);
-                detail_out.mprice = grp_HCNRH[i].First().SPRICE.ToString();
-                detail_out.cost = grp_HCNRH[i].Sum(s => s.COST);
-                detail_out.income = grp_HCNRH[i].Sum(s => s.INCOME);
-                detail_out.netamt = grp_HCNRH[i].Sum(s => s.INCOME);
-                detail_out.fee = grp_HCNRH[i].Sum(s => s.SFEE);
-                detail_out.tax = grp_HCNRH[i].Sum(s => s.TAX);
-                detail_out.wtype = grp_HCNRH[i].First().WTYPE;
-                detail_out.profit = grp_HCNRH[i].Sum(s => s.PROFIT);
+                detail_out.tdate = grp_HCNRH_item.First().TDATE;
+                detail_out.dseq = grp_HCNRH_item.First().SDSEQ;
+                detail_out.dno = grp_HCNRH_item.First().SDNO;
+                detail_out.mqty = grp_HCNRH_item.First().SQTY;
+                detail_out.cqty = grp_HCNRH_item.Sum(s => s.CQTY);
+                detail_out.mprice = grp_HCNRH_item.First().SPRICE.ToString();
+                detail_out.cost = grp_HCNRH_item.Sum(s => s.COST);
+                detail_out.income = grp_HCNRH_item.Sum(s => s.INCOME);
+                detail_out.netamt = grp_HCNRH_item.Sum(s => s.INCOME);
+                detail_out.fee = grp_HCNRH_item.Sum(s => s.SFEE);
+                detail_out.tax = grp_HCNRH_item.Sum(s => s.TAX);
+                detail_out.wtype = grp_HCNRH_item.First().WTYPE;
+                detail_out.profit = grp_HCNRH_item.Sum(s => s.PROFIT);
                 detail_out.ttypename2 = "現賣";
 
                 //取得個股彙總資料 List (第二階層)
@@ -181,8 +181,8 @@ namespace ESMP.STOCK.TASK.API
                 profitSum.tdate = detail_out.tdate;
                 profitSum.dseq = detail_out.dseq;
                 profitSum.dno = detail_out.dno;
-                profitSum.stock = grp_HCNRH[i].First().STOCK;
-                profitSum.stocknm = _sqlSearch.selectStockName(grp_HCNRH[i].First().STOCK);
+                profitSum.stock = grp_HCNRH_item.First().STOCK;
+                profitSum.stocknm = _sqlSearch.selectStockName(grp_HCNRH_item.First().STOCK);
                 profitSum.cqty = detail_out.cqty;
                 profitSum.mprice = detail_out.mprice;
                 profitSum.fee = detail_out.fee;
@@ -192,11 +192,10 @@ namespace ESMP.STOCK.TASK.API
                 profitSum.profit = detail_out.profit;
                 profitSum.pl_ratio = decimal.Round(((profitSum.profit / profitSum.cost) * 100), 2).ToString() + "%";
                 profitSum.ttypename2 = "現賣";
+                //第三階層資料存入第二階層List
                 profitSum.profit_detail = lst_detail;
                 profitSum.profit_detail_out = detail_out;
                 sumList.Add(profitSum);
-
-                //第三階層資料存入第二階層List
             }
             return sumList;
         }
@@ -212,11 +211,11 @@ namespace ESMP.STOCK.TASK.API
             var grp_HCNTD = dbHCNTD.GroupBy(d => new { d.TDATE, d.SDSEQ, d.SDNO }).Select(grp => grp.ToList()).ToList();
 
             //迴圈處理grp_HCNRH群組資料 存入個股彙總資料 List
-            for (int i = 0; i < grp_HCNTD.Count; i++)
+            foreach (var grp_HCNTD_item in grp_HCNTD)
             {
                 //取得個股明細資料 (買入) List (第三階層)
                 List<profit_detail> lst_detail = new List<profit_detail>();
-                foreach (var item in grp_HCNTD[i])
+                foreach (var item in grp_HCNTD_item)
                 {
                     var row = new profit_detail();
                     row.tdate = item.TDATE;
@@ -240,19 +239,19 @@ namespace ESMP.STOCK.TASK.API
 
                 //取得個股明細資料 (賣出) Class (第三階層)
                 profit_detail_out detail_out = new profit_detail_out();
-                detail_out.tdate = grp_HCNTD[i].First().TDATE;
-                detail_out.dseq = grp_HCNTD[i].First().SDSEQ;
-                detail_out.dno = grp_HCNTD[i].First().SDNO;
-                detail_out.mqty = grp_HCNTD[i].First().SQTY;
-                detail_out.cqty = grp_HCNTD[i].Sum(s => s.CQTY);
-                detail_out.mprice = grp_HCNTD[i].First().SPRICE.ToString();
-                detail_out.cost = grp_HCNTD[i].Sum(s => s.COST);
-                detail_out.income = grp_HCNTD[i].Sum(s => s.INCOME);
-                detail_out.netamt = grp_HCNTD[i].Sum(s => s.INCOME);
-                detail_out.fee = grp_HCNTD[i].Sum(s => s.SFEE);
-                detail_out.tax = grp_HCNTD[i].Sum(s => s.TAX);
+                detail_out.tdate = grp_HCNTD_item.First().TDATE;
+                detail_out.dseq = grp_HCNTD_item.First().SDSEQ;
+                detail_out.dno = grp_HCNTD_item.First().SDNO;
+                detail_out.mqty = grp_HCNTD_item.First().SQTY;
+                detail_out.cqty = grp_HCNTD_item.Sum(s => s.CQTY);
+                detail_out.mprice = grp_HCNTD_item.First().SPRICE.ToString();
+                detail_out.cost = grp_HCNTD_item.Sum(s => s.COST);
+                detail_out.income = grp_HCNTD_item.Sum(s => s.INCOME);
+                detail_out.netamt = grp_HCNTD_item.Sum(s => s.INCOME);
+                detail_out.fee = grp_HCNTD_item.Sum(s => s.SFEE);
+                detail_out.tax = grp_HCNTD_item.Sum(s => s.TAX);
                 detail_out.wtype = "0";
-                detail_out.profit = grp_HCNTD[i].Sum(s => s.PROFIT);
+                detail_out.profit = grp_HCNTD_item.Sum(s => s.PROFIT);
                 detail_out.ttypename2 = "賣沖";
 
                 //取得個股彙總資料 List (第二階層)
@@ -262,8 +261,8 @@ namespace ESMP.STOCK.TASK.API
                 profitSum.tdate = detail_out.tdate;
                 profitSum.dseq = detail_out.dseq;
                 profitSum.dno = detail_out.dno;
-                profitSum.stock = grp_HCNTD[i].First().STOCK;
-                profitSum.stocknm = _sqlSearch.selectStockName(grp_HCNTD[i].First().STOCK);
+                profitSum.stock = grp_HCNTD_item.First().STOCK;
+                profitSum.stocknm = _sqlSearch.selectStockName(grp_HCNTD_item.First().STOCK);
                 profitSum.cqty = detail_out.cqty;
                 profitSum.mprice = detail_out.mprice;
                 profitSum.fee = detail_out.fee;
@@ -273,11 +272,10 @@ namespace ESMP.STOCK.TASK.API
                 profitSum.profit = detail_out.profit;
                 profitSum.pl_ratio = decimal.Round(((profitSum.profit / profitSum.cost) * 100), 2).ToString() + "%";
                 profitSum.ttypename2 = "賣沖";
-                sumList.Add(profitSum);
-
                 //第三階層資料存入第二階層List
-                sumList[i].profit_detail = lst_detail;
-                sumList[i].profit_detail_out = detail_out;
+                profitSum.profit_detail = lst_detail;
+                profitSum.profit_detail_out = detail_out;
+                sumList.Add(profitSum);
             }
             return sumList;
         }
