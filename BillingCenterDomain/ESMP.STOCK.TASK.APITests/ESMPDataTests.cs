@@ -431,11 +431,488 @@ namespace ESMP.STOCK.TASK.API.Tests
             Assert.AreEqual(TCNUDList[2].WTYPE, "A");
         }
 
-        //沒有昨日日現股餘額、有今日匯入、今日全部賣出
+        //沒有昨日現股餘額、有今日匯入、今日全部賣出
         [TestMethod()]
         public void currentStockSellTest_4()
         {
-            
+            List<TCNUD> TCNUDList = new List<TCNUD>();
+            List<TMHIO> TMHIOList = new List<TMHIO>();
+            List<TCSIO> TCSIOList = new List<TCSIO>();
+            List<HCMIO> HCMIOList = new List<HCMIO>();
+            List<HCNRH> HCNRHList = new List<HCNRH>();
+            TCSIOList.Add(new TCSIO()
+            {
+                TDATE = "20221017",
+                BHNO = "592S",
+                DSEQ = "0002A",
+                DNO = "00",
+                CSEQ = "0105354",
+                STOCK = "6111",
+                BSTYPE = "B",
+                QTY = Convert.ToDecimal(300),
+                IOFLAG = "0167",
+                REMARK = "",
+                JRNUM = "9111101700003",
+                TRDATE = "20221017",
+                TRTIME = "180906",
+                MODDATE = "20221017",
+                MODTIME = "180906",
+                MODUSER = "REPLY"
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "592S",
+                DSEQ = "i0268",
+                JRNUM = "01337974",
+                MTYPE = "T",
+                CSEQ = "0131263",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "6111",
+                QTY = Convert.ToDecimal(300),
+                PRICE = Convert.ToDecimal(58.7000),
+                SALES = "0056",
+                ORGIN = "1",
+                MTIME = "112803904",
+                TRDATE = "20221017",
+                TRTIME = "112804",
+                MODDATE = "20221017",
+                MODTIME = "112804",
+                MODUSER = "REPLY"
+            });
+            HCMIOList = ESMPData.getHCMIO(TCSIOList, TMHIOList);
+            TCNUDList = ESMPData.addTCSIO(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList) = ESMPData.currentStockSell(TCNUDList, HCMIOList);
+            Assert.AreEqual(HCNRHList.Count, 1);
+            Assert.AreEqual(HCNRHList[0].SDNO, "01337974");
+            Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(300));
+            Assert.AreEqual(HCNRHList[0].SFEE, Convert.ToDecimal(25));
+            Assert.AreEqual(HCNRHList[0].TAX, Convert.ToDecimal(52));
+            Assert.AreEqual(HCNRHList[0].INCOME, Convert.ToDecimal(17533));
+            Assert.AreEqual(HCNRHList[0].COST, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].PROFIT, Convert.ToDecimal(17533));
+
+            Assert.AreEqual(TCNUDList.Count, 0);
+        }
+
+        //沒有昨日現股餘額、有今日匯入、今日部分賣出（需部分沖銷）
+        [TestMethod()]
+        public void currentStockSellTest_5()
+        {
+            List<TCNUD> TCNUDList = new List<TCNUD>();
+            List<TMHIO> TMHIOList = new List<TMHIO>();
+            List<TCSIO> TCSIOList = new List<TCSIO>();
+            List<HCMIO> HCMIOList = new List<HCMIO>();
+            List<HCNRH> HCNRHList = new List<HCNRH>();
+            TCSIOList.Add(new TCSIO()
+            {
+                TDATE = "20221017",
+                BHNO = "592S",
+                DSEQ = "0002A",
+                DNO = "00",
+                CSEQ = "0105354",
+                STOCK = "6111",
+                BSTYPE = "B",
+                QTY = Convert.ToDecimal(300),
+                IOFLAG = "0167",
+                REMARK = "",
+                JRNUM = "9111101700003",
+                TRDATE = "20221017",
+                TRTIME = "180906",
+                MODDATE = "20221017",
+                MODTIME = "180906",
+                MODUSER = "REPLY"
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "592S",
+                DSEQ = "i0268",
+                JRNUM = "01337974",
+                MTYPE = "T",
+                CSEQ = "0131263",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "6111",
+                QTY = Convert.ToDecimal(100),
+                PRICE = Convert.ToDecimal(58.7000),
+                SALES = "0056",
+                ORGIN = "1",
+                MTIME = "112803904",
+                TRDATE = "20221017",
+                TRTIME = "112804",
+                MODDATE = "20221017",
+                MODTIME = "112804",
+                MODUSER = "REPLY"
+            });
+            HCMIOList = ESMPData.getHCMIO(TCSIOList, TMHIOList);
+            TCNUDList = ESMPData.addTCSIO(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList) = ESMPData.currentStockSell(TCNUDList, HCMIOList);
+            Assert.AreEqual(HCNRHList.Count, 1);
+            Assert.AreEqual(HCNRHList[0].SDNO, "01337974");
+            Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(100));
+            Assert.AreEqual(HCNRHList[0].SFEE, Convert.ToDecimal(8));
+            Assert.AreEqual(HCNRHList[0].TAX, Convert.ToDecimal(17));
+            Assert.AreEqual(HCNRHList[0].INCOME, Convert.ToDecimal(5845));
+            Assert.AreEqual(HCNRHList[0].COST, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].PROFIT, Convert.ToDecimal(5845));
+
+            Assert.AreEqual(TCNUDList.Count, 1);
+            Assert.AreEqual(TCNUDList[0].DSEQ, "0002A");
+            Assert.AreEqual(TCNUDList[0].WTYPE, "A");
+            Assert.AreEqual(TCNUDList[0].BQTY, Convert.ToDecimal(200));
+            Assert.AreEqual(TCNUDList[0].FEE, Convert.ToDecimal(0));
+            Assert.AreEqual(TCNUDList[0].COST, Convert.ToDecimal(0));
+        }
+
+        //有昨日現股餘額、今日全部匯出
+        [TestMethod()]
+        public void currentStockSellTest_6()
+        {
+            List<TCNUD> TCNUDList = new List<TCNUD>();
+            List<TMHIO> TMHIOList = new List<TMHIO>();
+            List<TCSIO> TCSIOList = new List<TCSIO>();
+            List<HCMIO> HCMIOList = new List<HCMIO>();
+            List<HCNRH> HCNRHList = new List<HCNRH>();
+            TCNUDList.Add(new TCNUD()
+            {
+                TDATE = "20220815",
+                BHNO = "592S",
+                CSEQ = "0131263",
+                STOCK = "2609",
+                PRICE = Convert.ToDecimal(87.4),
+                QTY = Convert.ToDecimal(1000),
+                BQTY = Convert.ToDecimal(1000),
+                FEE = Convert.ToDecimal(124.00),
+                COST = Convert.ToDecimal(87524.00),
+                DSEQ = "t0350",
+                DNO = "0000007",
+                WTYPE = "0",
+                TRDATE = "20220815",
+                TRTIME = "190320",
+                MODDATE = "20220815",
+                MODTIME = "190320",
+                MODUSER = "DailyJob"
+            });
+            TCSIOList.Add(new TCSIO()
+            {
+                TDATE = "20221017",
+                BHNO = "592S",
+                DSEQ = "0002A",
+                DNO = "00",
+                CSEQ = "0105354",
+                STOCK = "2609",
+                BSTYPE = "S",
+                QTY = Convert.ToDecimal(1000),
+                IOFLAG = "0167",
+                REMARK = "",
+                JRNUM = "9111101700003",
+                TRDATE = "20221017",
+                TRTIME = "180906",
+                MODDATE = "20221017",
+                MODTIME = "180906",
+                MODUSER = "REPLY"
+            });
+            HCMIOList = ESMPData.getHCMIO(TCSIOList, TMHIOList);
+            (HCNRHList, TCNUDList) = ESMPData.currentStockSell(TCNUDList, HCMIOList);
+            Assert.AreEqual(HCNRHList.Count, 1);
+            Assert.AreEqual(HCNRHList[0].SDNO, "00");
+            Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(1000));
+            Assert.AreEqual(HCNRHList[0].SFEE, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].TAX, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].INCOME, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].PROFIT, Convert.ToDecimal(-87524));
+
+            Assert.AreEqual(TCNUDList.Count, 0);
+        }
+
+        //有昨日現股餘額、今日部分匯出（需部分沖銷）
+        [TestMethod()]
+        public void currentStockSellTest_7()
+        {
+            List<TCNUD> TCNUDList = new List<TCNUD>();
+            List<TMHIO> TMHIOList = new List<TMHIO>();
+            List<TCSIO> TCSIOList = new List<TCSIO>();
+            List<HCMIO> HCMIOList = new List<HCMIO>();
+            List<HCNRH> HCNRHList = new List<HCNRH>();
+            TCNUDList.Add(new TCNUD()
+            {
+                TDATE = "20220815",
+                BHNO = "592S",
+                CSEQ = "0131263",
+                STOCK = "2609",
+                PRICE = Convert.ToDecimal(87.4),
+                QTY = Convert.ToDecimal(1000),
+                BQTY = Convert.ToDecimal(1000),
+                FEE = Convert.ToDecimal(124.00),
+                COST = Convert.ToDecimal(87524.00),
+                DSEQ = "t0350",
+                DNO = "0000007",
+                WTYPE = "0",
+                TRDATE = "20220815",
+                TRTIME = "190320",
+                MODDATE = "20220815",
+                MODTIME = "190320",
+                MODUSER = "DailyJob"
+            });
+            TCSIOList.Add(new TCSIO()
+            {
+                TDATE = "20221017",
+                BHNO = "592S",
+                DSEQ = "0002A",
+                DNO = "00",
+                CSEQ = "0105354",
+                STOCK = "2609",
+                BSTYPE = "S",
+                QTY = Convert.ToDecimal(500),
+                IOFLAG = "0167",
+                REMARK = "",
+                JRNUM = "9111101700003",
+                TRDATE = "20221017",
+                TRTIME = "180906",
+                MODDATE = "20221017",
+                MODTIME = "180906",
+                MODUSER = "REPLY"
+            });
+            HCMIOList = ESMPData.getHCMIO(TCSIOList, TMHIOList);
+            (HCNRHList, TCNUDList) = ESMPData.currentStockSell(TCNUDList, HCMIOList);
+            Assert.AreEqual(HCNRHList.Count, 1);
+            Assert.AreEqual(HCNRHList[0].SDNO, "00");
+            Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(500));
+            Assert.AreEqual(HCNRHList[0].SFEE, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].TAX, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].INCOME, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].PROFIT, Convert.ToDecimal(-43762));
+
+            Assert.AreEqual(TCNUDList.Count, 1);
+            Assert.AreEqual(TCNUDList[0].DSEQ, "t0350");
+            Assert.AreEqual(TCNUDList[0].WTYPE, "0");
+            Assert.AreEqual(TCNUDList[0].BQTY, Convert.ToDecimal(500));
+            Assert.AreEqual(TCNUDList[0].FEE, Convert.ToDecimal(62));
+            Assert.AreEqual(TCNUDList[0].COST, Convert.ToDecimal(43762));
+        }
+
+        //有昨日現股餘額、有今日匯入、今日部分匯出（需部分沖銷）
+        [TestMethod()]
+        public void currentStockSellTest_8()
+        {
+            List<TCNUD> TCNUDList = new List<TCNUD>();
+            List<TMHIO> TMHIOList = new List<TMHIO>();
+            List<TCSIO> TCSIOList = new List<TCSIO>();
+            List<HCMIO> HCMIOList = new List<HCMIO>();
+            List<HCNRH> HCNRHList = new List<HCNRH>();
+            TCNUDList.Add(new TCNUD()
+            {
+                TDATE = "20220815",
+                BHNO = "592S",
+                CSEQ = "0131263",
+                STOCK = "2609",
+                PRICE = Convert.ToDecimal(87.4),
+                QTY = Convert.ToDecimal(1000),
+                BQTY = Convert.ToDecimal(1000),
+                FEE = Convert.ToDecimal(124.00),
+                COST = Convert.ToDecimal(87524.00),
+                DSEQ = "t0350",
+                DNO = "0000007",
+                WTYPE = "0",
+                TRDATE = "20220815",
+                TRTIME = "190320",
+                MODDATE = "20220815",
+                MODTIME = "190320",
+                MODUSER = "DailyJob"
+            });
+            TCSIOList.Add(new TCSIO()
+            {
+                TDATE = "20221017",
+                BHNO = "592S",
+                DSEQ = "0002A",
+                DNO = "00",
+                CSEQ = "0105354",
+                STOCK = "2609",
+                BSTYPE = "B",
+                QTY = Convert.ToDecimal(500),
+                IOFLAG = "0167",
+                REMARK = "",
+                JRNUM = "9111101700003",
+                TRDATE = "20221017",
+                TRTIME = "180906",
+                MODDATE = "20221017",
+                MODTIME = "180906",
+                MODUSER = "REPLY"
+            });
+            TCSIOList.Add(new TCSIO()
+            {
+                TDATE = "20221017",
+                BHNO = "592S",
+                DSEQ = "0004A",
+                DNO = "00",
+                CSEQ = "0105354",
+                STOCK = "2609",
+                BSTYPE = "S",
+                QTY = Convert.ToDecimal(500),
+                IOFLAG = "0167",
+                REMARK = "",
+                JRNUM = "9111101700003",
+                TRDATE = "20221017",
+                TRTIME = "180906",
+                MODDATE = "20221017",
+                MODTIME = "180906",
+                MODUSER = "REPLY"
+            });
+            HCMIOList = ESMPData.getHCMIO(TCSIOList, TMHIOList);
+            TCNUDList = ESMPData.addTCSIO(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList) = ESMPData.currentStockSell(TCNUDList, HCMIOList);
+            Assert.AreEqual(HCNRHList.Count, 1);
+            Assert.AreEqual(HCNRHList[0].SDNO, "00");
+            Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(500));
+            Assert.AreEqual(HCNRHList[0].SFEE, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].TAX, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].INCOME, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].PROFIT, Convert.ToDecimal(-43762));
+
+            Assert.AreEqual(TCNUDList.Count, 2);
+            Assert.AreEqual(TCNUDList[0].DSEQ, "t0350");
+            Assert.AreEqual(TCNUDList[0].WTYPE, "0");
+            Assert.AreEqual(TCNUDList[0].BQTY, Convert.ToDecimal(500));
+            Assert.AreEqual(TCNUDList[0].FEE, Convert.ToDecimal(62));
+            Assert.AreEqual(TCNUDList[0].COST, Convert.ToDecimal(43762));
+            Assert.AreEqual(TCNUDList[1].DSEQ, "0002A");
+            Assert.AreEqual(TCNUDList[1].WTYPE, "A");
+            Assert.AreEqual(TCNUDList[1].BQTY, Convert.ToDecimal(500));
+            Assert.AreEqual(TCNUDList[1].FEE, Convert.ToDecimal(0));
+            Assert.AreEqual(TCNUDList[1].COST, Convert.ToDecimal(0));
+        }
+
+        //沒有昨日現股餘額、有今日匯入、今日全部匯出
+        [TestMethod()]
+        public void currentStockSellTest_9()
+        {
+            List<TCNUD> TCNUDList = new List<TCNUD>();
+            List<TMHIO> TMHIOList = new List<TMHIO>();
+            List<TCSIO> TCSIOList = new List<TCSIO>();
+            List<HCMIO> HCMIOList = new List<HCMIO>();
+            List<HCNRH> HCNRHList = new List<HCNRH>();
+            TCSIOList.Add(new TCSIO()
+            {
+                TDATE = "20221017",
+                BHNO = "592S",
+                DSEQ = "0002A",
+                DNO = "00",
+                CSEQ = "0105354",
+                STOCK = "6111",
+                BSTYPE = "B",
+                QTY = Convert.ToDecimal(300),
+                IOFLAG = "0167",
+                REMARK = "",
+                JRNUM = "9111101700003",
+                TRDATE = "20221017",
+                TRTIME = "180906",
+                MODDATE = "20221017",
+                MODTIME = "180906",
+                MODUSER = "REPLY"
+            });
+            TCSIOList.Add(new TCSIO()
+            {
+                TDATE = "20221017",
+                BHNO = "592S",
+                DSEQ = "0005A",
+                DNO = "00",
+                CSEQ = "0105354",
+                STOCK = "6111",
+                BSTYPE = "S",
+                QTY = Convert.ToDecimal(300),
+                IOFLAG = "0256",
+                REMARK = "",
+                JRNUM = "9111101700087",
+                TRDATE = "20221017",
+                TRTIME = "180906",
+                MODDATE = "20221017",
+                MODTIME = "180906",
+                MODUSER = "REPLY"
+            });
+            HCMIOList = ESMPData.getHCMIO(TCSIOList, TMHIOList);
+            TCNUDList = ESMPData.addTCSIO(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList) = ESMPData.currentStockSell(TCNUDList, HCMIOList);
+            Assert.AreEqual(HCNRHList.Count, 1);
+            Assert.AreEqual(HCNRHList[0].SDNO, "00");
+            Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(300));
+            Assert.AreEqual(HCNRHList[0].SFEE, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].TAX, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].INCOME, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].COST, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].PROFIT, Convert.ToDecimal(0));
+
+            Assert.AreEqual(TCNUDList.Count, 0);
+        }
+
+        //沒有昨日現股餘額、有今日匯入、今日部分匯出（需部分沖銷）
+        [TestMethod()]
+        public void currentStockSellTest_10()
+        {
+            List<TCNUD> TCNUDList = new List<TCNUD>();
+            List<TMHIO> TMHIOList = new List<TMHIO>();
+            List<TCSIO> TCSIOList = new List<TCSIO>();
+            List<HCMIO> HCMIOList = new List<HCMIO>();
+            List<HCNRH> HCNRHList = new List<HCNRH>();
+            TCSIOList.Add(new TCSIO()
+            {
+                TDATE = "20221017",
+                BHNO = "592S",
+                DSEQ = "0004A",
+                DNO = "00",
+                CSEQ = "0105354",
+                STOCK = "6111",
+                BSTYPE = "B",
+                QTY = Convert.ToDecimal(300),
+                IOFLAG = "0167",
+                REMARK = "",
+                JRNUM = "9111101700003",
+                TRDATE = "20221017",
+                TRTIME = "180906",
+                MODDATE = "20221017",
+                MODTIME = "180906",
+                MODUSER = "REPLY"
+            });
+            TCSIOList.Add(new TCSIO()
+            {
+                TDATE = "20221017",
+                BHNO = "592S",
+                DSEQ = "0005A",
+                DNO = "00",
+                CSEQ = "0105354",
+                STOCK = "6111",
+                BSTYPE = "S",
+                QTY = Convert.ToDecimal(100),
+                IOFLAG = "0256",
+                REMARK = "",
+                JRNUM = "9111101700087",
+                TRDATE = "20221017",
+                TRTIME = "180906",
+                MODDATE = "20221017",
+                MODTIME = "180906",
+                MODUSER = "REPLY"
+            });
+            HCMIOList = ESMPData.getHCMIO(TCSIOList, TMHIOList);
+            TCNUDList = ESMPData.addTCSIO(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList) = ESMPData.currentStockSell(TCNUDList, HCMIOList);
+            Assert.AreEqual(HCNRHList.Count, 1);
+            Assert.AreEqual(HCNRHList[0].SDNO, "00");
+            Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(100));
+            Assert.AreEqual(HCNRHList[0].SFEE, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].TAX, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].INCOME, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].COST, Convert.ToDecimal(0));
+            Assert.AreEqual(HCNRHList[0].PROFIT, Convert.ToDecimal(0));
+
+            Assert.AreEqual(TCNUDList.Count, 1);
+            Assert.AreEqual(TCNUDList[0].DSEQ, "0004A");
+            Assert.AreEqual(TCNUDList[0].WTYPE, "A");
+            Assert.AreEqual(TCNUDList[0].BQTY, Convert.ToDecimal(200));
+            Assert.AreEqual(TCNUDList[0].FEE, Convert.ToDecimal(0));
+            Assert.AreEqual(TCNUDList[0].COST, Convert.ToDecimal(0));
         }
     }
 }

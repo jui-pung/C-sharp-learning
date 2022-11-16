@@ -28,7 +28,11 @@ namespace ESMP.STOCK.TASK.API
         public (string,string) getGainPaySearch(string QTYPE, string BHNO, string CSEQ, string SDATE, string EDATE, string stockSymbol, int type)
         {
             _type = type;
+            List<TCNUD> TCNUDList = new List<TCNUD>();                                      //自訂TCNUD類別List (ESMP.STOCK.DB.TABLE.API)
+            List<TMHIO> TMHIOList = new List<TMHIO>();                                      //自訂TMHIO類別List (ESMP.STOCK.DB.TABLE.API)
+            List<TCSIO> TCSIOList = new List<TCSIO>();                                      //自訂TCSIO類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNRH> HCNRHList = new List<HCNRH>();                                      //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
+            List<HCNRH> addHCNRHList = new List<HCNRH>();                                   //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNTD> HCNTDList = new List<HCNTD>();                                      //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             List<profit_sum> sumProfitList_HCNRH = new List<profit_sum>();                  //自訂profit_sum類別List            (階層二:個股已實現損益)  
             List<profit_sum> sumProfitList_HCNTD = new List<profit_sum>();                  //自訂profit_sum類別List            (階層二:個股已實現損益)  
@@ -43,9 +47,15 @@ namespace ESMP.STOCK.TASK.API
             //取得查詢字串Element
             var obj = GetElement(_searchStr, _type);
             root SearchElement = obj as root;
-            //查詢開始...
+            //查詢資料庫資料
+            TCNUDList = _sqlSearch.selectTCNUD(SearchElement);
+            TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
+            TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
             HCNRHList = _sqlSearch.selectHCNRH(SearchElement);
             HCNTDList = _sqlSearch.selectHCNTD(SearchElement);
+            //盤中現股沖銷處理
+            (TCNUDList, addHCNRHList) = ESMPData.getESMPData(TCNUDList, TMHIOList, TCSIOList);
+            HCNRHList.Concat(addHCNRHList);
             if (HCNRHList.Count > 0 || HCNTDList.Count > 0)
             {
                 sumProfitList_HCNRH = searchSum_HCNRH(HCNRHList, BHNO, CSEQ);

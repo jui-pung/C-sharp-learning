@@ -12,19 +12,19 @@ namespace ESMP.STOCK.TASK.API
 {
     public class ESMPData
     {
-        public static List<TCNUD> getESMPData(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList, List<TCSIO> TCSIOList)
+        public static (List<TCNUD>,List<HCNRH>) getESMPData(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList, List<TCSIO> TCSIOList)
         {
             List<HCNRH> HCNRHList = new List<HCNRH>();          //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCMIO> HCMIOList = new List<HCMIO>();          //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
-            //現股匯入資料TCSIO與TMHIO當日明細 儲存為歷史交易明細格式List
+            //將TMHIO List與TCSIO List資料轉入(Ram)HCMIO中
             HCMIOList = getHCMIO(TCSIOList, TMHIOList);
             //今日匯入（TCSIO）加入現股餘額
             TCNUDList = addTCSIO(TCNUDList, HCMIOList);
-            //今日賣出現股扣除現股餘額資料
+            //今日賣出 匯出現股扣除現股餘額資料
             (HCNRHList,TCNUDList) = currentStockSell(TCNUDList, HCMIOList);
             //今日買進（TMHIO）加入現股餘額
             TCNUDList = addTMHIOBuy(TCNUDList, HCMIOList);
-            return TCNUDList;
+            return (TCNUDList, HCNRHList);
         }
 
         //--------------------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ namespace ESMP.STOCK.TASK.API
             return TCNUDList;
         }
         //--------------------------------------------------------------------------------------------
-        //function currentStockSell() - 將賣出資料扣除現股餘額資料
+        //function currentStockSell() - 將賣出 匯出資料扣除現股餘額資料
         //--------------------------------------------------------------------------------------------
         public static (List<HCNRH>,List<TCNUD>) currentStockSell(List<TCNUD> TCNUDList, List<HCMIO> HCMIOList)
         {
@@ -136,6 +136,7 @@ namespace ESMP.STOCK.TASK.API
                 decimal currSellQty = HCMIO_item.QTY;
                 string currStockNo = HCMIO_item.STOCK;
 
+                //dic,.<string,List<TCNUD>>
                 //挑選出相同股票代號與未沖銷完成的買單現股庫存(BQTY > 0)
                 List<TCNUD> TCNUDCurrentList = TCNUDList.Where(s => s.STOCK == currStockNo && s.BQTY > 0).OrderBy(x => x.TDATE).ThenBy(x => x.WTYPE).ThenBy(x => x.DNO).ToList();
 
@@ -143,13 +144,13 @@ namespace ESMP.STOCK.TASK.API
                 foreach (var TCNUD_item in TCNUDCurrentList)
                 {
                     //計算沖銷狀況
-                    decimal bqtyState = Math.Min(currSellQty, TCNUD_item.BQTY);
+                    decimal cqtyState = Math.Min(currSellQty, TCNUD_item.BQTY);
 
                     //代表此筆賣單未沖銷完成 現股沖銷股數不足接續下一筆庫存現股沖銷
-                    if (bqtyState != currSellQty && bqtyState == TCNUD_item.BQTY)
+                    if (cqtyState != currSellQty && cqtyState == TCNUD_item.BQTY)
                     {
                         TCNUD_item.CQTY = TCNUD_item.BQTY;                  //TCNUD_item.CQTY紀錄本次沖銷股數
-                        HCMIO_item.BQTY = currSellQty - bqtyState;          //HCMIO_item.BQTY紀錄賣單未沖銷股數
+                        HCMIO_item.BQTY = currSellQty - cqtyState;          //HCMIO_item.BQTY紀錄賣單未沖銷股數
                         currSellQty = HCMIO_item.BQTY;                      //更新目前賣單剩餘未沖銷股數
 
                         //計算此筆HCMIO部分沖銷手續費 交易稅 成本
@@ -164,13 +165,13 @@ namespace ESMP.STOCK.TASK.API
                         //TCNUD_item.BQTY更新買單未沖銷股數
                         TCNUD_item.BQTY = 0;
                         //更新原始TCNUDList BQTY CQTY欄位
-                        TCNUDList.Where(s => s.DSEQ == TCNUD_item.DSEQ && s.DNO == TCNUD_item.DNO && s.STOCK == TCNUD_item.STOCK).ToList().ForEach(x => { x.BQTY = TCNUD_item.BQTY; x.CQTY = TCNUD_item.CQTY; });
+                        //TCNUDList.Where(s => s.DSEQ == TCNUD_item.DSEQ && s.DNO == TCNUD_item.DNO && s.STOCK == TCNUD_item.STOCK).ToList().ForEach(x => { x.BQTY = TCNUD_item.BQTY; x.CQTY = TCNUD_item.CQTY; });
                         continue;
                     }
                     //代表此筆賣單已沖銷完成 現股沖銷股數剩下
-                    else if (bqtyState == currSellQty && bqtyState != TCNUD_item.BQTY)
+                    else if (cqtyState == currSellQty && cqtyState != TCNUD_item.BQTY)
                     {
-                        TCNUD_item.CQTY = bqtyState;
+                        TCNUD_item.CQTY = cqtyState;
                         HCMIO_item.BQTY = 0;
                         
                         //計算此筆部分沖銷手續費 交易稅 成本
@@ -197,9 +198,9 @@ namespace ESMP.STOCK.TASK.API
                         break;
                     }
                     //代表此筆賣單已沖銷完成 現股沖銷股數沒有剩下(沒有部份沖銷)
-                    else if (bqtyState == currSellQty && bqtyState == TCNUD_item.BQTY)
+                    else if (cqtyState == currSellQty && cqtyState == TCNUD_item.BQTY)
                     {
-                        TCNUD_item.CQTY = bqtyState;
+                        TCNUD_item.CQTY = cqtyState;
                         HCMIO_item.BQTY = 0;
 
                         //增加HCNRH資料 已實現損益
