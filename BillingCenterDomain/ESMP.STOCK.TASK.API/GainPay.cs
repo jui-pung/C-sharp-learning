@@ -55,7 +55,7 @@ namespace ESMP.STOCK.TASK.API
             HCNTDList = _sqlSearch.selectHCNTD(SearchElement);
             //盤中現股沖銷處理
             (TCNUDList, addHCNRHList) = ESMPData.getESMPData(TCNUDList, TMHIOList, TCSIOList);
-            HCNRHList.Concat(addHCNRHList);
+            HCNRHList = HCNRHList.Concat(addHCNRHList).ToList();
             if (HCNRHList.Count > 0 || HCNTDList.Count > 0)
             {
                 sumProfitList_HCNRH = searchSum_HCNRH(HCNRHList, BHNO, CSEQ);

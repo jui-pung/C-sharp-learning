@@ -15,7 +15,6 @@ namespace ESMP.STOCK.DB.TABLE
         public decimal PRICE { get; set; } = 0;
         public decimal QTY { get; set; }
         public decimal BQTY { get; set; }
-        public decimal CQTY { get; set; }
         public decimal FEE { get; set; } = 0;
         public decimal COST { get; set; } = 0;
         public string DSEQ { get; set; }
