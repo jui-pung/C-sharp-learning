@@ -616,8 +616,13 @@ namespace ESMP.STOCK.TASK.API.Tests
                 MODTIME = "180906",
                 MODUSER = "REPLY"
             });
+            //將TMHIO List與TCSIO List資料轉入(Ram)HCMIO中
             HCMIOList = ESMPData.getHCMIO(TCSIOList, TMHIOList);
+            //今日匯入（TCSIO）加入現股餘額
+            TCNUDList = ESMPData.addTCSIO(TCNUDList, HCMIOList);
+            //今日賣出 匯出現股扣除現股餘額資料
             (HCNRHList, TCNUDList) = ESMPData.currentStockSell(TCNUDList, HCMIOList);
+
             Assert.AreEqual(HCNRHList.Count, 1);
             Assert.AreEqual(HCNRHList[0].SDNO, "00");
             Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(1000));
