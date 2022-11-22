@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ namespace ESMP.STOCK.TASK.API
     public class SqlSearch
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        static int _dateDiff = -35;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
+        static int _dateDiff = -36;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
@@ -88,7 +89,7 @@ namespace ESMP.STOCK.TASK.API
 
         # region selectMSTMB
         //----------------------------------------------------------------------------------
-        // function selectMSTMB() - 查詢 MSTMB TABLE的STOCK,CPRICE
+        // function selectMSTMB() - 查詢 MSTMB TABLE
         //----------------------------------------------------------------------------------
         public List<MSTMB> selectMSTMB()
         {
@@ -96,7 +97,7 @@ namespace ESMP.STOCK.TASK.API
             try
             {
                 _sqlConn.Open();
-                string sqlQuery = @"SELECT STOCK, CPRICE
+                string sqlQuery = @"SELECT STOCK, CNAME, ENAME, MTYPE, STYPE, SCLASS, TSDATE, TEDATE, CLDATE, CPRICE, TPRICE, BPRICE, TSTATUS, BRKNO, IDATE, IRATE, IDAY, CURRENCY, COUNTRY, SHARE, WARNING, TMARK, MFLAG, WMARK, TAXTYPE, PTYPE, DRDATE, PDRDATE, CDIV, SDIV, CNTDTYPE, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
                                     FROM MSTMB";
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
                 using (SqlDataReader reader = sqlCmd.ExecuteReader())
@@ -109,10 +110,44 @@ namespace ESMP.STOCK.TASK.API
                     {
                         var row = new MSTMB();
                         row.STOCK = reader["STOCK"].ToString();
-                        if (reader.IsDBNull(1))
-                            row.CPRICE = 0;
+                        row.CNAME = reader["CNAME"].ToString();
+                        row.ENAME = reader["ENAME"].ToString();
+                        row.MTYPE = reader["MTYPE"].ToString();
+                        row.STYPE = reader["STYPE"].ToString();
+                        row.SCLASS = reader["SCLASS"].ToString();
+                        row.TSDATE = reader["TSDATE"].ToString();
+                        row.TEDATE = reader["TEDATE"].ToString();
+                        row.CLDATE = reader["CLDATE"].ToString();
+                        row.CPRICE = reader.IsDBNull(9) ? 10 : Convert.ToDecimal(reader["CPRICE"].ToString());      //現價如果是空值, 假設現價為10
+                        row.TPRICE = reader.IsDBNull(10) ? 0 : Convert.ToDecimal(reader["TPRICE"].ToString());
+                        row.BPRICE = reader.IsDBNull(11) ? 0 : Convert.ToDecimal(reader["BPRICE"].ToString());
+                        row.TSTATUS = reader["TSTATUS"].ToString();
+                        row.BRKNO = reader["BRKNO"].ToString();
+                        row.IDATE = reader["IDATE"].ToString();
+                        row.IRATE = reader.IsDBNull(15) ? 0 : Convert.ToDecimal(reader["IRATE"].ToString());
+                        row.IDAY = reader.IsDBNull(16) ? 0 : Convert.ToDecimal(reader["IDAY"].ToString());
+                        row.CURRENCY = reader["CURRENCY"].ToString();
+                        row.COUNTRY = reader["COUNTRY"].ToString();
+                        row.SHARE = reader.IsDBNull(19) ? 0 : Convert.ToDecimal(reader["SHARE"].ToString());
+                        row.WARNING = reader["WARNING"].ToString();
+                        row.TMARK = reader["TMARK"].ToString();
+                        row.MFLAG = reader["MFLAG"].ToString();
+                        row.WMARK = reader["WMARK"].ToString();
+                        row.TAXTYPE = reader["TAXTYPE"].ToString();
+                        row.PTYPE = reader["PTYPE"].ToString();
+                        row.DRDATE = reader["DRDATE"].ToString();
+                        row.PDRDATE = reader["PDRDATE"].ToString();
+                        row.CDIV = reader.IsDBNull(28) ? 0 : Convert.ToDecimal(reader["CDIV"].ToString());
+                        row.SDIV = reader.IsDBNull(29) ? 0 : Convert.ToDecimal(reader["SDIV"].ToString());
+                        if (!reader.IsDBNull(30))
+                            row.CNTDTYPE = reader["CNTDTYPE"].ToString();
                         else
-                            row.CPRICE = Convert.ToDecimal(reader["CPRICE"].ToString());
+                            row.CNTDTYPE = "N";          //沖銷資格如果是空值, 假設賣單只能沖銷昨日餘額(N)
+                        row.TRDATE = reader["TRDATE"].ToString();
+                        row.TRTIME = reader["TRTIME"].ToString();
+                        row.MODDATE = reader["MODDATE"].ToString();
+                        row.MODTIME = reader["MODTIME"].ToString();
+                        row.MODUSER = reader["MODUSER"].ToString();
                         dbMSTMB.Add(row);
                     }
                     reader.Close();
@@ -236,6 +271,159 @@ namespace ESMP.STOCK.TASK.API
                         result = Reader["CNAME"].ToString();
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+            return result;
+        }
+
+        //----------------------------------------------------------------------------------
+        // function selectStockCNTDTYPE() - 查詢股票 MSTMB TABLE 當沖資格
+        //----------------------------------------------------------------------------------
+        public string selectStockCNTDTYPE(string stockNo)
+        {
+            string result = "";
+            try
+            {
+                _sqlConn.Open();
+                string sqlQuery = @"SELECT CNTDTYPE
+                                    FROM MSTMB
+                                    WHERE STOCK = @STOCK";
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                sqlCmd.Parameters.AddWithValue("@STOCK", stockNo);
+                SqlDataReader Reader = sqlCmd.ExecuteReader();
+                if (Reader.HasRows)
+                {
+                    if (Reader.Read())
+                    {
+                        if (!Reader.IsDBNull(0))
+                            result = Reader["CNTDTYPE"].ToString();
+                        else
+                            result = "N";          //沖銷資格如果是空值, 假設賣單只能沖銷昨日餘額(N)
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+            return result;
+        }
+
+        //----------------------------------------------------------------------------------
+        // function selectMCUMS() - 查詢 MCUMS TABLE
+        //----------------------------------------------------------------------------------
+        public List<MCUMS> selectMCUMS()
+        {
+            List<MCUMS> dbMCUMS = new List<MCUMS>();
+            try
+            {
+                _sqlConn.Open();
+                string sqlQuery = @"SELECT BHNO, CSEQ, BTYPE, IDNO, ACCOUNTTYPE, DCBFLAG, SALES, OTYPE, ODATE, FDATE, DSTATUS, CNACNO, SFCODE, DAYSDATE, DAYRDATE, CONTRA, CRLEVEL, DBLEVEL, RATIO, CRCREDIT, DBCREDIT, CNACOTYPE, CALCN, SELFQUR, EMAIL, NOLMTMINFEE, FEECRFREE, FEECOUNT, KIND, SBHNO, IBNO, CALSIT, CALHF, CNTDTYPE, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
+                                    FROM MCUMS";
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("reader has no rows");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new MCUMS();
+                        row.BHNO = reader["BHNO"].ToString();
+                        row.CSEQ = reader["CSEQ"].ToString();
+                        row.BTYPE = reader["BTYPE"].ToString();
+                        row.IDNO = reader["IDNO"].ToString();
+                        row.ACCOUNTTYPE = reader["ACCOUNTTYPE"].ToString();
+                        row.DCBFLAG = reader["DCBFLAG"].ToString();
+                        row.SALES = reader["SALES"].ToString();
+                        row.OTYPE = reader["OTYPE"].ToString();
+                        row.ODATE = reader["ODATE"].ToString();
+                        row.FDATE = reader["FDATE"].ToString();
+                        row.DSTATUS = reader["DSTATUS"].ToString();
+                        row.CNACNO = reader["CNACNO"].ToString();
+                        row.SFCODE = reader["SFCODE"].ToString();
+                        row.DAYSDATE = reader["DAYSDATE"].ToString();
+                        row.DAYRDATE = reader["DAYRDATE"].ToString();
+                        row.CONTRA = reader["CONTRA"].ToString();
+                        row.CRLEVEL = reader["CRLEVEL"].ToString();
+                        row.DBLEVEL = reader["DBLEVEL"].ToString();
+                        row.RATIO = reader.IsDBNull(18) ? 0 : Convert.ToDecimal(reader["RATIO"].ToString());
+                        row.CRCREDIT = reader.IsDBNull(19) ? 0 : Convert.ToDecimal(reader["CRCREDIT"].ToString());
+                        row.DBCREDIT = reader.IsDBNull(20) ? 0 : Convert.ToDecimal(reader["DBCREDIT"].ToString());
+                        row.CNACOTYPE = reader["CNACOTYPE"].ToString();
+                        row.CALCN = reader["CALCN"].ToString();
+                        row.SELFQUR = reader["SELFQUR"].ToString();
+                        row.EMAIL = reader["EMAIL"].ToString();
+                        row.NOLMTMINFEE = reader["NOLMTMINFEE"].ToString();
+                        row.FEECRFREE = reader["FEECRFREE"].ToString();
+                        row.FEECOUNT = reader.IsDBNull(27) ? 0 : Convert.ToDecimal(reader["FEECOUNT"].ToString());
+                        row.KIND = reader["KIND"].ToString();
+                        row.SBHNO = reader["SBHNO"].ToString();
+                        row.IBNO = reader["IBNO"].ToString();
+                        row.CALSIT = reader["CALSIT"].ToString();
+                        row.CALHF = reader["CALHF"].ToString();
+                        row.CNTDTYPE = reader["CNTDTYPE"].ToString();
+                        row.TRDATE = reader["TRDATE"].ToString();
+                        row.TRTIME = reader["TRTIME"].ToString();
+                        row.MODDATE = reader["MODDATE"].ToString();
+                        row.MODTIME = reader["MODTIME"].ToString();
+                        row.MODUSER = reader["MODUSER"].ToString();
+                        dbMCUMS.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+            return dbMCUMS;
+        }
+
+        //----------------------------------------------------------------------------------
+        // function selectCustomerCNTDTYPE() - 查詢客戶 MCUMS TABLE 當沖資格
+        //----------------------------------------------------------------------------------
+        public string selectCustomerCNTDTYPE(string BHNONo, string CSEQNo)
+        {
+            string result = "";
+            try
+            {
+                _sqlConn.Open();
+                string sqlQuery = @"SELECT CNTDTYPE
+                                    FROM MCUMS
+                                    WHERE BHNO = @BHNO AND CSEQ = CSEQ";
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                sqlCmd.Parameters.AddWithValue("@BHNO", BHNONo);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", CSEQNo);
+                SqlDataReader Reader = sqlCmd.ExecuteReader();
+                if (Reader.HasRows)
+                {
+                    if (Reader.Read())
+                    {
+                        if (!Reader.IsDBNull(0))
+                            result = Reader["CNTDTYPE"].ToString();
+                        else
+                            result = "N";          //沖銷資格如果是空值, 假設賣單只能沖銷昨日餘額(N)
+                    }
+                }
+                else
+                    result = "Y";       //如果查不到客戶的沖銷資格, 假設賣單可以沖銷比該筆早買進的資料(Y)
             }
             catch (Exception ex)
             {

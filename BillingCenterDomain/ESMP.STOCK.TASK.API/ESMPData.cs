@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
@@ -18,6 +19,8 @@ namespace ESMP.STOCK.TASK.API
             List<HCMIO> HCMIOList = new List<HCMIO>();          //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
             //將TMHIO List與TCSIO List資料轉入(Ram)HCMIO中
             HCMIOList = getHCMIO(TCSIOList, TMHIOList);
+            //今日現股當沖處理
+            HCMIOList = dayTrade(HCMIOList);
             //今日匯入（TCSIO）加入現股餘額
             TCNUDList = addTCSIO(TCNUDList, HCMIOList);
             //今日賣出 匯出現股扣除現股餘額資料
@@ -99,6 +102,21 @@ namespace ESMP.STOCK.TASK.API
                 row.MODUSER = TMHIO_item.MODUSER;
                 HCMIOList.Add(row);
             }
+            return HCMIOList;
+        }
+
+        //--------------------------------------------------------------------------------------------
+        //function dayTrade() - 今日現股當沖處理
+        //--------------------------------------------------------------------------------------------
+        private static List<HCMIO> dayTrade(List<HCMIO> HCMIOList)
+        {
+            List<HCMIO> HCMIODayTradeList = HCMIOList.Where(m => m.QTY > 1000).OrderBy(x => x.DSEQ).ThenBy(x => x.DNO).ToList();
+            foreach (var item in HCMIODayTradeList)
+            {
+                //Form1._StockMSTMB_Dic
+            }
+            SqlSearch sqlSearch = new SqlSearch();
+            //sqlSearch.selectStockCNTDTYPE(HCMIOList);
             return HCMIOList;
         }
 

@@ -47,6 +47,7 @@ namespace ESMP.STOCK.TASK.API
             TCNUDList = _sqlSearch.selectTCNUD(SearchElement);
             TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
             TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
+            
             //盤中現股沖銷處理
             (TCNUDList, HCNRHList) = ESMPData.getESMPData(TCNUDList, TMHIOList, TCSIOList);
             
