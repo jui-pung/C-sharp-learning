@@ -13,8 +13,25 @@ namespace ESMP.STOCK.TASK.API
 {
     public class ESMPData
     {
+        static SqlSearch _sqlSearch;
+        static List<MSTMB> _MSTMBList = new List<MSTMB>();             //自訂MSTMB類別List (ESMP.STOCK.DB.TABLE.API)
+        static List<MCUMS> _MCUMSList = new List<MCUMS>();             //自訂MCUMS類別List (ESMP.STOCK.DB.TABLE.API)
+        static Dictionary<string, List<MSTMB>> _StockMSTMB_Dic;
+        static Dictionary<string, List<MCUMS>> _CseqMCUMS_Dic;
+        private static void createDic()
+        {
+            _sqlSearch = new SqlSearch();
+            _MSTMBList = _sqlSearch.selectMSTMB();
+            _MCUMSList = _sqlSearch.selectMCUMS();
+            //依據 STOCK 建立 MSTMB Dictionary
+            _StockMSTMB_Dic = _MSTMBList.GroupBy(x => x.STOCK).ToDictionary(x => x.Key, x => x.ToList());
+            //依據 BHNO CSEQ 建立 MCUMS Dictionary
+            _CseqMCUMS_Dic = _MCUMSList.GroupBy(d => d.BHNO + d.CSEQ).ToDictionary(x => x.Key, x => x.ToList());
+        }
+        
         public static (List<TCNUD>,List<HCNRH>) getESMPData(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList, List<TCSIO> TCSIOList)
         {
+            createDic();
             List<HCNRH> HCNRHList = new List<HCNRH>();          //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCMIO> HCMIOList = new List<HCMIO>();          //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
             //將TMHIO List與TCSIO List資料轉入(Ram)HCMIO中
@@ -110,13 +127,114 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         private static List<HCMIO> dayTrade(List<HCMIO> HCMIOList)
         {
-            List<HCMIO> HCMIODayTradeList = HCMIOList.Where(m => m.QTY > 1000).OrderBy(x => x.DSEQ).ThenBy(x => x.DNO).ToList();
-            foreach (var item in HCMIODayTradeList)
+            List<HCNTD> HCNTDList = new List<HCNTD>();          //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
+            string stockCNTDTYPE;
+            string cseqCNTDTYPE;
+            List<HCMIO> HCMIOSellList = HCMIOList.Where(m => m.WTYPE == "0" && m.QTY >= 1000 && m.BSTYPE == "S").OrderBy(x => x.DSEQ).ThenBy(x => x.DNO).ToList();
+            List<HCMIO> HCMIOBuyList = HCMIOList.Where(m => m.WTYPE == "0" && m.QTY >= 1000 && m.BSTYPE == "B").OrderBy(x => x.DSEQ).ThenBy(x => x.DNO).ToList();
+            foreach (var HCMIOSell_item in HCMIOSellList)
             {
-                //Form1._StockMSTMB_Dic
+                //字典搜尋股票客戶當沖資格
+                if (_StockMSTMB_Dic.ContainsKey(HCMIOSell_item.STOCK))
+                    stockCNTDTYPE = _StockMSTMB_Dic[HCMIOSell_item.STOCK][0].CNTDTYPE;
+                else
+                    stockCNTDTYPE = "X";            //如果查不到股票的沖銷資格, 假設賣單可以沖銷比該筆早買進的資料(X)
+                if (_CseqMCUMS_Dic.ContainsKey(HCMIOSell_item.BHNO + HCMIOSell_item.CSEQ))
+                    cseqCNTDTYPE = _CseqMCUMS_Dic[HCMIOSell_item.BHNO + HCMIOSell_item.CSEQ][0].CNTDTYPE;
+                else
+                    cseqCNTDTYPE = "B";             //如果查不到客戶的沖銷資格, 假設賣單可以沖銷比該筆早買進的資料(B/X)
+
+                decimal originalSFEE = HCMIOSell_item.FEE;          //原始剩餘賣出手續費
+                decimal originalTAX = HCMIOSell_item.TAX;           //原始剩餘賣出交易稅
+                List<HCMIO> HCMIOCurrentList = HCMIOBuyList.Where(s => s.STOCK == HCMIOSell_item.STOCK).OrderBy(x => x.DSEQ).ThenBy(x => x.DNO).ToList();
+                if (HCMIOCurrentList.Count == 0)
+                    continue;
+                
+                if (stockCNTDTYPE == "N" || cseqCNTDTYPE == "N")
+                    Console.WriteLine("不可現股當沖 ( N )");
+                else if (stockCNTDTYPE == "Y" || cseqCNTDTYPE == "Y")
+                {
+                    Console.WriteLine("可先買後賣");
+                    
+                }
+                else if (stockCNTDTYPE == "X" && cseqCNTDTYPE == "B" || cseqCNTDTYPE == "X")
+                {
+                    Console.WriteLine("可先賣後買");
+                    foreach (var HCMIOBuy_item in HCMIOCurrentList)
+                    {
+                        //計算沖銷狀況 ----CQTY本次沖銷股數
+                        decimal CQTY = Math.Min(HCMIOSell_item.BQTY, HCMIOBuy_item.BQTY);
+                        decimal BFEE = decimal.Round(HCMIOBuy_item.FEE * (CQTY / HCMIOBuy_item.BQTY), 0);
+                        decimal COST = decimal.Truncate(HCMIOBuy_item.PRICE * CQTY) + BFEE;
+                        decimal SFEE = decimal.Round(originalSFEE * (CQTY / HCMIOSell_item.QTY), 0);
+                        decimal TAX = decimal.Round(originalTAX * (CQTY / HCMIOSell_item.QTY), 0);
+                        decimal INCOME = decimal.Truncate(HCMIOSell_item.PRICE * CQTY - SFEE - TAX);
+                        decimal PROFIT = INCOME - COST;
+
+                        HCMIOSell_item.BQTY -= CQTY;        //賣單剩餘未冲股數
+                        HCMIOBuy_item.BQTY -= CQTY;        //買單剩餘未冲股數
+                        //最後一筆沖銷賣出，剩餘的SFEE、TAX與INCOME放入最後一筆資料
+                        if (HCMIOSell_item.BQTY == 0)
+                        {
+                            SFEE = HCMIOSell_item.FEE;
+                            TAX = HCMIOSell_item.TAX;
+                            INCOME = HCMIOSell_item.NETAMT;
+                        }
+                        if (HCMIOBuy_item.BQTY == 0)
+                        {
+                            BFEE = HCMIOBuy_item.FEE;
+                        }
+                        //增加HCNRH資料 已實現損益
+                        var row = getHCNTD_ROW(CQTY, BFEE, SFEE, TAX, INCOME, COST, PROFIT);
+                        HCNTDList.Add(row);
+
+                        //更新TCNUD HCMIO的剩餘FEE COST TAX NETAMT
+                        HCMIOBuy_item.FEE -= BFEE;
+                        //HCMIOBuy_item.COST -= COST;
+                        HCMIOSell_item.FEE -= SFEE;
+                        HCMIOSell_item.TAX -= TAX;
+                        HCMIOSell_item.NETAMT -= INCOME;
+
+                        //此筆賣單已沖銷完成
+                        if (HCMIOSell_item.BQTY == 0)
+                            break;
+
+                        //HCNRH資料欄位
+                        HCNTD getHCNTD_ROW(decimal HCNRH_CQTY, decimal currBFEE, decimal currSFEE, decimal currTAX, decimal currINCOME, decimal currCOST, decimal currPROFIT)
+                        {
+                            var HCNTD_row = new HCNTD();
+                            HCNTD_row.BQTY = HCMIOBuy_item.QTY;
+                            HCNTD_row.SQTY = HCMIOSell_item.QTY;
+                            HCNTD_row.BHNO = HCMIOBuy_item.BHNO;
+                            HCNTD_row.TDATE = HCMIOSell_item.TDATE;
+                            //HCNTD_row.RDATE = HCMIOBuy_item.TDATE;
+                            HCNTD_row.CSEQ = HCMIOBuy_item.CSEQ;
+                            HCNTD_row.BDSEQ = HCMIOBuy_item.DSEQ;
+                            HCNTD_row.BDNO = HCMIOBuy_item.DNO;
+                            HCNTD_row.SDSEQ = HCMIOSell_item.DSEQ;
+                            HCNTD_row.SDNO = HCMIOSell_item.DNO;
+                            HCNTD_row.STOCK = HCMIOBuy_item.STOCK;
+                            HCNTD_row.CQTY = HCNRH_CQTY;
+                            HCNTD_row.BPRICE = HCMIOBuy_item.PRICE;
+                            HCNTD_row.BFEE = currBFEE;
+                            HCNTD_row.SPRICE = HCMIOSell_item.PRICE;
+                            HCNTD_row.SFEE = currSFEE;
+                            HCNTD_row.TAX = currTAX;
+                            HCNTD_row.INCOME = currINCOME;
+                            HCNTD_row.COST = currCOST;
+                            HCNTD_row.PROFIT = currPROFIT;
+                            //HCNTD_row.ADJDATE = "";
+                            //HCNTD_row.WTYPE = HCMIOBuy_item.WTYPE;
+                            return HCNTD_row;
+                        }
+                    }
+                }
+                    
+                else
+                    Console.WriteLine("不可現股當沖 ( N )");
+
             }
-            SqlSearch sqlSearch = new SqlSearch();
-            //sqlSearch.selectStockCNTDTYPE(HCMIOList);
+
             return HCMIOList;
         }
 

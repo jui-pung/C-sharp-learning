@@ -17,22 +17,13 @@ namespace BillingCenterDomain
     {
         int _type;                                              //查詢與回覆格式設定
         SqlSearch _sqlSearch;                                   //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)
-        List<MSTMB> _MSTMBList = new List<MSTMB>();             //自訂MSTMB類別List (ESMP.STOCK.DB.TABLE.API)
-        List<MCUMS> _MCUMSList = new List<MCUMS>();             //自訂MCUMS類別List (ESMP.STOCK.DB.TABLE.API)
-        Dictionary<string, List<MSTMB>> _StockMSTMB_Dic;
-        Dictionary<string, List<MCUMS>> _CseqMCUMS_Dic;
+        
 
         public Form1()
         {
             InitializeComponent();
             _ = BasicData.MsysDict;
-            _sqlSearch = new SqlSearch();
-            _MSTMBList = _sqlSearch.selectMSTMB();
-            _MCUMSList = _sqlSearch.selectMCUMS();
-            //依據 STOCK 建立 MSTMB Dictionary
-            _StockMSTMB_Dic = _MSTMBList.GroupBy(x => x.STOCK).ToDictionary(x => x.Key, x => x.ToList());
-            //依據 BHNO CSEQ 建立 MCUMS Dictionary
-            _CseqMCUMS_Dic = _MCUMSList.GroupBy(d => d.BHNO + d.CSEQ).ToDictionary(x => x.Key, x => x.ToList());
+            
         }
 
         private void btnSearch_Click(object sender, EventArgs e)

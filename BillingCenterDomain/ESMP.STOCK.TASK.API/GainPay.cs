@@ -165,7 +165,9 @@ namespace ESMP.STOCK.TASK.API
                 }
                 //計算明細資料(買入)的成交價金、報酬率
                 lst_detail.ForEach(x => x.mamt = (x.mqty * Convert.ToDecimal(x.mprice)).ToString());
-                lst_detail.ForEach(x => x.pl_ratio = decimal.Round(((x.profit / x.cost) * 100), 2).ToString() + "%");
+                lst_detail.Where(x => x.cost > 0).ToList().ForEach(x => x.pl_ratio = decimal.Round(((x.profit / x.cost) * 100), 2).ToString() + "%");
+                lst_detail.Where(x => x.cost == 0).ToList().ForEach(x => x.pl_ratio = "0%");
+
 
                 //取得個股明細資料 (賣出) Class (第三階層)
                 profit_detail_out detail_out = new profit_detail_out();
@@ -200,7 +202,10 @@ namespace ESMP.STOCK.TASK.API
                 profitSum.cost = detail_out.cost;
                 profitSum.income = detail_out.income;
                 profitSum.profit = detail_out.profit;
-                profitSum.pl_ratio = decimal.Round(((profitSum.profit / profitSum.cost) * 100), 2).ToString() + "%";
+                if (profitSum.cost != 0)
+                    profitSum.pl_ratio = decimal.Round(((profitSum.profit / profitSum.cost) * 100), 2).ToString() + "%";
+                else
+                    profitSum.pl_ratio = "0";
                 profitSum.ttypename2 = "現賣";
                 //第三階層資料存入第二階層List
                 profitSum.profit_detail = lst_detail;
