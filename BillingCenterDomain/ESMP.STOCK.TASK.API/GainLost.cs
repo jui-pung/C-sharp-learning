@@ -49,7 +49,7 @@ namespace ESMP.STOCK.TASK.API
             TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
             
             //盤中現股沖銷處理
-            (TCNUDList, HCNRHList) = ESMPData.getESMPData(TCNUDList, TMHIOList, TCSIOList);
+            (TCNUDList, HCNRHList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList);
             
             if (TCNUDList.Count > 0)
             {

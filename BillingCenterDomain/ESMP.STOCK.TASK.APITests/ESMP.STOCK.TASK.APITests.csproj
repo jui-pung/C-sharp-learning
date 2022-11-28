@@ -60,6 +60,7 @@
     <Compile Include="GainLostTests.cs" />
     <Compile Include="GainPayTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubESMPData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
