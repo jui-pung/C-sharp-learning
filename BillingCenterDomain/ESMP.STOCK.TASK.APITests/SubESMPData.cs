@@ -26,5 +26,10 @@ namespace ESMP.STOCK.TASK.APITests
         {
             return DayTrade(HCMIOList);
         }
+        public static List<HCNTD> SubCalculateHCNTD(List<HCNTD> HCNTDList)
+        {
+            return CalculateHCNTD(HCNTDList);
+        }
+
     }
 }

@@ -19,7 +19,7 @@ namespace ESMP.STOCK.TASK.API
         static List<MCUMS> _MCUMSList = new List<MCUMS>();             //自訂MCUMS類別List (ESMP.STOCK.DB.TABLE.API)
         static Dictionary<string, List<MSTMB>> _StockMSTMB_Dic;
         static Dictionary<string, List<MCUMS>> _CseqMCUMS_Dic;
-        private static void CreateDic()
+        public static void CreateDic()
         {
             _sqlSearch = new SqlSearch();
             _MSTMBList = _sqlSearch.selectMSTMB();
@@ -136,7 +136,7 @@ namespace ESMP.STOCK.TASK.API
             if (_CseqMCUMS_Dic.ContainsKey(client))
                 cseqCNTDTYPE = _CseqMCUMS_Dic[client][0].CNTDTYPE;
             else
-                cseqCNTDTYPE = "B";             //如果查不到客戶的沖銷資格, 假設此客戶不可現股當沖
+                cseqCNTDTYPE = "N";             //如果查不到客戶的沖銷資格, 假設此客戶不可現股當沖
             return cseqCNTDTYPE;
         }
 
@@ -267,7 +267,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function CalculateHCNTD() - 重新計算現股當沖TAX、INCOME、PROFIT
         //--------------------------------------------------------------------------------------------
-        private static List<HCNTD> CalculateHCNTD(List<HCNTD> HCNTDList)
+        protected static List<HCNTD> CalculateHCNTD(List<HCNTD> HCNTDList)
         {
             //依照賣出委託書號、賣出分單號產生新的清單群組grp_HCNTDList
             var grp_HCNTDList = HCNTDList.GroupBy(d => new { d.SDSEQ, d.SDNO }).Select(grp => grp.ToList()).ToList();
@@ -332,7 +332,7 @@ namespace ESMP.STOCK.TASK.API
             List<HCNRH> HCNRHList = new List<HCNRH>();          //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
 
             //挑選出當日賣出(WTYPE=0)賣單(BSTYPE=S)與當日匯出(WTYPE=A)賣單(BSTYPE=S) 並依照WTYPE 股票代號 賣單號 排序
-            List<HCMIO> HCMIOSellList = HCMIOList.Where(m => m.BSTYPE == "S").OrderBy(x => x.WTYPE).ThenBy(x => x.STOCK).ThenBy(x => x.DNO).ToList();
+            List<HCMIO> HCMIOSellList = HCMIOList.Where(m => m.BSTYPE == "S" && m.BQTY > 0).OrderBy(x => x.WTYPE).ThenBy(x => x.STOCK).ThenBy(x => x.DNO).ToList();
 
             //迴圈歷遍所有當日賣單
             foreach (var HCMIO_item in HCMIOSellList)
