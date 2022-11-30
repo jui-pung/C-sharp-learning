@@ -195,14 +195,15 @@ namespace ESMP.STOCK.TASK.API
 
                     decimal originalSFEE = HCMIOSell_item.FEE;          //原始剩餘賣出手續費
                     decimal originalTAX = HCMIOSell_item.TAX;           //原始剩餘賣出交易稅
+                    decimal originalBQTY = HCMIOSell_item.BQTY;         //原始剩餘賣出股數
                     foreach (var HCMIOBuy_item in HCMIOCurrentList)
                     {
                         //計算沖銷狀況 ----CQTY本次沖銷股數
                         decimal CQTY = Math.Min(HCMIOSell_item.BQTY, HCMIOBuy_item.BQTY);
                         decimal BFEE = decimal.Round(HCMIOBuy_item.FEE * (CQTY / HCMIOBuy_item.BQTY), 0, MidpointRounding.AwayFromZero);
                         decimal COST = decimal.Truncate(HCMIOBuy_item.PRICE * CQTY) + BFEE;
-                        decimal SFEE = decimal.Round(originalSFEE * (CQTY / HCMIOSell_item.QTY), 0, MidpointRounding.AwayFromZero);
-                        decimal TAX = decimal.Round(originalTAX * (CQTY / HCMIOSell_item.QTY), 0, MidpointRounding.AwayFromZero);
+                        decimal SFEE = decimal.Round(originalSFEE * (CQTY / originalBQTY), 0, MidpointRounding.AwayFromZero);
+                        decimal TAX = decimal.Round(originalTAX * (CQTY / originalBQTY), 0, MidpointRounding.AwayFromZero);
                         decimal INCOME = decimal.Truncate(HCMIOSell_item.PRICE * CQTY - SFEE - TAX);
                         decimal PROFIT = INCOME - COST;
 
@@ -339,6 +340,7 @@ namespace ESMP.STOCK.TASK.API
             {
                 decimal originalSFEE = HCMIO_item.FEE;          //原始剩餘賣出手續費
                 decimal originalTAX = HCMIO_item.TAX;           //原始剩餘賣出交易稅
+                decimal originalBQTY = HCMIO_item.BQTY;         //原始剩餘賣出股數
 
                 //挑選出相同股票代號與未沖銷完成的買單現股庫存(BQTY > 0)
                 List<TCNUD> TCNUDCurrentList = new List<TCNUD>();
@@ -354,10 +356,10 @@ namespace ESMP.STOCK.TASK.API
                 {
                     //計算沖銷狀況 ----CQTY本次沖銷股數
                     decimal CQTY = Math.Min(HCMIO_item.BQTY, TCNUD_item.BQTY);
-                    decimal BFEE = decimal.Round(TCNUD_item.FEE * (CQTY / TCNUD_item.BQTY), 0);
+                    decimal BFEE = decimal.Round(TCNUD_item.FEE * (CQTY / TCNUD_item.BQTY), 0, MidpointRounding.AwayFromZero);
                     decimal COST = decimal.Truncate(TCNUD_item.PRICE * CQTY) + BFEE;
-                    decimal SFEE = decimal.Round(originalSFEE * (CQTY / HCMIO_item.QTY), 0);
-                    decimal TAX = decimal.Round(originalTAX * (CQTY / HCMIO_item.QTY), 0);
+                    decimal SFEE = decimal.Round(originalSFEE * (CQTY / originalBQTY), 0, MidpointRounding.AwayFromZero);
+                    decimal TAX = decimal.Round(originalTAX * (CQTY / originalBQTY), 0, MidpointRounding.AwayFromZero);
                     decimal INCOME = decimal.Truncate(HCMIO_item.PRICE * CQTY - SFEE - TAX);
                     decimal PROFIT = INCOME - COST;
                     
@@ -428,7 +430,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function AddTMHIOBuy() - 今日買進（TMHIO）加入現股餘額
         //--------------------------------------------------------------------------------------------
-        public static List<TCNUD> AddTMHIOBuy(List<TCNUD> TCNUDList, List<HCMIO> HCMIOList)
+        protected static List<TCNUD> AddTMHIOBuy(List<TCNUD> TCNUDList, List<HCMIO> HCMIOList)
         {
             List<HCMIO> HCMIOBuyList = HCMIOList.Where(m => m.WTYPE == "0" && m.BSTYPE == "B").ToList();
             foreach (var item in HCMIOBuyList)
@@ -438,17 +440,24 @@ namespace ESMP.STOCK.TASK.API
                 row.STOCK = item.STOCK;
                 row.PRICE = item.PRICE;
                 row.QTY = item.QTY;
-                row.BQTY = item.QTY;
-                row.FEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(item.PRICE) * decimal.ToDouble(item.QTY) * 0.001425));
-                if (item.ETYPE == "2" && row.FEE < 1)
+                row.BQTY = item.BQTY;
+                if (item.FEE != 0)
                 {
-                    row.FEE = 1;
+                    row.FEE = item.FEE;
                 }
-                else if (item.ETYPE == "0" && row.FEE < 20)
+                else
                 {
-                    row.FEE = 20;
+                    row.FEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(item.PRICE) * decimal.ToDouble(item.QTY) * 0.001425));
+                    if (item.ETYPE == "2" && row.FEE < 1)
+                    {
+                        row.FEE = 1;
+                    }
+                    else if (item.ETYPE == "0" && row.FEE < 20)
+                    {
+                        row.FEE = 20;
+                    }
                 }
-                row.COST = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(item.PRICE) * decimal.ToDouble(item.QTY))) + row.FEE;
+                row.COST = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(item.PRICE) * decimal.ToDouble(item.BQTY))) + row.FEE;
                 row.DSEQ = item.DSEQ;
                 row.DNO = item.DNO;
                 row.WTYPE = "0";

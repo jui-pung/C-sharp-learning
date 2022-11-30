@@ -30,6 +30,9 @@ namespace ESMP.STOCK.TASK.APITests
         {
             return CalculateHCNTD(HCNTDList);
         }
-
+        public static List<TCNUD> SubAddTMHIOBuy(List<TCNUD> TCNUDList, List<HCMIO> HCMIOList)
+        {
+            return AddTMHIOBuy(TCNUDList, HCMIOList);
+        }
     }
 }
