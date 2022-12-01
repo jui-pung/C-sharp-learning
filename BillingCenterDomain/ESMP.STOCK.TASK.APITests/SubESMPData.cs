@@ -14,7 +14,7 @@ namespace ESMP.STOCK.TASK.APITests
         {
             return GetHCMIO(TCSIOList, TMHIOList);
         }
-        public static (List<HCNRH>, List<TCNUD>) SubCurrentStockSell(List<TCNUD> TCNUDList, List<HCMIO> HCMIOList)
+        public static (List<HCNRH>, List<TCNUD>, List<HCMIO>) SubCurrentStockSell(List<TCNUD> TCNUDList, List<HCMIO> HCMIOList)
         {
             return CurrentStockSell(TCNUDList, HCMIOList);
         }

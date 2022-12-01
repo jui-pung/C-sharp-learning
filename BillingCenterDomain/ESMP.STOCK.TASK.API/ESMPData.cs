@@ -30,7 +30,7 @@ namespace ESMP.STOCK.TASK.API
             _CseqMCUMS_Dic = _MCUMSList.GroupBy(d => d.BHNO + d.CSEQ).ToDictionary(x => x.Key, x => x.ToList());
         }
         
-        public static (List<TCNUD>,List<HCNRH>) GetESMPData(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList, List<TCSIO> TCSIOList)
+        public static (List<TCNUD>, List<HCNRH>, List<HCNTD>) GetESMPData(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList, List<TCSIO> TCSIOList)
         {
             CreateDic();
             List<HCNRH> HCNRHList = new List<HCNRH>();          //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
@@ -45,10 +45,12 @@ namespace ESMP.STOCK.TASK.API
             //今日匯入（TCSIO）加入現股餘額
             TCNUDList = AddTCSIO(TCNUDList, HCMIOList);
             //今日賣出 匯出現股扣除現股餘額資料
-            (HCNRHList,TCNUDList) = CurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList,TCNUDList,HCMIOList) = CurrentStockSell(TCNUDList, HCMIOList);
             //今日買進（TMHIO）加入現股餘額
             TCNUDList = AddTMHIOBuy(TCNUDList, HCMIOList);
-            return (TCNUDList, HCNRHList);
+            //剩餘賣出未沖銷，加入現股餘額
+            TCNUDList = AddTMHIOSell(TCNUDList, HCMIOList);
+            return (TCNUDList, HCNRHList, HCNTDList);
         }
 
         //--------------------------------------------------------------------------------------------
@@ -126,7 +128,7 @@ namespace ESMP.STOCK.TASK.API
             return HCMIOList;
         }
         //--------------------------------------------------------------------------------------------
-        //function GetClientCNTDTYPE() - 今日現股當沖處理
+        //function GetClientCNTDTYPE() - 取得客戶當沖資格
         //--------------------------------------------------------------------------------------------
         protected static string GetClientCNTDTYPE(List<HCMIO> HCMIOList)
         {
@@ -136,12 +138,13 @@ namespace ESMP.STOCK.TASK.API
             if (_CseqMCUMS_Dic.ContainsKey(client))
                 cseqCNTDTYPE = _CseqMCUMS_Dic[client][0].CNTDTYPE;
             else
-                cseqCNTDTYPE = "N";             //如果查不到客戶的沖銷資格, 假設此客戶不可現股當沖
+                //cseqCNTDTYPE = "N";             //如果查不到客戶的沖銷資格, 假設此客戶不可現股當沖
+                cseqCNTDTYPE = "X";           //(測試)如果查不到客戶的沖銷資格, 假設此客戶可先賣後買
             return cseqCNTDTYPE;
         }
 
         //--------------------------------------------------------------------------------------------
-        //function GetStockCNTDTYPE() - 今日現股當沖處理
+        //function GetStockCNTDTYPE() - 取得股票當沖資格
         //--------------------------------------------------------------------------------------------
         protected static string GetStockCNTDTYPE(HCMIO HCMIOSell_item)
         {
@@ -198,7 +201,7 @@ namespace ESMP.STOCK.TASK.API
                     decimal originalBQTY = HCMIOSell_item.BQTY;         //原始剩餘賣出股數
                     foreach (var HCMIOBuy_item in HCMIOCurrentList)
                     {
-                        //計算沖銷狀況 ----CQTY本次沖銷股數
+                        //計算當沖狀況 ----CQTY本次沖銷股數
                         decimal CQTY = Math.Min(HCMIOSell_item.BQTY, HCMIOBuy_item.BQTY);
                         decimal BFEE = decimal.Round(HCMIOBuy_item.FEE * (CQTY / HCMIOBuy_item.BQTY), 0, MidpointRounding.AwayFromZero);
                         decimal COST = decimal.Truncate(HCMIOBuy_item.PRICE * CQTY) + BFEE;
@@ -209,7 +212,7 @@ namespace ESMP.STOCK.TASK.API
 
                         HCMIOSell_item.BQTY -= CQTY;        //賣單剩餘未冲股數
                         HCMIOBuy_item.BQTY -= CQTY;         //買單剩餘未冲股數
-                        //最後一筆沖銷賣出，剩餘的SFEE、TAX與INCOME放入最後一筆資料
+                        //最後一筆當沖賣出，剩餘的SFEE、TAX與INCOME放入最後一筆資料
                         if (HCMIOSell_item.BQTY == 0)
                         {
                             SFEE = HCMIOSell_item.FEE;
@@ -325,7 +328,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function CurrentStockSell() - 將賣出 匯出資料扣除現股餘額資料
         //--------------------------------------------------------------------------------------------
-        protected static (List<HCNRH>,List<TCNUD>) CurrentStockSell(List<TCNUD> TCNUDList, List<HCMIO> HCMIOList)
+        protected static (List<HCNRH>, List<TCNUD>, List<HCMIO>) CurrentStockSell(List<TCNUD> TCNUDList, List<HCMIO> HCMIOList)
         {
             //依據STOCK建立TCNUD現股庫存Dictionary
             Dictionary<string, List<TCNUD>> grpStockTCNUD_Dic = TCNUDList.GroupBy(x => x.STOCK).ToDictionary(x => x.Key, x => x.ToList());
@@ -349,6 +352,10 @@ namespace ESMP.STOCK.TASK.API
                     TCNUDCurrentList = TCNUDCurrentList.Where(s => s.BQTY > 0).OrderBy(x => x.TDATE).ThenBy(x => x.WTYPE).ThenBy(x => x.DNO).ToList();
                 }
                 else
+                    continue;
+
+                //該筆賣單為整股且餘額總和不足1000股時，不沖銷零股餘額資料
+                if (HCMIO_item.BQTY >= 1000 && TCNUDCurrentList.Sum((x) => x.BQTY) < 1000)
                     continue;
 
                 //迴圈歷遍相同股票代號與未沖銷完成的買單現股庫存
@@ -393,7 +400,7 @@ namespace ESMP.STOCK.TASK.API
                 }
             }
             TCNUDList.RemoveAll(x => x.BQTY == 0);
-            return (HCNRHList, TCNUDList);
+            return (HCNRHList, TCNUDList, HCMIOList);
         }
 
         //--------------------------------------------------------------------------------------------
@@ -462,6 +469,49 @@ namespace ESMP.STOCK.TASK.API
                 row.DNO = item.DNO;
                 row.WTYPE = "0";
                 TCNUDList.Add(row);
+            }
+            return TCNUDList;
+        }
+
+        //--------------------------------------------------------------------------------------------
+        //function AddTMHIOSell() - 剩餘賣出未沖銷，加入現股餘額
+        //--------------------------------------------------------------------------------------------
+        protected static List<TCNUD> AddTMHIOSell(List<TCNUD> TCNUDList, List<HCMIO> HCMIOList)
+        {
+            string cseqCNTDTYPE = GetClientCNTDTYPE(HCMIOList);
+            if (cseqCNTDTYPE == "X" || cseqCNTDTYPE == "B")
+            {
+                Console.WriteLine("此客戶可現股賣出 ( X )");
+                List<HCMIO> HCMIOSellList = HCMIOList.Where(m => m.WTYPE == "0" && m.BSTYPE == "S").ToList();
+                foreach (var item in HCMIOSellList)
+                {
+                    string stockCNTDTYPE = GetStockCNTDTYPE(item);
+                    if (stockCNTDTYPE == "X")
+                    {
+                        Console.WriteLine("此股票可現股賣出 ( X )");
+                        var row = new TCNUD();
+                        row.TDATE = item.TDATE;
+                        row.BHNO = item.BHNO;
+                        row.CSEQ = item.CSEQ;
+                        row.STOCK = item.STOCK;
+                        row.PRICE = item.PRICE;
+                        row.QTY = item.QTY;
+                        row.BQTY = item.BQTY * -1;
+                        row.FEE = item.FEE;
+                        //row.COST ??
+                        row.DSEQ = item.DSEQ;
+                        row.DNO = item.DNO;
+                        row.ADJDATE = item.ADJDATE;
+                        row.WTYPE = item.WTYPE;
+                        row.TRDATE = item.TRDATE;
+                        row.TRTIME = item.TRTIME;
+                        row.MODDATE = item.MODDATE;
+                        row.MODTIME = item.MODTIME;
+                        row.MODUSER = item.MODUSER;
+                        row.IOFLAG = item.IOFLAG;
+                        TCNUDList.Add(row);
+                    }
+                }
             }
             return TCNUDList;
         }

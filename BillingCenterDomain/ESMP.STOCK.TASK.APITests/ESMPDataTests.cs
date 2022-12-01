@@ -130,7 +130,7 @@ namespace ESMP.STOCK.TASK.API.Tests
                 MODUSER = "DailyJob"
             });
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
-            (HCNRHList,TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList,TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(HCNRHList.Count, 2);
             Assert.AreEqual(HCNRHList[0].SDNO, "01337974");
             Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(1000));
@@ -259,7 +259,7 @@ namespace ESMP.STOCK.TASK.API.Tests
                 MODUSER = "DailyJob"
             });
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(HCNRHList.Count, 2);
             Assert.AreEqual(HCNRHList[1].SDNO, "01443453");
             Assert.AreEqual(HCNRHList[1].CQTY, Convert.ToDecimal(500));
@@ -412,7 +412,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(HCNRHList.Count, 2);
             Assert.AreEqual(HCNRHList[1].SDNO, "01443453");
             Assert.AreEqual(HCNRHList[1].CQTY, Convert.ToDecimal(500));
@@ -485,7 +485,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(HCNRHList.Count, 1);
             Assert.AreEqual(HCNRHList[0].SDNO, "01337974");
             Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(300));
@@ -551,7 +551,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(HCNRHList.Count, 1);
             Assert.AreEqual(HCNRHList[0].SDNO, "01337974");
             Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(100));
@@ -622,7 +622,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             //今日匯入（TCSIO）加入現股餘額
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
             //今日賣出 匯出現股扣除現股餘額資料
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
 
             Assert.AreEqual(HCNRHList.Count, 1);
             Assert.AreEqual(HCNRHList[0].SDNO, "00");
@@ -684,7 +684,7 @@ namespace ESMP.STOCK.TASK.API.Tests
                 MODUSER = "REPLY"
             });
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(HCNRHList.Count, 1);
             Assert.AreEqual(HCNRHList[0].SDNO, "00");
             Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(500));
@@ -770,7 +770,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(HCNRHList.Count, 1);
             Assert.AreEqual(HCNRHList[0].SDNO, "00");
             Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(500));
@@ -841,7 +841,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(HCNRHList.Count, 1);
             Assert.AreEqual(HCNRHList[0].SDNO, "00");
             Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(300));
@@ -903,7 +903,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(HCNRHList.Count, 1);
             Assert.AreEqual(HCNRHList[0].SDNO, "00");
             Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(100));
@@ -1013,7 +1013,7 @@ namespace ESMP.STOCK.TASK.API.Tests
                 MODUSER = "REPLY"
             });
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(HCNRHList.Count, 2);
             Assert.AreEqual(HCNRHList[0].SDNO, "01337974");
             Assert.AreEqual(HCNRHList[0].CQTY, Convert.ToDecimal(100));
@@ -1204,7 +1204,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             TCNUDList = SubESMPData.SubAddTMHIOBuy(TCNUDList, HCMIOList);
             Assert.AreEqual(TCNUDList.Count, 2);
             Assert.AreEqual(TCNUDList[0].QTY, Convert.ToDecimal(8000));
@@ -1289,7 +1289,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             TCNUDList = SubESMPData.SubAddTMHIOBuy(TCNUDList, HCMIOList);
             Assert.AreEqual(TCNUDList.Count, 2);
             Assert.AreEqual(TCNUDList[0].QTY, Convert.ToDecimal(8000));
@@ -1388,7 +1388,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(TCNUDList.Count, 1);
             Assert.AreEqual(TCNUDList[0].CSEQ, "0003027");
             Assert.AreEqual(TCNUDList[0].BQTY, Convert.ToDecimal(5000));
@@ -1485,7 +1485,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(TCNUDList.Count, 0);
             
             Assert.AreEqual(HCNRHList.Count, 1);
@@ -1578,7 +1578,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             Assert.AreEqual(TCNUDList.Count, 0);
 
             Assert.AreEqual(HCNRHList.Count, 1);
@@ -1656,7 +1656,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             TCNUDList = SubESMPData.SubAddTMHIOBuy(TCNUDList, HCMIOList);
             Assert.AreEqual(TCNUDList.Count, 1);
             Assert.AreEqual(TCNUDList[0].QTY, Convert.ToDecimal(2000));
@@ -1745,7 +1745,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             TCNUDList = SubESMPData.SubAddTMHIOBuy(TCNUDList, HCMIOList);
             Assert.AreEqual(TCNUDList.Count, 2);
             Assert.AreEqual(TCNUDList[0].QTY, Convert.ToDecimal(2000));
@@ -1849,7 +1849,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             TCNUDList = SubESMPData.SubAddTMHIOBuy(TCNUDList, HCMIOList);
             Assert.AreEqual(TCNUDList.Count, 2);
             Assert.AreEqual(TCNUDList[0].QTY, Convert.ToDecimal(4000));
@@ -1942,7 +1942,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             TCNUDList = SubESMPData.SubAddTMHIOBuy(TCNUDList, HCMIOList);
             Assert.AreEqual(TCNUDList.Count, 1);
             Assert.AreEqual(TCNUDList[0].QTY, Convert.ToDecimal(3000));
@@ -2025,7 +2025,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
             TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
-            (HCNRHList, TCNUDList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
             TCNUDList = SubESMPData.SubAddTMHIOBuy(TCNUDList, HCMIOList);
             Assert.AreEqual(TCNUDList.Count, 2);
             Assert.AreEqual(TCNUDList[0].QTY, Convert.ToDecimal(3000));
