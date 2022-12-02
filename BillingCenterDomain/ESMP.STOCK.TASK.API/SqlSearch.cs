@@ -14,7 +14,7 @@ namespace ESMP.STOCK.TASK.API
     public class SqlSearch
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        static int _dateDiff = -45;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
+        static int _dateDiff = -46;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
@@ -394,6 +394,58 @@ namespace ESMP.STOCK.TASK.API
                 _sqlConn.Close();
             }
             return dbMCUMS;
+        }
+
+        //----------------------------------------------------------------------------------
+        // function selectMCSRH() - 查詢 MCSRH TABLE
+        //----------------------------------------------------------------------------------
+        public List<MCSRH> selectMCSRH()
+        {
+            List<MCSRH> dbMCSRH = new List<MCSRH>();
+            try
+            {
+                _sqlConn.Open();
+                string sqlQuery = @"SELECT BHNO, CSEQ, STOCK, CNQBAL, CRAQTY, CROQTY, DBAQTY, DBOQTY, CLDATE, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER, CNQBAL_DE
+                                    FROM MCSRH";
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, _sqlConn);
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("reader has no rows");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new MCSRH();
+                        row.BHNO = reader["BHNO"].ToString();
+                        row.CSEQ = reader["CSEQ"].ToString();
+                        row.STOCK = reader["STOCK"].ToString();
+                        row.CNQBAL = reader.IsDBNull(3) ? 0 : Convert.ToDecimal(reader["CNQBAL"].ToString());
+                        row.CRAQTY = reader.IsDBNull(4) ? 0 : Convert.ToDecimal(reader["CRAQTY"].ToString());
+                        row.CROQTY = reader.IsDBNull(5) ? 0 : Convert.ToDecimal(reader["CROQTY"].ToString());
+                        row.DBAQTY = reader.IsDBNull(6) ? 0 : Convert.ToDecimal(reader["DBAQTY"].ToString());
+                        row.DBOQTY = reader.IsDBNull(7) ? 0 : Convert.ToDecimal(reader["DBOQTY"].ToString());
+                        row.CLDATE = reader["CLDATE"].ToString();
+                        row.TRDATE = reader["TRDATE"].ToString();
+                        row.TRTIME = reader["TRTIME"].ToString();
+                        row.MODDATE = reader["MODDATE"].ToString();
+                        row.MODTIME = reader["MODTIME"].ToString();
+                        row.MODUSER = reader["MODUSER"].ToString();
+                        row.CNQBAL_DE = reader.IsDBNull(14) ? 0 : Convert.ToDecimal(reader["CNQBAL_DE"].ToString());
+                        dbMCSRH.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+            return dbMCSRH;
         }
 
         //----------------------------------------------------------------------------------

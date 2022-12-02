@@ -13,9 +13,10 @@ namespace ESMP.STOCK.FORMAT
         public string stock { get; set; }
         public string stocknm { get; set; }
         public string ttype { get; set; } = "0";
-        public string ttypename { get; set; } = "現買";
-        public string bstype { get; set; } = "B";
+        public string ttypename { get; set; }
+        public string bstype { get; set; }
         public decimal bqty { get; set; }
+        public decimal real_qty { get; set; }
         public decimal cost { get; set; }
         public decimal avgprice { get; set; }
         public decimal lastprice { get; set; }

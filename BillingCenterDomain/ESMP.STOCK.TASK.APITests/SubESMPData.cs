@@ -22,9 +22,9 @@ namespace ESMP.STOCK.TASK.APITests
         {
             return AddTCSIO(TCNUDList, HCMIOList);
         }
-        public static (List<HCMIO>, List<HCNTD>) SubDayTrade(List<HCMIO> HCMIOList)
+        public static (List<HCMIO>, List<HCNTD>) SubDayTrade(List<HCMIO> HCMIOList, string BHNO, string CSEQ)
         {
-            return DayTrade(HCMIOList);
+            return DayTrade(HCMIOList, BHNO, CSEQ);
         }
         public static List<HCNTD> SubCalculateHCNTD(List<HCNTD> HCNTDList)
         {

@@ -55,7 +55,7 @@ namespace ESMP.STOCK.TASK.API
             HCNRHList = _sqlSearch.selectHCNRH(SearchElement);
             HCNTDList = _sqlSearch.selectHCNTD(SearchElement);
             //盤中現股沖銷 當沖 處理
-            (TCNUDList, addHCNRHList, addHCNTDList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList);
+            (TCNUDList, addHCNRHList, addHCNTDList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, BHNO, CSEQ);
             HCNRHList = HCNRHList.Concat(addHCNRHList).ToList();
             HCNTDList = HCNTDList.Concat(addHCNTDList).ToList();
             if (HCNRHList.Count > 0 || HCNTDList.Count > 0)

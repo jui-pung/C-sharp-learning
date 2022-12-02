@@ -19,7 +19,10 @@ namespace ESMP.STOCK.TASK.API
     {
         int _type;                                          //查詢與回覆格式設定
         string _searchStr;                                  //查詢xml或json格式字串
-        SqlSearch _sqlSearch = new SqlSearch();             //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)                                           
+        SqlSearch _sqlSearch = new SqlSearch();             //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)
+        static List<MCSRH> _MCSRHList = new List<MCSRH>();  //自訂MCUMS類別List (ESMP.STOCK.DB.TABLE.API)
+        static Dictionary<string, List<MCSRH>> _MCSRH_Dic;
+
         //--------------------------------------------------------------------------------------------
         //function getGainLostSearch() - 未實現損益查詢的對外接口function
         //--------------------------------------------------------------------------------------------
@@ -48,9 +51,13 @@ namespace ESMP.STOCK.TASK.API
             TCNUDList = _sqlSearch.selectTCNUD(SearchElement);
             TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
             TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
-            
+            _MCSRHList = _sqlSearch.selectMCSRH();
+
+            //依據 BHNO CSEQ STOCK 建立 MCSRH Dictionary
+            _MCSRH_Dic = _MCSRHList.GroupBy(d => d.BHNO + d.CSEQ + d.STOCK).ToDictionary(x => x.Key, x => x.ToList());
+
             //盤中現股沖銷 當沖 現股賣出處理
-            (TCNUDList, HCNRHList, HCNTDList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList);
+            (TCNUDList, HCNRHList, HCNTDList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, BHNO, CSEQ);
             
             if (TCNUDList.Count > 0)
             {
@@ -127,10 +134,11 @@ namespace ESMP.STOCK.TASK.API
         {
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TCNUD
-            var grp_TCNUD = TCNUD.GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();
+            var grp_TCNUD_Buy = TCNUD.Where(x => x.BQTY > 0).GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();
+            var grp_TCNUD_Sell = TCNUD.Where(x => x.BQTY < 0).GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();
 
-            //迴圈處理grp_TCNUD群組資料 存入個股未實現損益 List
-            foreach (var grp_item in grp_TCNUD)
+            //(現買)迴圈處理grp_TCNUD_Buy群組資料 存入個股未實現損益 List
+            foreach (var grp_item in grp_TCNUD_Buy)
             {
                 //取得個股明細資料 List (第三階層)
                 List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();
@@ -141,24 +149,20 @@ namespace ESMP.STOCK.TASK.API
                     row.dseq = item.DSEQ;
                     row.dno = item.DNO;
                     row.bqty = item.BQTY;
-                    if (row.bqty > 0)
-                    {
-                        row.ttypename = "現買";
-                        row.bstype = "B";
-                        row.tax = 0;
-                        row.cost = item.COST;
-                    }
-                    else
-                    {
-                        row.ttypename = "現賣";
-                        row.bstype= "S";
-                        row.tax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(item.PRICE) * decimal.ToDouble(item.QTY) * 0.003));
-                        row.cost = item.COST;
-                    }
                     row.mprice = item.PRICE;
                     row.lastprice = _sqlSearch.selectStockCprice(item.STOCK);
                     row.fee = item.FEE;
-                    
+                    row.ttypename = "現買";
+                    row.bstype = "B";
+                    row.mamt = row.bqty * row.mprice;
+                    row.tax = 0;
+                    row.cost = item.COST;
+                    row.estimateAmt = decimal.Truncate(row.lastprice * row.bqty);
+                    row.estimateFee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.estimateAmt) * 0.001425));
+                    if (row.estimateFee < 20)
+                        row.estimateFee = 20;
+                    row.estimateTax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.estimateAmt) * 0.003));
+
                     //匯撥來源說明
                     if (item.WTYPE == "A")
                     {
@@ -168,22 +172,27 @@ namespace ESMP.STOCK.TASK.API
                     }
                     detailList.Add(row);
                 }
-                detailList.ForEach(p => p.mamt = p.bqty * p.mprice);
-                detailList.ForEach(p => p.estimateAmt = decimal.Truncate(p.lastprice * p.bqty));
-                detailList.ForEach(p => p.estimateFee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(p.estimateAmt) * 0.001425)));
-                detailList.Where(x => x.estimateFee < 20).ToList().ForEach(p => p.estimateFee = 20);
-                detailList.ForEach(p => p.estimateTax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(p.estimateAmt) * 0.003)));
-                detailList.Where(x => x.bqty > 0).ToList().ForEach(p => p.marketvalue = p.estimateAmt - p.estimateFee - p.estimateTax);
-                detailList.Where(x => x.bqty < 0).ToList().ForEach(p => p.marketvalue = (p.estimateAmt + p.estimateFee) * -1);
+                detailList.ForEach(p => p.marketvalue = p.estimateAmt - p.estimateFee - p.estimateTax);
                 detailList.ForEach(p => p.profit = p.marketvalue - p.cost);
-                detailList.Where(x => x.cost > 0).ToList().ForEach(p => p.pl_ratio = decimal.Round(((p.profit / p.cost) * 100), 2).ToString() + "%");
+                detailList.Where(x => x.cost != 0).ToList().ForEach(p => p.pl_ratio = decimal.Round(((p.profit / p.cost) * 100), 2).ToString() + "%");
                 detailList.Where(x => x.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
+
+                //字典搜尋客戶此股票 昨日庫存股數
+                decimal yesterdayBqty = 0;
+                string searchKey = grp_item.First().BHNO + grp_item.First().CSEQ + grp_item.First().STOCK;
+                if (_MCSRH_Dic.ContainsKey(searchKey))
+                    yesterdayBqty = _MCSRH_Dic[searchKey][0].CNQBAL;
+                else
+                    yesterdayBqty = 0;             //如果查不到昨日庫存股數, 假設昨日庫存股數為0
 
                 //取得個股未實現損益 List (第二階層)
                 unoffset_qtype_sum row_Sum = new unoffset_qtype_sum();
                 row_Sum.stock = grp_item.First().STOCK;
                 row_Sum.stocknm = _sqlSearch.selectStockName(row_Sum.stock);
-                row_Sum.bqty = detailList.Sum(x => x.bqty);
+                row_Sum.ttypename = detailList.First().ttypename;
+                row_Sum.bstype = detailList.First().bstype;
+                row_Sum.bqty = yesterdayBqty;
+                row_Sum.real_qty = detailList.Sum(x => x.bqty);
                 row_Sum.cost = detailList.Sum(x => x.cost);
                 row_Sum.lastprice = detailList.First().lastprice;
                 row_Sum.marketvalue = detailList.Sum(x => x.marketvalue);
@@ -198,6 +207,69 @@ namespace ESMP.STOCK.TASK.API
                 row_Sum.unoffset_qtype_detail = detailList;
                 sumList.Add(row_Sum);
                 sumList.ForEach(x => x.avgprice = decimal.Round((x.cost / x.bqty), 2));
+                sumList.Where(n => n.cost != 0).ToList().ForEach(x => x.pl_ratio = decimal.Round(((x.profit / x.cost) * 100), 2).ToString() + "%");
+                sumList.Where(n => n.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
+            }
+
+            foreach (var grp_item in grp_TCNUD_Sell)
+            {
+                //取得個股明細資料 List (第三階層)
+                List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();
+                foreach (var item in grp_item)
+                {
+                    var row = new unoffset_qtype_detail();
+                    row.tdate = item.TDATE;
+                    row.dseq = item.DSEQ;
+                    row.dno = item.DNO;
+                    row.bqty = item.BQTY;
+                    row.mprice = item.PRICE;
+                    row.lastprice = _sqlSearch.selectStockCprice(item.STOCK);
+                    row.fee = item.FEE;
+                    row.ttypename = "現賣";
+                    row.bstype = "S";
+                    row.mamt = row.bqty * row.mprice * -1;
+                    row.tax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.mamt) * 0.003));
+                    row.cost = (row.mamt - row.fee - row.tax) * -1;
+                    row.estimateAmt = decimal.Truncate(row.lastprice * row.bqty * -1);
+                    row.estimateFee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.estimateAmt) * 0.001425));
+                    row.estimateTax = 0;
+
+                    //匯撥來源說明
+                    if (item.WTYPE == "A")
+                    {
+                        row.ioflag = item.IOFLAG;
+                        if (row.ioflag != null)
+                            row.ioname = BasicData.getIoflagName(item.IOFLAG);
+                    }
+                    detailList.Add(row);
+                }
+                detailList.ForEach(p => p.marketvalue = (p.estimateAmt + p.estimateFee) * -1);
+                detailList.ToList().ForEach(p => p.profit = p.cost - p.marketvalue);
+                detailList.Where(x => x.cost != 0).ToList().ForEach(p => p.pl_ratio = decimal.Round(((p.profit / p.cost) * 100), 2).ToString() + "%");
+                detailList.Where(x => x.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
+
+                //取得個股未實現損益 List (第二階層)
+                unoffset_qtype_sum row_Sum = new unoffset_qtype_sum();
+                row_Sum.stock = grp_item.First().STOCK;
+                row_Sum.stocknm = _sqlSearch.selectStockName(row_Sum.stock);
+                row_Sum.ttypename = detailList.First().ttypename;
+                row_Sum.bstype = detailList.First().bstype;
+                row_Sum.bqty = 0;
+                row_Sum.real_qty = detailList.Sum(x => x.bqty);
+                row_Sum.cost = detailList.Sum(x => x.cost);
+                row_Sum.lastprice = detailList.First().lastprice;
+                row_Sum.marketvalue = detailList.Sum(x => x.marketvalue);
+                row_Sum.estimateAmt = detailList.Sum(x => x.estimateAmt);
+                row_Sum.estimateFee = detailList.Sum(x => x.estimateFee);
+                row_Sum.estimateTax = detailList.Sum(x => x.estimateTax);
+                row_Sum.profit = detailList.Sum(x => x.profit);
+                row_Sum.fee = detailList.Sum(x => x.fee);
+                row_Sum.tax = detailList.Sum(x => x.tax);
+                row_Sum.amt = detailList.Sum(x => x.mamt);
+                //第三階層資料存入第二階層List
+                row_Sum.unoffset_qtype_detail = detailList;
+                sumList.Add(row_Sum);
+                sumList.ForEach(x => x.avgprice = decimal.Round((x.cost / x.real_qty), 2));
                 sumList.Where(n => n.cost != 0).ToList().ForEach(x => x.pl_ratio = decimal.Round(((x.profit / x.cost) * 100), 2).ToString() + "%");
                 sumList.Where(n => n.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
             }
