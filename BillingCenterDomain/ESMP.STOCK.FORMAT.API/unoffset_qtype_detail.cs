@@ -8,8 +8,8 @@ namespace ESMP.STOCK.FORMAT
     {
         public string tdate { get; set; }
         public string ttype { get; set; } = "0";
-        public string ttypename { get; set; } = "現買";
-        public string bstype { get; set; } = "B";
+        public string ttypename { get; set; }
+        public string bstype { get; set; }
         public string dseq { get; set; }
         public string dno { get; set; }
         public decimal bqty { get; set; }

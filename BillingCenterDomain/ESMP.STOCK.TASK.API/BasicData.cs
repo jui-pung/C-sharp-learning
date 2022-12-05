@@ -12,12 +12,16 @@ namespace ESMP.STOCK.TASK.API
     public sealed class BasicData
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
+        static SqlSearch _sqlSearch;
         private static object chekLock = new object();
         private static Dictionary<string, string> _MsysDict = null;
-        private BasicData()
-        {
+        static List<MSTMB> _MSTMBList = new List<MSTMB>();                  //自訂MSTMB類別List (ESMP.STOCK.DB.TABLE.API)
+        public static Dictionary<string, List<MSTMB>> _MSTMB_Dic = null;
+        static List<MCSRH> _MCSRHList = new List<MCSRH>();                  //自訂MCUMS類別List (ESMP.STOCK.DB.TABLE.API)
+        public static Dictionary<string, List<MCSRH>> _MCSRH_Dic = null;
+        static List<MCUMS> _MCUMSList = new List<MCUMS>();                  //自訂MCUMS類別List (ESMP.STOCK.DB.TABLE.API)
+        public static Dictionary<string, List<MCUMS>> _MCUMS_Dic = null;
 
-        }
         public static Dictionary<string, string> MsysDict
         { 
             get
@@ -35,6 +39,67 @@ namespace ESMP.STOCK.TASK.API
                 }
                 return _MsysDict;
             } 
+        }
+        public static Dictionary<string, List<MSTMB>> MSTMB_Dic
+        {
+            get
+            {
+                if (_MSTMB_Dic == null)
+                {
+                    lock (chekLock)
+                    {
+                        if (_MSTMB_Dic == null)
+                        {
+                            _sqlSearch = new SqlSearch();
+                            _MSTMBList = _sqlSearch.selectMSTMB();
+                            //依據STOCK 建立 MSTMB Dictionary
+                            _MSTMB_Dic = _MSTMBList.GroupBy(d => d.STOCK).ToDictionary(x => x.Key, x => x.ToList());
+                        }
+                    }
+                }
+                return _MSTMB_Dic;
+            }
+        }
+        public static Dictionary<string, List<MCSRH>> MCSRH_Dic
+        {
+            get
+            {
+                if (_MCSRH_Dic == null)
+                {
+                    lock (chekLock)
+                    {
+                        if (_MCSRH_Dic == null)
+                        {
+                            _sqlSearch = new SqlSearch();
+                            _MCSRHList = _sqlSearch.selectMCSRH();
+                            //依據 BHNO CSEQ STOCK 建立 MCSRH Dictionary
+                            _MCSRH_Dic = _MCSRHList.GroupBy(d => d.BHNO + d.CSEQ + d.STOCK).ToDictionary(x => x.Key, x => x.ToList());
+                        }
+                    }
+                }
+                return _MCSRH_Dic;
+            }
+        }
+
+        public static Dictionary<string, List<MCUMS>> MCUMS_Dic
+        {
+            get
+            {
+                if (_MCUMS_Dic == null)
+                {
+                    lock (chekLock)
+                    {
+                        if (_MCUMS_Dic == null)
+                        {
+                            _sqlSearch = new SqlSearch();
+                            _MCUMSList = _sqlSearch.selectMCUMS();
+                            //依據 BHNO CSEQ 建立 MCUMS Dictionary
+                            _MCUMS_Dic = _MCUMSList.GroupBy(d => d.BHNO + d.CSEQ).ToDictionary(x => x.Key, x => x.ToList());
+                        }
+                    }
+                }
+                return _MCUMS_Dic;
+            }
         }
         public static string getIoflagName(string ioflag)
         {

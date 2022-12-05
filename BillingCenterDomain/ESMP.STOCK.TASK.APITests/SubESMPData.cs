@@ -34,5 +34,9 @@ namespace ESMP.STOCK.TASK.APITests
         {
             return AddTMHIOBuy(TCNUDList, HCMIOList);
         }
+        public static List<TCNUD> SubAddTMHIOSell(List<TCNUD> TCNUDList, List<HCMIO> HCMIOList, string BHNO, string CSEQ)
+        {
+            return AddTMHIOSell(TCNUDList, HCMIOList, BHNO, CSEQ);
+        }
     }
 }

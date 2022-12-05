@@ -25,9 +25,16 @@ namespace ESMP.STOCK.TASK.API
         public (string, string) getBillSearch(string QTYPE, string BHNO, string CSEQ, string SDATE, string EDATE, string stockSymbol, int type)
         {
             _type = type;
-            List<HCMIO> HCMIOList = new List<HCMIO>();                  //自訂HCMIO類別List             (ESMP.STOCK.DB.TABLE.API)
-            List<TMHIO> TMHIOList = new List<TMHIO>();                  //自訂TMHIO類別List             (ESMP.STOCK.DB.TABLE.API)
+            List<HCMIO> HCMIOList = new List<HCMIO>();                  //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
+            List<TMHIO> TMHIOList = new List<TMHIO>();                  //自訂TMHIO類別List (ESMP.STOCK.DB.TABLE.API)
+            List<TCNUD> TCNUDList = new List<TCNUD>();                  //自訂TCNUD類別List (ESMP.STOCK.DB.TABLE.API)
+            List<TCSIO> TCSIOList = new List<TCSIO>();                  //自訂TCSIO類別List (ESMP.STOCK.DB.TABLE.API)
+            List<HCNRH> HCNRHList = new List<HCNRH>();                  //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
+            List<HCNTD> HCNTDList = new List<HCNTD>();                  //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
+            List<HCMIO> HCMIOList_Today = new List<HCMIO>();            //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
+
             List<profile> profileList = new List<profile>();            //自訂profile類別List           (階層二:對帳單明細資料)  
+            List<profile> profileList_Today = new List<profile>();      //自訂profile類別List           (階層二:對帳單明細資料)  
             billSum billsum = new billSum();                            //自訂billSum類別class          (階層二:對帳單匯總資料)  
             profile_sum profileSum = new profile_sum();                 //自訂profile_sum類別Class      (階層一:對帳單彙總資料)  
             string txtSearchContent = "";
@@ -39,12 +46,22 @@ namespace ESMP.STOCK.TASK.API
             //取得查詢字串Element
             var obj = GetElement(_searchStr, _type);
             root SearchElement = obj as root;
-            //查詢開始...
-            HCMIOList = _sqlSearch.selectHCMIO(SearchElement);
+
+            //查詢資料庫資料
+            TCNUDList = _sqlSearch.selectTCNUD(SearchElement);
             TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
+            HCMIOList = _sqlSearch.selectHCMIO(SearchElement);
+            TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
+
+            //盤中現股沖銷 當沖 現股賣出處理
+            (TCNUDList, HCNRHList, HCNTDList, HCMIOList_Today) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, BHNO, CSEQ);
+
             if (HCMIOList.Count > 0 || TMHIOList.Count > 0)
             {
-                profileList = searchDetails(HCMIOList, TMHIOList, BHNO, CSEQ);
+                profileList = searchDetails(HCMIOList, BHNO, CSEQ);
+                profileList_Today = searchDetails_Today(HCMIOList_Today, BHNO, CSEQ);
+                //合併歷史與當日資料
+                profileList = profileList.Concat(profileList_Today).ToList();
                 billsum = searchSum(profileList);
                 profileSum = searchProfileSum(profileList, billsum);
                 //呈現查詢結果
@@ -115,19 +132,26 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchDetails() - 計算取得 查詢回復階層二的對帳明細資料
         //--------------------------------------------------------------------------------------------
-        private List<profile> searchDetails(List<HCMIO> dbHCMIO, List<TMHIO> dbTMHIO, string BHNO, string CSEQ)
+        private List<profile> searchDetails(List<HCMIO> HCMIO, string BHNO, string CSEQ)
         {
             List<profile> profileList = new List<profile>();                //自訂profile類別List (ESMP.STOCK.FORMAT.API)                                                                    //
             List<profile> profileHCMIOList = new List<profile>();           //自訂profile類別List (ESMP.STOCK.FORMAT.API)                                                                    //
-            List<profile> profileTMHIOList = new List<profile>();           //自訂profile類別List (ESMP.STOCK.FORMAT.API)                                                                    //
+            
             //歷史資料
-            foreach (var item in dbHCMIO)
+            foreach (var item in HCMIO)
             {
+                //字典搜尋此股票 中文名稱
+                string cname = "";
+                if (BasicData._MSTMB_Dic.ContainsKey(item.STOCK))
+                    cname = BasicData._MSTMB_Dic[item.STOCK][0].CNAME;
+                else
+                    cname = "";             //如果查不到股票中文名稱, 假設中文名稱為" "
+
                 profile row = new profile();
                 row.bhno = BHNO;
                 row.cseq = CSEQ;
                 row.stock = item.STOCK;
-                row.stocknm = _sqlSearch.selectStockName(item.STOCK);
+                row.stocknm = cname;
                 row.mdate = item.TDATE;
                 row.dseq = item.DSEQ;
                 row.dno = item.DNO;
@@ -150,67 +174,100 @@ namespace ESMP.STOCK.TASK.API
                 row.netamt = item.NETAMT;
                 profileHCMIOList.Add(row);
             }
-            //當日資料
-            foreach (var item in dbTMHIO)
+            return profileList;
+        }
+
+        /// <summary>
+        /// function searchDetails_Today() - 計算取得 查詢回復階層二的對帳明細資料 (當日交易明細)
+        /// </summary>
+        /// <param name="HCMIO"></param>
+        /// <param name="BHNO"></param>
+        /// <param name="CSEQ"></param>
+        /// <returns></returns>
+        private List<profile> searchDetails_Today(List<HCMIO> HCMIO, string BHNO, string CSEQ)
+        {
+            List<profile> profileList = new List<profile>();                //自訂profile類別List (ESMP.STOCK.FORMAT.API)                                                                    //
+            List<profile> profileHCMIOList = new List<profile>();           //自訂profile類別List (ESMP.STOCK.FORMAT.API)                                                                    //
+
+            //歷史資料
+            foreach (var item in HCMIO)
             {
+                //字典搜尋此股票 中文名稱
+                string cname = "";
+                if (BasicData._MSTMB_Dic.ContainsKey(item.STOCK))
+                    cname = BasicData._MSTMB_Dic[item.STOCK][0].CNAME;
+                else
+                    cname = "";             //如果查不到股票中文名稱, 假設中文名稱為" "
+
                 profile row = new profile();
                 row.bhno = BHNO;
                 row.cseq = CSEQ;
                 row.stock = item.STOCK;
-                row.stocknm = _sqlSearch.selectStockName(item.STOCK);
+                row.stocknm = cname;
                 row.mdate = item.TDATE;
                 row.dseq = item.DSEQ;
-                row.dno = item.JRNUM;
+                row.dno = item.DNO;
                 row.ttype = item.TTYPE;
-                if (item.TTYPE == "0" && item.BSTYPE == "B" && item.ETYPE == "0")
-                    row.ttypename = "現買";
-                else if (item.TTYPE == "0" && item.BSTYPE == "B" && item.ETYPE == "2")
-                    row.ttypename = "盤後零買";
-                else if (item.TTYPE == "0" && item.BSTYPE == "B" && item.ETYPE == "5")
-                    row.ttypename = "盤中零買";
-                else if (item.TTYPE == "0" && item.BSTYPE == "S" && item.ETYPE == "0")
-                    row.ttypename = "現賣";
-                else if (item.TTYPE == "0" && item.BSTYPE == "S" && item.ETYPE == "2")
-                    row.ttypename = "盤後零賣";
-                else if (item.TTYPE == "0" && item.BSTYPE == "S" && item.ETYPE == "5")
-                    row.ttypename = "盤中零賣";
                 row.bstype = item.BSTYPE;
                 if (item.BSTYPE == "B")
                     row.bstypename = "買";
                 else if (item.BSTYPE == "S")
                     row.bstypename = "賣";
-                if (item.ETYPE == "2")
-                    row.etype = "1";
-                else
-                    row.etype = "0";
+                row.etype = item.ETYPE;
                 row.mprice = item.PRICE;
                 row.mqty = item.QTY;
-                row.mamt = item.PRICE * item.QTY;
-                
-                row.fee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.mprice) * decimal.ToDouble(row.mqty) * 0.001425));
-                //零股最小手續費
-                if (row.etype == "1" && row.fee < 1)
+                if (item.BQTY > 0)
                 {
-                    row.fee = 1;
+                    if (item.TTYPE == "0" && item.BSTYPE == "B" && item.ETYPE == "0")
+                        row.ttypename = "現買";
+                    else if (item.TTYPE == "0" && item.BSTYPE == "B" && item.ETYPE == "2")
+                        row.ttypename = "盤後零買";
+                    else if (item.TTYPE == "0" && item.BSTYPE == "B" && item.ETYPE == "5")
+                        row.ttypename = "盤中零買";
+                    else if (item.TTYPE == "0" && item.BSTYPE == "S" && item.ETYPE == "0")
+                        row.ttypename = "現賣";
+                    else if (item.TTYPE == "0" && item.BSTYPE == "S" && item.ETYPE == "2")
+                        row.ttypename = "盤後零賣";
+                    else if (item.TTYPE == "0" && item.BSTYPE == "S" && item.ETYPE == "5")
+                        row.ttypename = "盤中零賣";
+                    row.mamt = item.AMT;
+                    row.fee = item.FEE;
+                    //零股最小手續費
+                    if (row.etype == "1" && row.fee < 1)
+                        row.fee = 1;
+                    //整股最小手續費
+                    else if (row.etype == "0" && row.fee < 20)
+                        row.fee = 20;
+                    row.tax = item.TAX;
+                    row.netamt = item.NETAMT;
                 }
-                //整股最小手續費
-                else if (row.etype == "0" && row.fee < 20)
+                else
                 {
-                    row.fee = 20;
+                    row.mamt = item.PRICE * item.QTY;
+                    row.fee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.mprice) * decimal.ToDouble(row.mqty) * 0.001425));
+                    //零股最小手續費
+                    if (row.etype == "1" && row.fee < 1)
+                        row.fee = 1;
+                    //整股最小手續費
+                    else if (row.etype == "0" && row.fee < 20)
+                        row.fee = 20;
+                    if (item.BSTYPE == "B")
+                    {
+                        row.ttypename = "買沖";
+                        row.tax = 0;
+                        //買入資料計算淨收付
+                        row.netamt = ((row.mamt + row.fee) * -1);
+                    }   
+                    else if (item.BSTYPE == "S")
+                    {
+                        row.ttypename = "賣沖";
+                        //賣出資料計算交易稅 淨收付
+                        row.tax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.mprice) * decimal.ToDouble(row.mqty) * 0.0015));
+                        row.netamt = row.mamt - row.fee - row.tax;
+                    }
                 }
-                //賣出資料計算交易稅 淨收付
-                if (item.BSTYPE == "S")
-                {
-                    row.tax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.mprice) * decimal.ToDouble(row.mqty) * 0.003));
-                    row.netamt = row.mamt - row.fee - row.tax;
-                }
-                //買入資料計算淨收付
-                else if (item.BSTYPE == "B")
-                    row.netamt = ((row.mamt + row.fee) * -1);
-                profileTMHIOList.Add(row);
+                profileHCMIOList.Add(row);
             }
-            //合併歷史與當日資料
-            profileList = profileHCMIOList.Concat(profileTMHIOList).ToList();
             return profileList;
         }
 

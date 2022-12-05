@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace ESMP.STOCK.TASK.API
@@ -32,6 +33,7 @@ namespace ESMP.STOCK.TASK.API
             List<TMHIO> TMHIOList = new List<TMHIO>();                                      //自訂TMHIO類別List (ESMP.STOCK.DB.TABLE.API)
             List<TCSIO> TCSIOList = new List<TCSIO>();                                      //自訂TCSIO類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNRH> HCNRHList = new List<HCNRH>();                                      //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
+            List<HCMIO> HCMIOList = new List<HCMIO>();                                      //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNRH> addHCNRHList = new List<HCNRH>();                                   //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNTD> HCNTDList = new List<HCNTD>();                                      //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNTD> addHCNTDList = new List<HCNTD>();                                   //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
@@ -55,7 +57,7 @@ namespace ESMP.STOCK.TASK.API
             HCNRHList = _sqlSearch.selectHCNRH(SearchElement);
             HCNTDList = _sqlSearch.selectHCNTD(SearchElement);
             //盤中現股沖銷 當沖 處理
-            (TCNUDList, addHCNRHList, addHCNTDList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, BHNO, CSEQ);
+            (TCNUDList, addHCNRHList, addHCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, BHNO, CSEQ);
             HCNRHList = HCNRHList.Concat(addHCNRHList).ToList();
             HCNTDList = HCNTDList.Concat(addHCNTDList).ToList();
             if (HCNRHList.Count > 0 || HCNTDList.Count > 0)
@@ -188,6 +190,13 @@ namespace ESMP.STOCK.TASK.API
                 detail_out.profit = grp_HCNRH_item.Sum(s => s.PROFIT);
                 detail_out.ttypename2 = "現賣";
 
+                //字典搜尋此股票 中文名稱
+                string cname = "";
+                if (BasicData._MSTMB_Dic.ContainsKey(grp_HCNRH_item.First().STOCK))
+                    cname = BasicData._MSTMB_Dic[grp_HCNRH_item.First().STOCK][0].CNAME;
+                else
+                    cname = "";             //如果查不到股票中文名稱, 假設中文名稱為" "
+
                 //取得個股彙總資料 List (第二階層)
                 profit_sum profitSum = new profit_sum();
                 profitSum.bhno = BHNO;
@@ -196,7 +205,7 @@ namespace ESMP.STOCK.TASK.API
                 profitSum.dseq = detail_out.dseq;
                 profitSum.dno = detail_out.dno;
                 profitSum.stock = grp_HCNRH_item.First().STOCK;
-                profitSum.stocknm = _sqlSearch.selectStockName(grp_HCNRH_item.First().STOCK);
+                profitSum.stocknm = cname;
                 profitSum.cqty = detail_out.cqty;
                 profitSum.mprice = detail_out.mprice;
                 profitSum.fee = detail_out.fee;
@@ -271,6 +280,13 @@ namespace ESMP.STOCK.TASK.API
                 detail_out.profit = grp_HCNTD_item.Sum(s => s.PROFIT);
                 detail_out.ttypename2 = "賣沖";
 
+                //字典搜尋此股票 中文名稱
+                string cname = "";
+                if (BasicData._MSTMB_Dic.ContainsKey(grp_HCNTD_item.First().STOCK))
+                    cname = BasicData._MSTMB_Dic[grp_HCNTD_item.First().STOCK][0].CNAME;
+                else
+                    cname = "";             //如果查不到股票中文名稱, 假設中文名稱為" "
+
                 //取得個股彙總資料 List (第二階層)
                 profit_sum profitSum = new profit_sum();
                 profitSum.bhno = BHNO;
@@ -279,7 +295,7 @@ namespace ESMP.STOCK.TASK.API
                 profitSum.dseq = detail_out.dseq;
                 profitSum.dno = detail_out.dno;
                 profitSum.stock = grp_HCNTD_item.First().STOCK;
-                profitSum.stocknm = _sqlSearch.selectStockName(grp_HCNTD_item.First().STOCK);
+                profitSum.stocknm = cname;
                 profitSum.cqty = detail_out.cqty;
                 profitSum.mprice = detail_out.mprice;
                 profitSum.fee = detail_out.fee;

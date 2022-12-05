@@ -13,26 +13,9 @@ using System.Threading.Tasks;
 namespace ESMP.STOCK.TASK.API
 {
     public class ESMPData
-    {
-        static SqlSearch _sqlSearch;
-        static List<MSTMB> _MSTMBList = new List<MSTMB>();             //自訂MSTMB類別List (ESMP.STOCK.DB.TABLE.API)
-        static List<MCUMS> _MCUMSList = new List<MCUMS>();             //自訂MCUMS類別List (ESMP.STOCK.DB.TABLE.API)
-        static Dictionary<string, List<MSTMB>> _StockMSTMB_Dic;
-        static Dictionary<string, List<MCUMS>> _CseqMCUMS_Dic;
-        public static void CreateDic()
+    {   
+        public static (List<TCNUD>, List<HCNRH>, List<HCNTD>, List<HCMIO>) GetESMPData(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList, List<TCSIO> TCSIOList, string BHNO, string CSEQ)
         {
-            _sqlSearch = new SqlSearch();
-            _MSTMBList = _sqlSearch.selectMSTMB();
-            _MCUMSList = _sqlSearch.selectMCUMS();
-            //依據 STOCK 建立 MSTMB Dictionary
-            _StockMSTMB_Dic = _MSTMBList.GroupBy(x => x.STOCK).ToDictionary(x => x.Key, x => x.ToList());
-            //依據 BHNO CSEQ 建立 MCUMS Dictionary
-            _CseqMCUMS_Dic = _MCUMSList.GroupBy(d => d.BHNO + d.CSEQ).ToDictionary(x => x.Key, x => x.ToList());
-        }
-        
-        public static (List<TCNUD>, List<HCNRH>, List<HCNTD>) GetESMPData(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList, List<TCSIO> TCSIOList, string BHNO, string CSEQ)
-        {
-            CreateDic();
             List<HCNRH> HCNRHList = new List<HCNRH>();          //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCMIO> HCMIOList = new List<HCMIO>();          //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNTD> HCNTDList = new List<HCNTD>();          //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
@@ -50,7 +33,7 @@ namespace ESMP.STOCK.TASK.API
             TCNUDList = AddTMHIOBuy(TCNUDList, HCMIOList);
             //剩餘賣出未沖銷，加入現股餘額
             TCNUDList = AddTMHIOSell(TCNUDList, HCMIOList, BHNO, CSEQ);
-            return (TCNUDList, HCNRHList, HCNTDList);
+            return (TCNUDList, HCNRHList, HCNTDList, HCMIOList);
         }
 
         //--------------------------------------------------------------------------------------------
@@ -135,8 +118,8 @@ namespace ESMP.STOCK.TASK.API
             string cseqCNTDTYPE = string.Empty;
             //字典搜尋客戶當沖資格
             string client = BHNO + CSEQ;
-            if (_CseqMCUMS_Dic.ContainsKey(client))
-                cseqCNTDTYPE = _CseqMCUMS_Dic[client][0].CNTDTYPE;
+            if (BasicData._MCUMS_Dic.ContainsKey(client))
+                cseqCNTDTYPE = BasicData._MCUMS_Dic[client][0].CNTDTYPE;
             else
                 //cseqCNTDTYPE = "N";             //如果查不到客戶的沖銷資格, 假設此客戶不可現股當沖
                 cseqCNTDTYPE = "X";           //(測試)如果查不到客戶的沖銷資格, 假設此客戶可先賣後買
@@ -150,8 +133,8 @@ namespace ESMP.STOCK.TASK.API
         {
             string stockCNTDTYPE = string.Empty;
             //字典搜尋股票當沖資格
-            if (_StockMSTMB_Dic.ContainsKey(HCMIOSell_item.STOCK))
-                stockCNTDTYPE = _StockMSTMB_Dic[HCMIOSell_item.STOCK][0].CNTDTYPE;
+            if (BasicData._MSTMB_Dic.ContainsKey(HCMIOSell_item.STOCK))
+                stockCNTDTYPE = BasicData._MSTMB_Dic[HCMIOSell_item.STOCK][0].CNTDTYPE;
             else
                 stockCNTDTYPE = "N";            //如果查不到股票的沖銷資格, 假設此股票不可現股當沖
             return stockCNTDTYPE;

@@ -19,9 +19,7 @@ namespace ESMP.STOCK.TASK.API
     {
         int _type;                                          //查詢與回覆格式設定
         string _searchStr;                                  //查詢xml或json格式字串
-        SqlSearch _sqlSearch = new SqlSearch();             //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)
-        static List<MCSRH> _MCSRHList = new List<MCSRH>();  //自訂MCUMS類別List (ESMP.STOCK.DB.TABLE.API)
-        static Dictionary<string, List<MCSRH>> _MCSRH_Dic;
+        SqlSearch _sqlSearch = new SqlSearch();             //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)                                           
 
         //--------------------------------------------------------------------------------------------
         //function getGainLostSearch() - 未實現損益查詢的對外接口function
@@ -35,6 +33,7 @@ namespace ESMP.STOCK.TASK.API
             List<TCSIO> TCSIOList = new List<TCSIO>();                                      //自訂TCSIO類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNRH> HCNRHList = new List<HCNRH>();                                      //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNTD> HCNTDList = new List<HCNTD>();                                      //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
+            List<HCMIO> HCMIOList = new List<HCMIO>();                                      //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
             List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();     //自訂unoffset_qtype_detail類別List (階層三:個股明細)
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();              //自訂unoffset_qtype_sum類別List    (階層二:個股未實現損益)
             List<unoffset_qtype_accsum> accsumList = new List<unoffset_qtype_accsum>();     //自訂unoffset_qtype_accsum類別List (階層一:帳戶未實現損益)
@@ -51,13 +50,9 @@ namespace ESMP.STOCK.TASK.API
             TCNUDList = _sqlSearch.selectTCNUD(SearchElement);
             TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
             TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
-            _MCSRHList = _sqlSearch.selectMCSRH();
-
-            //依據 BHNO CSEQ STOCK 建立 MCSRH Dictionary
-            _MCSRH_Dic = _MCSRHList.GroupBy(d => d.BHNO + d.CSEQ + d.STOCK).ToDictionary(x => x.Key, x => x.ToList());
 
             //盤中現股沖銷 當沖 現股賣出處理
-            (TCNUDList, HCNRHList, HCNTDList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, BHNO, CSEQ);
+            (TCNUDList, HCNRHList, HCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, BHNO, CSEQ);
             
             if (TCNUDList.Count > 0)
             {
@@ -127,13 +122,15 @@ namespace ESMP.STOCK.TASK.API
             return root;
         }
 
-        //--------------------------------------------------------------------------------------------
-        // function searchSum() - 計算取得 查詢回復階層二的個股未實現損益與個股明細
-        //--------------------------------------------------------------------------------------------
+        /// <summary>
+        /// function searchSum() - 計算取得 查詢回復階層二的個股未實現損益與個股明細
+        /// </summary>
+        /// <param name="TCNUD"></param>
+        /// <returns></returns>
         public List<unoffset_qtype_sum> searchSum(List<TCNUD> TCNUD)
         {
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
-            //依照股票代號產生新的清單群組grp_TCNUD
+            //依照股票代號產生新的清單群組grp_TCNUD ----現賣 現買
             var grp_TCNUD_Buy = TCNUD.Where(x => x.BQTY > 0).GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();
             var grp_TCNUD_Sell = TCNUD.Where(x => x.BQTY < 0).GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();
 
@@ -144,13 +141,20 @@ namespace ESMP.STOCK.TASK.API
                 List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();
                 foreach (var item in grp_item)
                 {
+                    //字典搜尋此股票 現價
+                    decimal cprice = 0;
+                    if (BasicData._MSTMB_Dic.ContainsKey(item.STOCK))
+                        cprice = BasicData._MSTMB_Dic[item.STOCK][0].CPRICE;
+                    else
+                        cprice = 10;             //如果查不到股票現價, 假設現價為10
+
                     var row = new unoffset_qtype_detail();
                     row.tdate = item.TDATE;
                     row.dseq = item.DSEQ;
                     row.dno = item.DNO;
                     row.bqty = item.BQTY;
                     row.mprice = item.PRICE;
-                    row.lastprice = _sqlSearch.selectStockCprice(item.STOCK);
+                    row.lastprice = cprice;
                     row.fee = item.FEE;
                     row.ttypename = "現買";
                     row.bstype = "B";
@@ -180,15 +184,22 @@ namespace ESMP.STOCK.TASK.API
                 //字典搜尋客戶此股票 昨日庫存股數
                 decimal yesterdayBqty = 0;
                 string searchKey = grp_item.First().BHNO + grp_item.First().CSEQ + grp_item.First().STOCK;
-                if (_MCSRH_Dic.ContainsKey(searchKey))
-                    yesterdayBqty = _MCSRH_Dic[searchKey][0].CNQBAL;
+                if (BasicData._MCSRH_Dic.ContainsKey(searchKey))
+                    yesterdayBqty = BasicData._MCSRH_Dic[searchKey][0].CNQBAL;
                 else
                     yesterdayBqty = 0;             //如果查不到昨日庫存股數, 假設昨日庫存股數為0
+
+                //字典搜尋此股票 中文名稱
+                string cname = "";
+                if (BasicData._MSTMB_Dic.ContainsKey(grp_item.First().STOCK))
+                    cname = BasicData._MSTMB_Dic[grp_item.First().STOCK][0].CNAME;
+                else
+                    cname = "";             //如果查不到股票中文名稱, 假設中文名稱為" "
 
                 //取得個股未實現損益 List (第二階層)
                 unoffset_qtype_sum row_Sum = new unoffset_qtype_sum();
                 row_Sum.stock = grp_item.First().STOCK;
-                row_Sum.stocknm = _sqlSearch.selectStockName(row_Sum.stock);
+                row_Sum.stocknm = cname;
                 row_Sum.ttypename = detailList.First().ttypename;
                 row_Sum.bstype = detailList.First().bstype;
                 row_Sum.bqty = yesterdayBqty;
@@ -206,7 +217,7 @@ namespace ESMP.STOCK.TASK.API
                 //第三階層資料存入第二階層List
                 row_Sum.unoffset_qtype_detail = detailList;
                 sumList.Add(row_Sum);
-                sumList.ForEach(x => x.avgprice = decimal.Round((x.cost / x.bqty), 2));
+                sumList.ForEach(x => x.avgprice = decimal.Round((x.cost / x.real_qty), 2)); //??
                 sumList.Where(n => n.cost != 0).ToList().ForEach(x => x.pl_ratio = decimal.Round(((x.profit / x.cost) * 100), 2).ToString() + "%");
                 sumList.Where(n => n.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
             }
@@ -217,13 +228,20 @@ namespace ESMP.STOCK.TASK.API
                 List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();
                 foreach (var item in grp_item)
                 {
+                    //字典搜尋此股票 現價
+                    decimal cprice = 0;
+                    if (BasicData._MSTMB_Dic.ContainsKey(item.STOCK))
+                        cprice = BasicData._MSTMB_Dic[item.STOCK][0].CPRICE;
+                    else
+                        cprice = 0;             //如果查不到股票現價, 假設現價為0
+
                     var row = new unoffset_qtype_detail();
                     row.tdate = item.TDATE;
                     row.dseq = item.DSEQ;
                     row.dno = item.DNO;
                     row.bqty = item.BQTY;
                     row.mprice = item.PRICE;
-                    row.lastprice = _sqlSearch.selectStockCprice(item.STOCK);
+                    row.lastprice = cprice;
                     row.fee = item.FEE;
                     row.ttypename = "現賣";
                     row.bstype = "S";
@@ -248,10 +266,17 @@ namespace ESMP.STOCK.TASK.API
                 detailList.Where(x => x.cost != 0).ToList().ForEach(p => p.pl_ratio = decimal.Round(((p.profit / p.cost) * 100), 2).ToString() + "%");
                 detailList.Where(x => x.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
 
+                //字典搜尋此股票 中文名稱
+                string cname = "";
+                if (BasicData._MSTMB_Dic.ContainsKey(grp_item.First().STOCK))
+                    cname = BasicData._MSTMB_Dic[grp_item.First().STOCK][0].CNAME;
+                else
+                    cname = "";             //如果查不到股票中文名稱, 假設中文名稱為" "
+
                 //取得個股未實現損益 List (第二階層)
                 unoffset_qtype_sum row_Sum = new unoffset_qtype_sum();
                 row_Sum.stock = grp_item.First().STOCK;
-                row_Sum.stocknm = _sqlSearch.selectStockName(row_Sum.stock);
+                row_Sum.stocknm = cname;
                 row_Sum.ttypename = detailList.First().ttypename;
                 row_Sum.bstype = detailList.First().bstype;
                 row_Sum.bqty = 0;

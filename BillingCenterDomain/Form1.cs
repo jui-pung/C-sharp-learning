@@ -23,7 +23,9 @@ namespace BillingCenterDomain
         {
             InitializeComponent();
             _ = BasicData.MsysDict;
-            
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCSRH_Dic;
+            _ = BasicData.MCUMS_Dic;
         }
 
         private void btnSearch_Click(object sender, EventArgs e)

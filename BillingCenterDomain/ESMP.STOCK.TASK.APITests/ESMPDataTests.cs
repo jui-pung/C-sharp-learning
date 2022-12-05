@@ -1074,7 +1074,8 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             string BHNO = TMHIOList[0].BHNO;
             string CSEQ = TMHIOList[0].CSEQ;
-            ESMPData.CreateDic();
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
@@ -1129,7 +1130,8 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             string BHNO = TMHIOList[0].BHNO;
             string CSEQ = TMHIOList[0].CSEQ;
-            ESMPData.CreateDic();
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
@@ -1205,7 +1207,8 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             string BHNO = TMHIOList[0].BHNO;
             string CSEQ = TMHIOList[0].CSEQ;
-            ESMPData.CreateDic();
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
@@ -1292,7 +1295,8 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             string BHNO = TMHIOList[0].BHNO;
             string CSEQ = TMHIOList[0].CSEQ;
-            ESMPData.CreateDic();
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
@@ -1394,7 +1398,8 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             string BHNO = TMHIOList[0].BHNO;
             string CSEQ = TMHIOList[0].CSEQ;
-            ESMPData.CreateDic();
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
@@ -1493,7 +1498,8 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             string BHNO = TMHIOList[0].BHNO;
             string CSEQ = TMHIOList[0].CSEQ;
-            ESMPData.CreateDic();
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
@@ -1588,7 +1594,8 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             string BHNO = TMHIOList[0].BHNO;
             string CSEQ = TMHIOList[0].CSEQ;
-            ESMPData.CreateDic();
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
@@ -1668,7 +1675,8 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             string BHNO = TMHIOList[0].BHNO;
             string CSEQ = TMHIOList[0].CSEQ;
-            ESMPData.CreateDic();
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
@@ -1758,7 +1766,8 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             string BHNO = TMHIOList[0].BHNO;
             string CSEQ = TMHIOList[0].CSEQ;
-            ESMPData.CreateDic();
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
@@ -1864,7 +1873,8 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             string BHNO = TMHIOList[0].BHNO;
             string CSEQ = TMHIOList[0].CSEQ;
-            ESMPData.CreateDic();
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
@@ -1959,7 +1969,8 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             string BHNO = TMHIOList[0].BHNO;
             string CSEQ = TMHIOList[0].CSEQ;
-            ESMPData.CreateDic();
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
@@ -2044,7 +2055,8 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             string BHNO = TCNUDList[0].BHNO;
             string CSEQ = TCNUDList[0].CSEQ;
-            ESMPData.CreateDic();
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
             HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
             (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
             HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
@@ -2069,6 +2081,292 @@ namespace ESMP.STOCK.TASK.API.Tests
             Assert.AreEqual(HCNRHList[0].PROFIT, Convert.ToDecimal(33386));
           
             Assert.AreEqual(HCNTDList.Count, 0);
+        }
+
+        //［現股當沖資格：X］先賣部位檢核
+        [TestMethod()]
+        public void currentStockSellTest_24()
+        {
+            List<TCNUD> TCNUDList = new List<TCNUD>();
+            List<TMHIO> TMHIOList = new List<TMHIO>();
+            List<TCSIO> TCSIOList = new List<TCSIO>();
+            List<HCMIO> HCMIOList = new List<HCMIO>();
+            List<HCNRH> HCNRHList = new List<HCNRH>();
+            List<HCNTD> HCNTDList = new List<HCNTD>();
+            TCNUDList.Add(new TCNUD()
+            {
+                TDATE = "20160504",
+                BHNO = "5920",
+                CSEQ = "0002141",
+                STOCK = "2330",
+                PRICE = Convert.ToDecimal(380),
+                QTY = Convert.ToDecimal(350),
+                BQTY = Convert.ToDecimal(350),
+                FEE = Convert.ToDecimal(189),
+                COST = Convert.ToDecimal(133189),
+                DSEQ = "k8563",
+                DNO = "002713",
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "5920",
+                DSEQ = "T0726",
+                JRNUM = "00600970",
+                MTYPE = "T",
+                CSEQ = "0002141",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "2330",
+                QTY = Convert.ToDecimal(5000),
+                PRICE = Convert.ToDecimal(399)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "5920",
+                DSEQ = "B0726",
+                JRNUM = "00601350",
+                MTYPE = "T",
+                CSEQ = "0002141",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "B",
+                STOCK = "2330",
+                QTY = Convert.ToDecimal(2000),
+                PRICE = Convert.ToDecimal(394)
+            });
+            string BHNO = TCNUDList[0].BHNO;
+            string CSEQ = TCNUDList[0].CSEQ;
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
+            HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
+            (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
+            HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
+            TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            TCNUDList = SubESMPData.SubAddTMHIOBuy(TCNUDList, HCMIOList);
+            TCNUDList = SubESMPData.SubAddTMHIOSell(TCNUDList, HCMIOList, BHNO, CSEQ);
+            Assert.AreEqual(TCNUDList.Count, 3);
+            Assert.AreEqual(TCNUDList[0].QTY, Convert.ToDecimal(350));
+            Assert.AreEqual(TCNUDList[0].BQTY, Convert.ToDecimal(350));
+            Assert.AreEqual(TCNUDList[0].FEE, Convert.ToDecimal(189));
+            Assert.AreEqual(TCNUDList[0].COST, Convert.ToDecimal(133189));
+            Assert.AreEqual(TCNUDList[1].QTY, Convert.ToDecimal(2000));
+            Assert.AreEqual(TCNUDList[1].BQTY, Convert.ToDecimal(0));
+            Assert.AreEqual(TCNUDList[2].QTY, Convert.ToDecimal(5000));
+            Assert.AreEqual(TCNUDList[2].BQTY, Convert.ToDecimal(-3000));
+            Assert.AreEqual(TCNUDList[2].FEE, Convert.ToDecimal(1705));
+            Assert.AreEqual(TCNUDList[2].COST, Convert.ToDecimal(0));
+
+            Assert.AreEqual(HCNTDList.Count, 1);
+            Assert.AreEqual(HCNTDList[0].CQTY, Convert.ToDecimal(2000));
+            Assert.AreEqual(HCNTDList[0].BFEE, Convert.ToDecimal(1122));
+            Assert.AreEqual(HCNTDList[0].SFEE, Convert.ToDecimal(1137));
+            Assert.AreEqual(HCNTDList[0].TAX, Convert.ToDecimal(1197));
+            Assert.AreEqual(HCNTDList[0].INCOME, Convert.ToDecimal(795666));
+            Assert.AreEqual(HCNTDList[0].PROFIT, Convert.ToDecimal(6544));
+        }
+
+        //［現股當沖資格：X］先賣部位檢核
+        [TestMethod()]
+        public void currentStockSellTest_25()
+        {
+            List<TCNUD> TCNUDList = new List<TCNUD>();
+            List<TMHIO> TMHIOList = new List<TMHIO>();
+            List<TCSIO> TCSIOList = new List<TCSIO>();
+            List<HCMIO> HCMIOList = new List<HCMIO>();
+            List<HCNRH> HCNRHList = new List<HCNRH>();
+            List<HCNTD> HCNTDList = new List<HCNTD>();
+            TCNUDList.Add(new TCNUD()
+            {
+                TDATE = "20160504",
+                BHNO = "5920",
+                CSEQ = "0002141",
+                STOCK = "2330",
+                PRICE = Convert.ToDecimal(380),
+                QTY = Convert.ToDecimal(2640),
+                BQTY = Convert.ToDecimal(2640),
+                FEE = Convert.ToDecimal(1429),
+                COST = Convert.ToDecimal(1004629),
+                DSEQ = "k8563",
+                DNO = "002713",
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "5920",
+                DSEQ = "T0726",
+                JRNUM = "00600970",
+                MTYPE = "T",
+                CSEQ = "0002141",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "2330",
+                QTY = Convert.ToDecimal(2000),
+                PRICE = Convert.ToDecimal(399)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "5920",
+                DSEQ = "T0726",
+                JRNUM = "00600971",
+                MTYPE = "T",
+                CSEQ = "0002141",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "2330",
+                QTY = Convert.ToDecimal(1000),
+                PRICE = Convert.ToDecimal(399)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "5920",
+                DSEQ = "T0726",
+                JRNUM = "00600972",
+                MTYPE = "T",
+                CSEQ = "0002141",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "2330",
+                QTY = Convert.ToDecimal(1000),
+                PRICE = Convert.ToDecimal(399)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "5920",
+                DSEQ = "T0726",
+                JRNUM = "00600973",
+                MTYPE = "T",
+                CSEQ = "0002141",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "2330",
+                QTY = Convert.ToDecimal(1000),
+                PRICE = Convert.ToDecimal(399)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "5920",
+                DSEQ = "T0726",
+                JRNUM = "00600974",
+                MTYPE = "T",
+                CSEQ = "0002141",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "2330",
+                QTY = Convert.ToDecimal(1000),
+                PRICE = Convert.ToDecimal(399)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "5920",
+                DSEQ = "T0726",
+                JRNUM = "00600975",
+                MTYPE = "T",
+                CSEQ = "0002141",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "2330",
+                QTY = Convert.ToDecimal(1000),
+                PRICE = Convert.ToDecimal(399)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "5920",
+                DSEQ = "T0726",
+                JRNUM = "00600976",
+                MTYPE = "T",
+                CSEQ = "0002141",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "2330",
+                QTY = Convert.ToDecimal(1000),
+                PRICE = Convert.ToDecimal(399)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "5920",
+                DSEQ = "T0726",
+                JRNUM = "00600977",
+                MTYPE = "T",
+                CSEQ = "0002141",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "2330",
+                QTY = Convert.ToDecimal(1000),
+                PRICE = Convert.ToDecimal(399)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "5920",
+                DSEQ = "T0726",
+                JRNUM = "00600978",
+                MTYPE = "T",
+                CSEQ = "0002141",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "2330",
+                QTY = Convert.ToDecimal(1000),
+                PRICE = Convert.ToDecimal(399)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221017",
+                BHNO = "5920",
+                DSEQ = "B0726",
+                JRNUM = "00601350",
+                MTYPE = "T",
+                CSEQ = "0002141",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "B",
+                STOCK = "2330",
+                QTY = Convert.ToDecimal(2000),
+                PRICE = Convert.ToDecimal(394)
+            });
+            string BHNO = TCNUDList[0].BHNO;
+            string CSEQ = TCNUDList[0].CSEQ;
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
+            HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
+            (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
+            HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
+            TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            TCNUDList = SubESMPData.SubAddTMHIOBuy(TCNUDList, HCMIOList);
+            TCNUDList = SubESMPData.SubAddTMHIOSell(TCNUDList, HCMIOList, BHNO, CSEQ);
+            Assert.AreEqual(TCNUDList.Count, 11);
+            Assert.AreEqual(TCNUDList[0].BQTY, Convert.ToDecimal(640));
+            Assert.AreEqual(TCNUDList[1].BQTY, Convert.ToDecimal(0));
+            Assert.AreEqual(TCNUDList[9].BQTY, Convert.ToDecimal(-1000));
+            Assert.AreEqual(TCNUDList[10].BQTY, Convert.ToDecimal(-1000));
+
+            Assert.AreEqual(HCNTDList.Count, 1);
+            Assert.AreEqual(HCNTDList[0].CQTY, Convert.ToDecimal(2000));
+            Assert.AreEqual(HCNTDList[0].BFEE, Convert.ToDecimal(1122));
+            Assert.AreEqual(HCNTDList[0].SFEE, Convert.ToDecimal(1137));
+            Assert.AreEqual(HCNTDList[0].TAX, Convert.ToDecimal(1197));
+            Assert.AreEqual(HCNTDList[0].INCOME, Convert.ToDecimal(795666));
+            Assert.AreEqual(HCNTDList[0].PROFIT, Convert.ToDecimal(6544));
         }
     }
 }
