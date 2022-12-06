@@ -59,7 +59,7 @@ namespace ESMP.STOCK.TASK.API
             if (HCMIOList.Count > 0 || TMHIOList.Count > 0)
             {
                 profileList = searchDetails(HCMIOList, BHNO, CSEQ);
-                profileList_Today = searchDetails_Today(HCMIOList_Today, BHNO, CSEQ);
+                profileList_Today = searchDetails_Today(HCMIOList_Today, HCNTDList, HCNRHList, BHNO, CSEQ);
                 //合併歷史與當日資料
                 profileList = profileList.Concat(profileList_Today).ToList();
                 billsum = searchSum(profileList);
@@ -132,13 +132,12 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchDetails() - 計算取得 查詢回復階層二的對帳明細資料
         //--------------------------------------------------------------------------------------------
-        private List<profile> searchDetails(List<HCMIO> HCMIO, string BHNO, string CSEQ)
+        public List<profile> searchDetails(List<HCMIO> HCMIOList, string BHNO, string CSEQ)
         {
             List<profile> profileList = new List<profile>();                //自訂profile類別List (ESMP.STOCK.FORMAT.API)                                                                    //
-            List<profile> profileHCMIOList = new List<profile>();           //自訂profile類別List (ESMP.STOCK.FORMAT.API)                                                                    //
-            
-            //歷史資料
-            foreach (var item in HCMIO)
+
+            //提供歷史對帳單資料
+            foreach (var item in HCMIOList)
             {
                 //字典搜尋此股票 中文名稱
                 string cname = "";
@@ -172,7 +171,7 @@ namespace ESMP.STOCK.TASK.API
                 row.fee = item.FEE;
                 row.tax = item.TAX;
                 row.netamt = item.NETAMT;
-                profileHCMIOList.Add(row);
+                profileList.Add(row);
             }
             return profileList;
         }
@@ -180,17 +179,72 @@ namespace ESMP.STOCK.TASK.API
         /// <summary>
         /// function searchDetails_Today() - 計算取得 查詢回復階層二的對帳明細資料 (當日交易明細)
         /// </summary>
-        /// <param name="HCMIO"></param>
+        /// <param name="HCMIOList"></param>
         /// <param name="BHNO"></param>
         /// <param name="CSEQ"></param>
         /// <returns></returns>
-        private List<profile> searchDetails_Today(List<HCMIO> HCMIO, string BHNO, string CSEQ)
+        public List<profile> searchDetails_Today(List<HCMIO> HCMIOList, List<HCNTD> HCNTDList, List<HCNRH> HCNRHList, string BHNO, string CSEQ)
         {
-            List<profile> profileList = new List<profile>();                //自訂profile類別List (ESMP.STOCK.FORMAT.API)                                                                    //
-            List<profile> profileHCMIOList = new List<profile>();           //自訂profile類別List (ESMP.STOCK.FORMAT.API)                                                                    //
+            List<profile> profileList = new List<profile>();                //自訂profile類別List (ESMP.STOCK.FORMAT.API)
+            HCMIOList = HCMIOList.Where(m => m.WTYPE == "0").ToList();
+            //若盤中現股賣出為部分當沖、部分現沖，則拆成2筆對帳單資料提供
+            List<HCMIO> HCMIOList_Part = HCMIOList.Where(m => m.BSTYPE == "S").ToList();
+            foreach (var HCMIO_item in HCMIOList_Part)
+            {
+                List<HCNRH> HCNRHList_Part = HCNRHList.Where(x => x.SDSEQ == HCMIO_item.DSEQ && x.SDNO == HCMIO_item.DNO).ToList();
+                List<HCNTD> HCNTDList_Part = HCNTDList.Where(x => x.SDSEQ == HCMIO_item.DSEQ && x.SDNO == HCMIO_item.DNO).ToList();
 
-            //歷史資料
-            foreach (var item in HCMIO)
+                if (HCNRHList_Part.Count > 0)
+                {
+                    foreach (var HCNRH_item in HCNRHList)
+                    {
+                        var row = new HCMIO();
+                        row.TDATE = HCMIO_item.TDATE;
+                        row.BHNO = HCMIO_item.BHNO;
+                        row.CSEQ = HCMIO_item.CSEQ;
+                        row.DSEQ = HCMIO_item.DSEQ;
+                        row.DNO = HCMIO_item.DNO;
+                        row.WTYPE = "0";
+                        row.STOCK = HCMIO_item.STOCK;
+                        row.TTYPE = HCMIO_item.TTYPE;
+                        row.ETYPE = HCMIO_item.ETYPE;
+                        row.BSTYPE = HCMIO_item.BSTYPE;
+                        row.PRICE = HCMIO_item.PRICE;
+                        row.QTY = HCNRH_item.CQTY;          //合計成交股數????
+                        row.BQTY = 0;                       //未沖銷股數
+                        row.AMT = decimal.Truncate(HCMIO_item.PRICE * row.QTY);
+                        row.FEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.AMT) * 0.001425));
+                        if (HCMIO_item.QTY >= 1000 && row.FEE < 20)
+                            row.FEE = 20;
+                        else if (HCMIO_item.QTY < 1000 && row.FEE < 1)
+                            row.FEE = 1;
+                        row.TAX = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.AMT) * 0.0015));
+                        row.NETAMT = row.AMT - row.FEE - row.TAX;
+                        row.ORIGN = HCMIO_item.ORIGN;
+                        row.SALES = HCMIO_item.SALES;
+                        row.TRDATE = HCMIO_item.TRDATE;
+                        row.TRTIME = HCMIO_item.TRTIME;
+                        row.MODDATE = HCMIO_item.MODDATE;
+                        row.MODTIME = HCMIO_item.MODTIME;
+                        row.MODUSER = HCMIO_item.MODUSER;
+                        HCMIOList.Add(row);
+                    }
+                }
+                foreach (var HCNTD_item in HCNTDList)
+                {
+                    HCMIO_item.QTY = HCNTD_item.CQTY;          //合計成交股數????
+                    HCMIO_item.AMT = decimal.Truncate(HCMIO_item.PRICE * HCMIO_item.QTY);
+                    HCMIO_item.FEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(HCMIO_item.AMT) * 0.001425));
+                    if (HCMIO_item.QTY >= 1000 && HCMIO_item.FEE < 20)
+                        HCMIO_item.FEE = 20;
+                    else if (HCMIO_item.QTY < 1000 && HCMIO_item.FEE < 1)
+                        HCMIO_item.FEE = 1;
+                    HCMIO_item.TAX = HCNTD_item.TAX;
+                    HCMIO_item.NETAMT = HCMIO_item.AMT - HCMIO_item.FEE - HCMIO_item.TAX;
+                }
+            }
+            //提供當日對帳單資料
+            foreach (var item in HCMIOList)
             {
                 //字典搜尋此股票 中文名稱
                 string cname = "";
@@ -243,16 +297,16 @@ namespace ESMP.STOCK.TASK.API
                 }
                 else
                 {
-                    row.mamt = item.PRICE * item.QTY;
-                    row.fee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.mprice) * decimal.ToDouble(row.mqty) * 0.001425));
-                    //零股最小手續費
-                    if (row.etype == "1" && row.fee < 1)
-                        row.fee = 1;
-                    //整股最小手續費
-                    else if (row.etype == "0" && row.fee < 20)
-                        row.fee = 20;
                     if (item.BSTYPE == "B")
                     {
+                        row.mamt = item.PRICE * item.QTY;
+                        row.fee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.mprice) * decimal.ToDouble(row.mqty) * 0.001425));
+                        //零股最小手續費
+                        if (row.etype == "1" && row.fee < 1)
+                            row.fee = 1;
+                        //整股最小手續費
+                        else if (row.etype == "0" && row.fee < 20)
+                            row.fee = 20;
                         row.ttypename = "買沖";
                         row.tax = 0;
                         //買入資料計算淨收付
@@ -260,13 +314,14 @@ namespace ESMP.STOCK.TASK.API
                     }   
                     else if (item.BSTYPE == "S")
                     {
-                        row.ttypename = "賣沖";
-                        //賣出資料計算交易稅 淨收付
-                        row.tax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.mprice) * decimal.ToDouble(row.mqty) * 0.0015));
-                        row.netamt = row.mamt - row.fee - row.tax;
+                        row.mamt = item.AMT;
+                        row.fee = item.FEE;
+                        row.ttypename = "賣沖";       //若盤中現股賣出為部分當沖、部分現沖 (都給賣沖??)
+                        row.tax = item.TAX;
+                        row.netamt = item.NETAMT;
                     }
                 }
-                profileHCMIOList.Add(row);
+                profileList.Add(row);
             }
             return profileList;
         }

@@ -121,8 +121,8 @@ namespace ESMP.STOCK.TASK.API
             if (BasicData._MCUMS_Dic.ContainsKey(client))
                 cseqCNTDTYPE = BasicData._MCUMS_Dic[client][0].CNTDTYPE;
             else
-                //cseqCNTDTYPE = "N";             //如果查不到客戶的沖銷資格, 假設此客戶不可現股當沖
-                cseqCNTDTYPE = "X";           //(測試)如果查不到客戶的沖銷資格, 假設此客戶可先賣後買
+                cseqCNTDTYPE = "N";             //如果查不到客戶的沖銷資格, 假設此客戶不可現股當沖
+                //cseqCNTDTYPE = "X";           //(測試)如果查不到客戶的沖銷資格, 假設此客戶可先賣後買
             return cseqCNTDTYPE;
         }
 
