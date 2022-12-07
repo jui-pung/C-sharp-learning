@@ -14,7 +14,7 @@ namespace ESMP.STOCK.TASK.API
     public class SqlSearch
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        static int _dateDiff = -50;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
+        static int _dateDiff = -51;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
@@ -878,8 +878,90 @@ namespace ESMP.STOCK.TASK.API
             }
             return dbTCSIO;
         }
+        /// <summary>
+        /// 查詢 TCNTD TABLE
+        /// </summary>
+        /// <param name="o">查詢元素</param>
+        /// <returns>TCNTD List</returns>
+        public List<TCNTD> selectTCNTD(object o)
+        {
+            root SearchElement = o as root;
+            List<TCNTD> dbTCNTD = new List<TCNTD>();
+            string sqlQuery = "";
+            try
+            {
+                _sqlConn.Open();
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
+                {
+                    sqlQuery = @"SELECT TDATE, BHNO, BDSEQ, BDNO, SDSEQ, SDNO, CSEQ, STOCK, CQTY, BPRICE, BQTY, BFEE, SPRICE, SQTY, SFEE, TAX, INCOME, COST, PROFIT, STINTAX, JRNUM, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER																
+                                    FROM dbo.TCNTD
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND STOCK = @STOCK";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
+                }
+                else
+                {
+                    sqlQuery = @"SELECT TDATE, BHNO, BDSEQ, BDNO, SDSEQ, SDNO, CSEQ, STOCK, CQTY, BPRICE, BQTY, BFEE, SPRICE, SQTY, SFEE, TAX, INCOME, COST, PROFIT, STINTAX, JRNUM, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER																
+                                    FROM dbo.TCNTD
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ";
+                }
 
-        
+                sqlCmd.CommandText = sqlQuery;
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("沒有現股當沖指定沖銷資料");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new TCNTD();
+                        row.TDATE = reader["TDATE"].ToString();
+                        row.BHNO = reader["BHNO"].ToString();
+                        row.BDSEQ = reader["BDSEQ"].ToString();
+                        row.BDNO = reader["BDNO"].ToString();
+                        row.SDSEQ = reader["SDSEQ"].ToString();
+                        row.SDNO = reader["SDNO"].ToString();
+                        row.CSEQ = reader["CSEQ"].ToString();
+                        row.STOCK = reader["STOCK"].ToString();
+                        row.CQTY = Convert.ToDecimal(reader["CQTY"].ToString());
+                        row.BPRICE = Convert.ToDecimal(reader["BPRICE"].ToString());
+                        row.BQTY = Convert.ToDecimal(reader["BQTY"].ToString());
+                        row.BFEE = Convert.ToDecimal(reader["BFEE"].ToString());
+                        row.SPRICE = Convert.ToDecimal(reader["SPRICE"].ToString());
+                        row.SQTY = Convert.ToDecimal(reader["SQTY"].ToString());
+                        row.SFEE = Convert.ToDecimal(reader["SFEE"].ToString());
+                        row.TAX = Convert.ToDecimal(reader["TAX"].ToString());
+                        row.INCOME = Convert.ToDecimal(reader["INCOME"].ToString());
+                        row.COST = Convert.ToDecimal(reader["COST"].ToString());
+                        row.PROFIT = Convert.ToDecimal(reader["PROFIT"].ToString());
+                        row.STINTAX = Convert.ToDecimal(reader["STINTAX"].ToString());
+                        row.JRNUM = reader["JRNUM"].ToString();
+                        row.TRDATE = reader["TRDATE"].ToString();
+                        row.TRTIME = reader["TRTIME"].ToString();
+                        row.MODDATE = reader["MODDATE"].ToString();
+                        row.MODTIME = reader["MODTIME"].ToString();
+                        row.MODUSER = reader["MODUSER"].ToString();
+
+                        dbTCNTD.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+            return dbTCNTD;
+        }
 
     }
 }

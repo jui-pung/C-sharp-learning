@@ -14,13 +14,16 @@ namespace ESMP.STOCK.TASK.API
 {
     public class ESMPData
     {   
-        public static (List<TCNUD>, List<HCNRH>, List<HCNTD>, List<HCMIO>) GetESMPData(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList, List<TCSIO> TCSIOList, string BHNO, string CSEQ)
+        public static (List<TCNUD>, List<HCNRH>, List<HCNTD>, List<HCMIO>) GetESMPData(List<TCNUD> TCNUDList, List<TMHIO> TMHIOList, List<TCSIO> TCSIOList, List<TCNTD> TCNTDList, string BHNO, string CSEQ)
         {
             List<HCNRH> HCNRHList = new List<HCNRH>();          //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCMIO> HCMIOList = new List<HCMIO>();          //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNTD> HCNTDList = new List<HCNTD>();          //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
+            
             //將TMHIO List與TCSIO List資料轉入(Ram)HCMIO中
             HCMIOList = GetHCMIO(TCSIOList, TMHIOList);
+            //指定現股當沖
+            (HCMIOList, HCNTDList) = AssignDayTrade(HCMIOList, TCNTDList);
             //今日現股當沖處理
             (HCMIOList, HCNTDList) = DayTrade(HCMIOList, BHNO, CSEQ);
             //重新計算現股當沖TAX、INCOME、PROFIT
@@ -139,6 +142,46 @@ namespace ESMP.STOCK.TASK.API
                 stockCNTDTYPE = "N";            //如果查不到股票的沖銷資格, 假設此股票不可現股當沖
             return stockCNTDTYPE;
         }
+        /// <summary>
+        /// 指定現股當沖
+        /// </summary>
+        /// <param name="HCMIOList">TMHIO資料轉入HCMIOList(當日交易明細)</param>
+        /// <param name="TCNTDList">指定現股當沖資料</param>
+        /// <param name="BHNO">分公司</param>
+        /// <param name="CSEQ">客戶帳號</param>
+        /// <returns></returns>
+        protected static (List<HCMIO>, List<HCNTD>) AssignDayTrade(List<HCMIO> HCMIOList, List<TCNTD> TCNTDList)
+        {
+            List<HCNTD> HCNTDList = new List<HCNTD>();          //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
+            foreach (var TCNTD_item in TCNTDList)
+            {
+                //增加HCNTD資料 已實現損益
+                var HCNTD_row = new HCNTD();
+                HCNTD_row.BQTY = TCNTD_item.BQTY;
+                HCNTD_row.SQTY = TCNTD_item.SQTY;
+                HCNTD_row.BHNO = TCNTD_item.BHNO;
+                HCNTD_row.TDATE = TCNTD_item.TDATE;
+                HCNTD_row.CSEQ = TCNTD_item.CSEQ;
+                HCNTD_row.BDSEQ = TCNTD_item.BDSEQ;
+                HCNTD_row.BDNO = TCNTD_item.BDNO;
+                HCNTD_row.SDSEQ = TCNTD_item.SDSEQ;
+                HCNTD_row.SDNO = TCNTD_item.SDNO;
+                HCNTD_row.STOCK = TCNTD_item.STOCK;
+                HCNTD_row.CQTY = TCNTD_item.CQTY;
+                HCNTD_row.BPRICE = TCNTD_item.BPRICE;
+                HCNTD_row.BFEE = TCNTD_item.BFEE;
+                HCNTD_row.SPRICE = TCNTD_item.SPRICE;
+                HCNTD_row.SFEE = TCNTD_item.SFEE;
+                HCNTD_row.TAX = TCNTD_item.TAX;
+                HCNTD_row.INCOME = TCNTD_item.INCOME;
+                HCNTD_row.COST = TCNTD_item.COST;
+                HCNTD_row.PROFIT = TCNTD_item.PROFIT;
+                HCNTDList.Add(HCNTD_row);
+                HCMIOList.Where(x => x.BSTYPE == "B" && x.DSEQ == TCNTD_item.BDSEQ).ToList().ForEach(p => p.BQTY = p.BQTY - TCNTD_item.CQTY);
+                HCMIOList.Where(x => x.BSTYPE == "S" && x.DSEQ == TCNTD_item.SDSEQ).ToList().ForEach(p => p.BQTY = p.BQTY - TCNTD_item.CQTY);
+            }
+            return (HCMIOList, HCNTDList);
+        }
 
         //--------------------------------------------------------------------------------------------
         //function DayTrade() - 今日現股當沖處理
@@ -153,8 +196,8 @@ namespace ESMP.STOCK.TASK.API
             }
             else
             {
-                List<HCMIO> HCMIOSellList = HCMIOList.Where(m => m.WTYPE == "0" && m.QTY >= 1000 && m.BSTYPE == "S").OrderBy(x => x.DSEQ).ThenBy(x => x.DNO).ToList();
-                List<HCMIO> HCMIOBuyList = HCMIOList.Where(m => m.WTYPE == "0" && m.QTY >= 1000 && m.BSTYPE == "B").ToList();
+                List<HCMIO> HCMIOSellList = HCMIOList.Where(m => m.WTYPE == "0" && m.QTY >= 1000 && m.BSTYPE == "S" && m.BQTY > 0).OrderBy(x => x.DSEQ).ThenBy(x => x.DNO).ToList();
+                List<HCMIO> HCMIOBuyList = HCMIOList.Where(m => m.WTYPE == "0" && m.QTY >= 1000 && m.BSTYPE == "B" && m.BQTY > 0).ToList();
                 foreach (var HCMIOSell_item in HCMIOSellList)
                 {
                     List<HCMIO> HCMIOCurrentList = new List<HCMIO>();

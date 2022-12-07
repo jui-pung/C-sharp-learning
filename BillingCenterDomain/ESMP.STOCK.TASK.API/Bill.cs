@@ -32,6 +32,8 @@ namespace ESMP.STOCK.TASK.API
             List<HCNRH> HCNRHList = new List<HCNRH>();                  //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNTD> HCNTDList = new List<HCNTD>();                  //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCMIO> HCMIOList_Today = new List<HCMIO>();            //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
+            List<TCNTD> TCNTDList = new List<TCNTD>();                  //自訂TCNTD類別List (ESMP.STOCK.DB.TABLE.API)
+
 
             List<profile> profileList = new List<profile>();            //自訂profile類別List           (階層二:對帳單明細資料)  
             List<profile> profileList_Today = new List<profile>();      //自訂profile類別List           (階層二:對帳單明細資料)  
@@ -52,9 +54,10 @@ namespace ESMP.STOCK.TASK.API
             TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
             HCMIOList = _sqlSearch.selectHCMIO(SearchElement);
             TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
+            TCNTDList = _sqlSearch.selectTCNTD(SearchElement);
 
             //盤中現股沖銷 當沖 現股賣出處理
-            (TCNUDList, HCNRHList, HCNTDList, HCMIOList_Today) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, BHNO, CSEQ);
+            (TCNUDList, HCNRHList, HCNTDList, HCMIOList_Today) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, TCNTDList, BHNO, CSEQ);
 
             if (HCMIOList.Count > 0 || TMHIOList.Count > 0)
             {

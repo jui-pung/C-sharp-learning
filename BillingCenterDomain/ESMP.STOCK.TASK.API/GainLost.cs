@@ -34,6 +34,7 @@ namespace ESMP.STOCK.TASK.API
             List<HCNRH> HCNRHList = new List<HCNRH>();                                      //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNTD> HCNTDList = new List<HCNTD>();                                      //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCMIO> HCMIOList = new List<HCMIO>();                                      //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
+            List<TCNTD> TCNTDList = new List<TCNTD>();                                      //自訂TCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();     //自訂unoffset_qtype_detail類別List (階層三:個股明細)
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();              //自訂unoffset_qtype_sum類別List    (階層二:個股未實現損益)
             List<unoffset_qtype_accsum> accsumList = new List<unoffset_qtype_accsum>();     //自訂unoffset_qtype_accsum類別List (階層一:帳戶未實現損益)
@@ -50,9 +51,9 @@ namespace ESMP.STOCK.TASK.API
             TCNUDList = _sqlSearch.selectTCNUD(SearchElement);
             TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
             TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
-
+            TCNTDList = _sqlSearch.selectTCNTD(SearchElement);
             //盤中現股沖銷 當沖 現股賣出處理
-            (TCNUDList, HCNRHList, HCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, BHNO, CSEQ);
+            (TCNUDList, HCNRHList, HCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, TCNTDList, BHNO, CSEQ);
             
             if (TCNUDList.Count > 0)
             {
@@ -123,16 +124,16 @@ namespace ESMP.STOCK.TASK.API
         }
 
         /// <summary>
-        /// function searchSum() - 計算取得 查詢回復階層二的個股未實現損益與個股明細
+        /// 計算取得 查詢回復階層二的個股未實現損益與個股明細
         /// </summary>
-        /// <param name="TCNUD"></param>
+        /// <param name="TCNUDList"></param>
         /// <returns></returns>
-        public List<unoffset_qtype_sum> searchSum(List<TCNUD> TCNUD)
+        public List<unoffset_qtype_sum> searchSum(List<TCNUD> TCNUDList)
         {
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TCNUD ----現賣 現買
-            var grp_TCNUD_Buy = TCNUD.Where(x => x.BQTY > 0).GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();
-            var grp_TCNUD_Sell = TCNUD.Where(x => x.BQTY < 0).GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();
+            var grp_TCNUD_Buy = TCNUDList.Where(x => x.BQTY > 0).GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();
+            var grp_TCNUD_Sell = TCNUDList.Where(x => x.BQTY < 0).GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();
 
             //(現買)迴圈處理grp_TCNUD_Buy群組資料 存入個股未實現損益 List
             foreach (var grp_item in grp_TCNUD_Buy)
@@ -142,11 +143,7 @@ namespace ESMP.STOCK.TASK.API
                 foreach (var item in grp_item)
                 {
                     //字典搜尋此股票 現價
-                    decimal cprice = 0;
-                    if (BasicData._MSTMB_Dic.ContainsKey(item.STOCK))
-                        cprice = BasicData._MSTMB_Dic[item.STOCK][0].CPRICE;
-                    else
-                        cprice = 10;             //如果查不到股票現價, 假設現價為10
+                    decimal cprice = Quote.GetDealPrice(item.STOCK);
 
                     var row = new unoffset_qtype_detail();
                     row.tdate = item.TDATE;
@@ -229,11 +226,7 @@ namespace ESMP.STOCK.TASK.API
                 foreach (var item in grp_item)
                 {
                     //字典搜尋此股票 現價
-                    decimal cprice = 0;
-                    if (BasicData._MSTMB_Dic.ContainsKey(item.STOCK))
-                        cprice = BasicData._MSTMB_Dic[item.STOCK][0].CPRICE;
-                    else
-                        cprice = 0;             //如果查不到股票現價, 假設現價為0
+                    decimal cprice = Quote.GetDealPrice(item.STOCK);
 
                     var row = new unoffset_qtype_detail();
                     row.tdate = item.TDATE;

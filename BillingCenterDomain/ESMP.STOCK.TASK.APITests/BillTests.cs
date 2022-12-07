@@ -81,6 +81,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             List<HCMIO> HCMIOList = new List<HCMIO>();
             List<HCNRH> HCNRHList = new List<HCNRH>();
             List<HCNTD> HCNTDList = new List<HCNTD>();
+            List<TCNTD> TCNTDList = new List<TCNTD>();
             List<profile> profileList = new List<profile>();
             billSum billsum = new billSum();
             Bill bill = new Bill();
@@ -118,7 +119,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             string CSEQ = TMHIOList[0].CSEQ;
             _ = BasicData.MSTMB_Dic;
             _ = BasicData.MCUMS_Dic;
-            (TCNUDList, HCNRHList, HCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, BHNO, CSEQ);
+            (TCNUDList, HCNRHList, HCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, TCNTDList, BHNO, CSEQ);
             profileList = bill.searchDetails_Today(HCMIOList, HCNTDList, HCNRHList, BHNO, CSEQ);
             Assert.AreEqual(profileList.Count, 2);
             Assert.AreEqual(profileList[0].ttypename, "賣沖");
@@ -136,6 +137,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             List<HCMIO> HCMIOList = new List<HCMIO>();
             List<HCNRH> HCNRHList = new List<HCNRH>();
             List<HCNTD> HCNTDList = new List<HCNTD>();
+            List<TCNTD> TCNTDList = new List<TCNTD>();
             List<profile> profileList = new List<profile>();
             billSum billsum = new billSum();
             Bill bill = new Bill();
@@ -187,7 +189,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             string CSEQ = TMHIOList[0].CSEQ;
             _ = BasicData.MSTMB_Dic;
             _ = BasicData.MCUMS_Dic;
-            (TCNUDList, HCNRHList, HCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, BHNO, CSEQ);
+            (TCNUDList, HCNRHList, HCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, TCNTDList, BHNO, CSEQ);
             profileList = bill.searchDetails_Today(HCMIOList, HCNTDList, HCNRHList, BHNO, CSEQ);
             Assert.AreEqual(profileList.Count, 3);
             Assert.AreEqual(profileList[0].ttypename, "賣沖");

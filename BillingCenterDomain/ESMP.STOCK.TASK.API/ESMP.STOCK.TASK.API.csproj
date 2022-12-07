@@ -50,6 +50,7 @@
     <Compile Include="GainPay.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BasicData.cs" />
+    <Compile Include="Quote.cs" />
     <Compile Include="SqlSearch.cs" />
   </ItemGroup>
   <ItemGroup>

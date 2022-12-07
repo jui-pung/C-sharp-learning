@@ -37,6 +37,7 @@ namespace ESMP.STOCK.TASK.API
             List<HCNRH> addHCNRHList = new List<HCNRH>();                                   //自訂HCNRH類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNTD> HCNTDList = new List<HCNTD>();                                      //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCNTD> addHCNTDList = new List<HCNTD>();                                   //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
+            List<TCNTD> TCNTDList = new List<TCNTD>();                                      //自訂TCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             List<profit_sum> sumProfitList_HCNRH = new List<profit_sum>();                  //自訂profit_sum類別List            (階層二:個股已實現損益)  
             List<profit_sum> sumProfitList_HCNTD = new List<profit_sum>();                  //自訂profit_sum類別List            (階層二:個股已實現損益)  
             List<profit_sum> sumProfitList = new List<profit_sum>();                        //自訂profit_sum類別List            (階層二:個股已實現損益)  
@@ -56,8 +57,9 @@ namespace ESMP.STOCK.TASK.API
             TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
             HCNRHList = _sqlSearch.selectHCNRH(SearchElement);
             HCNTDList = _sqlSearch.selectHCNTD(SearchElement);
+            TCNTDList = _sqlSearch.selectTCNTD(SearchElement);
             //盤中現股沖銷 當沖 處理
-            (TCNUDList, addHCNRHList, addHCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, BHNO, CSEQ);
+            (TCNUDList, addHCNRHList, addHCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, TCNTDList, BHNO, CSEQ);
             HCNRHList = HCNRHList.Concat(addHCNRHList).ToList();
             HCNTDList = HCNTDList.Concat(addHCNTDList).ToList();
             if (HCNRHList.Count > 0 || HCNTDList.Count > 0)

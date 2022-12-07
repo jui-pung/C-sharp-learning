@@ -2368,5 +2368,163 @@ namespace ESMP.STOCK.TASK.API.Tests
             Assert.AreEqual(HCNTDList[0].INCOME, Convert.ToDecimal(795666));
             Assert.AreEqual(HCNTDList[0].PROFIT, Convert.ToDecimal(6544));
         }
+
+        //範例五測試
+        [TestMethod()]
+        public void currentStockSellTest_sample5()
+        {
+            List<TCNUD> TCNUDList = new List<TCNUD>();
+            List<TMHIO> TMHIOList = new List<TMHIO>();
+            List<TCSIO> TCSIOList = new List<TCSIO>();
+            List<HCMIO> HCMIOList = new List<HCMIO>();
+            List<HCNRH> HCNRHList = new List<HCNRH>();
+            List<HCNTD> HCNTDList = new List<HCNTD>();
+            List<TCNTD> TCNTDList = new List<TCNTD>();
+            TCNUDList.Add(new TCNUD()
+            {
+                TDATE = "20221124",
+                BHNO = "9A9Z",
+                CSEQ = "1900730",
+                STOCK = "6214",
+                PRICE = Convert.ToDecimal(80),
+                QTY = Convert.ToDecimal(10000),
+                BQTY = Convert.ToDecimal(10000),
+                FEE = Convert.ToDecimal(1140),
+                COST = Convert.ToDecimal(801140),
+                DSEQ = "k9601",
+                DNO = "00001",
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221125",
+                BHNO = "9A9Z",
+                DSEQ = "K0001",
+                JRNUM = "00600970",
+                MTYPE = "T",
+                CSEQ = "1900730",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "B",
+                STOCK = "6214",
+                QTY = Convert.ToDecimal(1000),
+                PRICE = Convert.ToDecimal(81.1)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221125",
+                BHNO = "9A9Z",
+                DSEQ = "K0002",
+                JRNUM = "00600970",
+                MTYPE = "T",
+                CSEQ = "1900730",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "B",
+                STOCK = "6214",
+                QTY = Convert.ToDecimal(1000),
+                PRICE = Convert.ToDecimal(81.1)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221125",
+                BHNO = "9A9Z",
+                DSEQ = "K0003",
+                JRNUM = "00600970",
+                MTYPE = "T",
+                CSEQ = "1900730",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "B",
+                STOCK = "6214",
+                QTY = Convert.ToDecimal(1000),
+                PRICE = Convert.ToDecimal(81.1)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221125",
+                BHNO = "9A9Z",
+                DSEQ = "K0004",
+                JRNUM = "00600970",
+                MTYPE = "T",
+                CSEQ = "1900730",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "6214",
+                QTY = Convert.ToDecimal(2000),
+                PRICE = Convert.ToDecimal(81.4)
+            });
+            TMHIOList.Add(new TMHIO()
+            {
+                TDATE = "20221125",
+                BHNO = "9A9Z",
+                DSEQ = "K0005",
+                JRNUM = "00600970",
+                MTYPE = "T",
+                CSEQ = "1900730",
+                TTYPE = "0",
+                ETYPE = "0",
+                BSTYPE = "S",
+                STOCK = "6214",
+                QTY = Convert.ToDecimal(2000),
+                PRICE = Convert.ToDecimal(81.4)
+            });
+            TCNTDList.Add(new TCNTD()
+            {
+                TDATE = "20221125",
+                BHNO = "9A9Z",
+                BDSEQ = "K0002",
+                SDSEQ = "K0005",
+                CSEQ = "1900730",
+                STOCK = "6214",
+                CQTY = Convert.ToDecimal(1000),
+                BPRICE = Convert.ToDecimal(81.1),
+                BFEE = Convert.ToDecimal(115),
+                SPRICE = Convert.ToDecimal(81.4),
+                SFEE = Convert.ToDecimal(115),
+                TAX = Convert.ToDecimal(122)
+            });
+            TCNTDList.Add(new TCNTD()
+            {
+                TDATE = "20221125",
+                BHNO = "9A9Z",
+                BDSEQ = "K0003",
+                SDSEQ = "K0004",
+                CSEQ = "1900730",
+                STOCK = "6214",
+                CQTY = Convert.ToDecimal(1000),
+                BPRICE = Convert.ToDecimal(81.1),
+                BFEE = Convert.ToDecimal(115),
+                SPRICE = Convert.ToDecimal(81.4),
+                SFEE = Convert.ToDecimal(115),
+                TAX = Convert.ToDecimal(122)
+            });
+
+            string BHNO = TCNUDList[0].BHNO;
+            string CSEQ = TCNUDList[0].CSEQ;
+            _ = BasicData.MSTMB_Dic;
+            _ = BasicData.MCUMS_Dic;
+            HCMIOList = SubESMPData.SubGetHCMIO(TCSIOList, TMHIOList);
+            (HCMIOList, HCNTDList) = SubESMPData.SubAssignDayTrade(HCMIOList, TCNTDList);
+            (HCMIOList, HCNTDList) = SubESMPData.SubDayTrade(HCMIOList, BHNO, CSEQ);
+            HCNTDList = SubESMPData.SubCalculateHCNTD(HCNTDList);
+            TCNUDList = SubESMPData.SubAddTCSIO(TCNUDList, HCMIOList);
+            (HCNRHList, TCNUDList, HCMIOList) = SubESMPData.SubCurrentStockSell(TCNUDList, HCMIOList);
+            TCNUDList = SubESMPData.SubAddTMHIOBuy(TCNUDList, HCMIOList);
+            TCNUDList = SubESMPData.SubAddTMHIOSell(TCNUDList, HCMIOList, BHNO, CSEQ);
+            Assert.AreEqual(TCNUDList.Count, 11);
+            Assert.AreEqual(TCNUDList[0].BQTY, Convert.ToDecimal(640));
+            Assert.AreEqual(TCNUDList[1].BQTY, Convert.ToDecimal(0));
+            Assert.AreEqual(TCNUDList[9].BQTY, Convert.ToDecimal(-1000));
+            Assert.AreEqual(TCNUDList[10].BQTY, Convert.ToDecimal(-1000));
+
+            Assert.AreEqual(HCNTDList.Count, 1);
+            Assert.AreEqual(HCNTDList[0].CQTY, Convert.ToDecimal(2000));
+            Assert.AreEqual(HCNTDList[0].BFEE, Convert.ToDecimal(1122));
+            Assert.AreEqual(HCNTDList[0].SFEE, Convert.ToDecimal(1137));
+            Assert.AreEqual(HCNTDList[0].TAX, Convert.ToDecimal(1197));
+            Assert.AreEqual(HCNTDList[0].INCOME, Convert.ToDecimal(795666));
+            Assert.AreEqual(HCNTDList[0].PROFIT, Convert.ToDecimal(6544));
+        }
     }
 }

@@ -10,6 +10,10 @@ namespace ESMP.STOCK.TASK.APITests
 {
     public class SubESMPData:ESMPData
     {
+        public static (List<HCMIO>, List<HCNTD>) SubAssignDayTrade(List<HCMIO> HCMIOList, List<TCNTD> TCNTDList)
+        {
+            return AssignDayTrade(HCMIOList, TCNTDList);
+        }
         public static List<HCMIO> SubGetHCMIO(List<TCSIO> TCSIOList, List<TMHIO> TMHIOList)
         {
             return GetHCMIO(TCSIOList, TMHIOList);

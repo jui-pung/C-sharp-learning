@@ -52,6 +52,7 @@
     <Compile Include="profit_detail_out.cs" />
     <Compile Include="profit_sum.cs" />
     <Compile Include="root.cs" />
+    <Compile Include="Symbols.cs" />
     <Compile Include="unoffset_qtype_accsum.cs" />
     <Compile Include="unoffset_qtype_detail.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
