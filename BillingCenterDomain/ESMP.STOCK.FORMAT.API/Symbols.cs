@@ -11,7 +11,7 @@ namespace ESMP.STOCK.FORMAT
     public class Symbols
     {
         [XmlElement("Symbol")]
-        public Symbol Symbol { get; set; }
+        public List<Symbol> Symbol { get; set; }
     }
     public class Symbol
     {

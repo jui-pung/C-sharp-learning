@@ -30,21 +30,21 @@ namespace ESMP.STOCK.TASK.API.Tests
             detailList = sumList[0].unoffset_qtype_detail;
             foreach (var item in detailList)
             {
-                //65 * 1000
-                Assert.AreEqual(item.estimateAmt, Convert.ToDecimal(65000));
-                //65000 * 0.001425
-                Assert.AreEqual(item.estimateFee, Convert.ToDecimal(92));
-                //65000 * 0.003
-                Assert.AreEqual(item.estimateTax, Convert.ToDecimal(195));
-                Assert.AreEqual(item.marketvalue, Convert.ToDecimal(64713));
+                //49.5 * 1000
+                Assert.AreEqual(item.estimateAmt, Convert.ToDecimal(49500));
+                //49500 * 0.001425
+                Assert.AreEqual(item.estimateFee, Convert.ToDecimal(70));
+                //49500 * 0.003
+                Assert.AreEqual(item.estimateTax, Convert.ToDecimal(148));
+                Assert.AreEqual(item.marketvalue, Convert.ToDecimal(49282));
             }
             foreach (var item in sumList)
             {
-                Assert.AreEqual(item.estimateAmt, Convert.ToDecimal(130000.0));
-                Assert.AreEqual(item.estimateFee, Convert.ToDecimal(184.0));
-                Assert.AreEqual(item.estimateTax, Convert.ToDecimal(390.0));
-                Assert.AreEqual(item.marketvalue, Convert.ToDecimal(129426.0));
-                Assert.AreEqual(item.profit, Convert.ToDecimal(-42918.00));
+                Assert.AreEqual(item.estimateAmt, Convert.ToDecimal(99000));
+                Assert.AreEqual(item.estimateFee, Convert.ToDecimal(140));
+                Assert.AreEqual(item.estimateTax, Convert.ToDecimal(296));
+                Assert.AreEqual(item.marketvalue, Convert.ToDecimal(98564));
+                Assert.AreEqual(item.profit, Convert.ToDecimal(-73780));
             }
         }
 

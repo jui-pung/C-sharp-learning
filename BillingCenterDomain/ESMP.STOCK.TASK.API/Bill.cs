@@ -33,6 +33,7 @@ namespace ESMP.STOCK.TASK.API
             List<HCNTD> HCNTDList = new List<HCNTD>();                  //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             List<HCMIO> HCMIOList_Today = new List<HCMIO>();            //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
             List<TCNTD> TCNTDList = new List<TCNTD>();                  //自訂TCNTD類別List (ESMP.STOCK.DB.TABLE.API)
+            List<T210> T210List = new List<T210>();                     //自訂T210類別List (ESMP.STOCK.DB.TABLE.API)
 
 
             List<profile> profileList = new List<profile>();            //自訂profile類別List           (階層二:對帳單明細資料)  
@@ -55,9 +56,10 @@ namespace ESMP.STOCK.TASK.API
             HCMIOList = _sqlSearch.selectHCMIO(SearchElement);
             TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
             TCNTDList = _sqlSearch.selectTCNTD(SearchElement);
+            T210List = _sqlSearch.selectT210(SearchElement);
 
             //盤中現股沖銷 當沖 現股賣出處理
-            (TCNUDList, HCNRHList, HCNTDList, HCMIOList_Today) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, TCNTDList, BHNO, CSEQ);
+            (TCNUDList, HCNRHList, HCNTDList, HCMIOList_Today) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, TCNTDList, T210List, BHNO, CSEQ);
 
             if (HCMIOList.Count > 0 || TMHIOList.Count > 0)
             {

@@ -14,7 +14,7 @@ namespace ESMP.STOCK.TASK.API
     public class SqlSearch
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        static int _dateDiff = -51;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
+        static int _dateDiff = -55;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
@@ -878,6 +878,7 @@ namespace ESMP.STOCK.TASK.API
             }
             return dbTCSIO;
         }
+
         /// <summary>
         /// 查詢 TCNTD TABLE
         /// </summary>
@@ -963,5 +964,73 @@ namespace ESMP.STOCK.TASK.API
             return dbTCNTD;
         }
 
+        /// <summary>
+        /// 查詢 T210 Table
+        /// </summary>
+        /// <param name="o">查詢元素</param>
+        /// <returns>T210 List</returns>
+        public List<T210> selectT210(object o)
+        {
+            root SearchElement = o as root;
+            List<T210> dbT210 = new List<T210>();
+            string sqlQuery = "";
+            try
+            {
+                _sqlConn.Open();
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
+                {
+                    sqlQuery = @"SELECT TDate, BhNo, CSeq, DSEQ, Stock, Price, TrDate, TrTime, ModDate, ModTime, ModUser																
+                                    FROM dbo.T210
+                                    WHERE BhNo = @BHNO AND CSeq = @CSEQ AND Stock = @STOCK";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
+                }
+                else
+                {
+                    sqlQuery = @"SELECT TDate, BhNo, CSeq, DSEQ, Stock, Price, TrDate, TrTime, ModDate, ModTime, ModUser																
+                                    FROM dbo.T210
+                                    WHERE BhNo = @BHNO AND CSeq = @CSEQ";
+                }
+
+                sqlCmd.CommandText = sqlQuery;
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("沒有現股當沖指定沖銷資料");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new T210();
+                        row.TDate = reader["TDate"].ToString();
+                        row.BhNo = reader["BhNo"].ToString();
+                        row.CSeq = reader["CSeq"].ToString();
+                        row.DSEQ = reader["DSEQ"].ToString();
+                        row.Stock = reader["Stock"].ToString();
+                        row.Price = Convert.ToDecimal(reader["Price"].ToString());
+                        row.TrDate = reader["TrDate"].ToString();
+                        row.TrTime = reader["TrTime"].ToString();
+                        row.ModDate = reader["ModDate"].ToString();
+                        row.ModTime = reader["ModTime"].ToString();
+                        row.ModUser = reader["ModUser"].ToString();
+                        dbT210.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+            return dbT210;
+        }
     }
 }

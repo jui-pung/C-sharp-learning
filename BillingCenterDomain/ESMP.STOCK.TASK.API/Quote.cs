@@ -1,4 +1,5 @@
-﻿using ESMP.STOCK.FORMAT;
+﻿using ESMP.STOCK.DB.TABLE;
+using ESMP.STOCK.FORMAT;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,28 +16,38 @@ namespace ESMP.STOCK.TASK.API
 {
     public class Quote
     {
+        public static Dictionary<string, List<Symbol>> _Quote_Dic = null;
         /// <summary>
-        /// 從Quote站台取得 股票現價
+        /// 依照給定股票代號列表 查詢Quote站台資料
         /// </summary>
-        /// <param name="stockNo">股票代號</param>
-        /// <returns>此股票現價</returns>
-        public static decimal GetDealPrice(string stockNo)
+        /// <param name="stockNo">股票代號列表</param>
+        /// <returns> Quote_Dic </returns>
+        public static Dictionary<string, List<Symbol>> Quote_Dic(string[] stockNo)
         {
-            string strUrl = "http://10.10.56.182:8080/Quote/Stock.jsp?stock=" + stockNo;
+            List<Symbol> SymbolList = new List<Symbol>();
+            string strUrl = "http://10.10.56.182:8080/Quote/Stock.jsp?stock=";
+            string last = stockNo.Last();
+            foreach (var item in stockNo)
+            {
+                if (!item.Equals(last))
+                    strUrl += item + ",";
+                else
+                    strUrl += item;
+            }
             string content = SearchQuote(strUrl);
-            decimal dealPrice = 0;
             if (content == null)
             {
-                dealPrice = 10;         //如果查不到股票現價, 假設現價為10
+                Console.WriteLine("Quote站台 url回應為空");
             }
             else
             {
                 Symbols symbols = new Symbols();
                 XmlSerializer ser = new XmlSerializer(typeof(Symbols));
                 Symbols obj = (Symbols)ser.Deserialize(new StringReader(content));
-                dealPrice = obj.Symbol.dealprice;
+                SymbolList = obj.Symbol;
             }
-            return dealPrice;
+            _Quote_Dic = SymbolList.GroupBy(d => d.id).ToDictionary(x => x.Key, x => x.ToList());
+            return _Quote_Dic;
         }
 
         /// <summary>
