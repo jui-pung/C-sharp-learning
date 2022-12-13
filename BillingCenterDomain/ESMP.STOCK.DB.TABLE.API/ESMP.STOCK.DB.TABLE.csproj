@@ -52,7 +52,9 @@
     <Compile Include="T210.cs" />
     <Compile Include="TCNTD.cs" />
     <Compile Include="TCNUD.cs" />
+    <Compile Include="TCRUD.cs" />
     <Compile Include="TCSIO.cs" />
+    <Compile Include="TDBUD.cs" />
     <Compile Include="TMHIO.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

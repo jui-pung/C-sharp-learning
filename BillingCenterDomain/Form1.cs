@@ -16,8 +16,6 @@ namespace BillingCenterDomain
     public partial class Form1 : Form
     {
         int _type;                                              //查詢與回覆格式設定
-        SqlSearch _sqlSearch;                                   //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)
-        
 
         public Form1()
         {
@@ -32,14 +30,14 @@ namespace BillingCenterDomain
         {
             txtSearchContent.Clear();
             txtSearchResultContent.Clear();
-            _sqlSearch = new SqlSearch();
+            string strComboBoxTTYPE = comboBoxTTYPE.Text.Substring(0, 1);
 
             //未實現損益查詢
             if (comboBoxQTYPE.Text == "0001" && txtBHNO.Text.Length == 4 && txtCSEQ.Text.Length == 7)
             {
                 GainLost gainLost = new GainLost();             //自訂GainLost類別   (ESMP.STOCK.TASK.API)
                 //呈現查詢結果
-                (txtSearchContent.Text,txtSearchResultContent.Text) = gainLost.getGainLostSearch(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, txtStockSymbol.Text, _type);
+                (txtSearchContent.Text,txtSearchResultContent.Text) = gainLost.getGainLostSearch(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, txtStockSymbol.Text, strComboBoxTTYPE, _type);
             }
             //已實現損益查詢
             else if (comboBoxQTYPE.Text == "0002" && txtBHNO.Text.Length == 4 && txtCSEQ.Text.Length == 7 && txtEDATE.Text.Length == 8 && txtSDATE.Text.Length == 8)
@@ -79,6 +77,7 @@ namespace BillingCenterDomain
                 txtCSEQ.Text = "0107938";
                 txtSDATE.Text = "";
                 txtEDATE.Text = "";
+                comboBoxTTYPE.Enabled = true;
                 txtSDATE.Enabled = false;
                 txtEDATE.Enabled = false;
                 txtStockSymbol.Text = "";
@@ -89,6 +88,7 @@ namespace BillingCenterDomain
                 txtCSEQ.Text = "0123938";
                 txtSDATE.Text = "20210101";
                 txtEDATE.Text = "20210121";
+                comboBoxTTYPE.Enabled = false;
                 txtSDATE.Enabled = true;
                 txtEDATE.Enabled = true;
                 txtStockSymbol.Text = "";
@@ -99,6 +99,7 @@ namespace BillingCenterDomain
                 txtCSEQ.Text = "0098047";
                 txtSDATE.Text = "20221001";
                 txtEDATE.Text = "20221031";
+                comboBoxTTYPE.Enabled = false;
                 txtSDATE.Enabled = true;
                 txtEDATE.Enabled = true;
                 txtStockSymbol.Text = "3041";

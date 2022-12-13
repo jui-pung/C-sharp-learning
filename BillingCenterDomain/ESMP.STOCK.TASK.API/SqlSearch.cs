@@ -14,7 +14,7 @@ namespace ESMP.STOCK.TASK.API
     public class SqlSearch
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        static int _dateDiff = -55;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
+        static int _dateDiff = -56;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
@@ -85,6 +85,180 @@ namespace ESMP.STOCK.TASK.API
                 _sqlConn.Close();
             }
             return dbTCNUD;
+        }
+
+        //----------------------------------------------------------------------------------
+        // function selectTCRUD() - 查詢 TCRUD TABLE
+        //----------------------------------------------------------------------------------
+        public List<TCRUD> selectTCRUD(object o)
+        {
+            root SearchElement = o as root;
+            List<TCRUD> dbTCRUD = new List<TCRUD>();
+            string sqlQuery = "";
+            try
+            {
+                _sqlConn.Open();
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
+                {
+                    //加入查詢股票代號
+                    sqlQuery = @"SELECT TDATE, BHNO, DSEQ, PRICE, DNO, CSEQ, STOCK, QTY, CRAMT, PAMT, BQTY, BCRAMT, CRINT, SFCODE, CRRATIO, ASFAMT, FEE, COST, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
+                                FROM dbo.TCRUD
+                                WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND STOCK = @STOCK
+                                ORDER BY BHNO, CSEQ, STOCK";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
+                }
+                else
+                {
+                    sqlQuery = @"SELECT TDATE, BHNO, DSEQ, PRICE, DNO, CSEQ, STOCK, QTY, CRAMT, PAMT, BQTY, BCRAMT, CRINT, SFCODE, CRRATIO, ASFAMT, FEE, COST, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
+                                FROM dbo.TCRUD
+                                WHERE BHNO = @BHNO AND CSEQ = @CSEQ
+                                ORDER BY BHNO, CSEQ, STOCK";
+                }
+                sqlCmd.CommandText = sqlQuery;
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("reader has no rows");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new TCRUD();
+                        row.TDATE = reader.IsDBNull(0) ? " " : reader["TDATE"].ToString();
+                        row.BHNO = reader.IsDBNull(1) ? " " : reader["BHNO"].ToString();
+                        row.DSEQ = reader.IsDBNull(2) ? " " : reader["DSEQ"].ToString();
+                        row.PRICE = reader.IsDBNull(3) ? 0 : Convert.ToDecimal(reader["PRICE"].ToString());
+                        row.DNO = reader.IsDBNull(4) ? " " : reader["DNO"].ToString();
+                        row.CSEQ = reader.IsDBNull(5) ? " " : reader["CSEQ"].ToString();
+                        row.STOCK = reader.IsDBNull(6) ? " " : reader["STOCK"].ToString();
+                        row.QTY = reader.IsDBNull(7) ? 0 : Convert.ToDecimal(reader["QTY"].ToString());
+                        row.CRAMT = reader.IsDBNull(8) ? 0 : Convert.ToDecimal(reader["CRAMT"].ToString());
+                        row.PAMT = reader.IsDBNull(9) ? 0 : Convert.ToDecimal(reader["PAMT"].ToString());
+                        row.BQTY = reader.IsDBNull(10) ? 0 : Convert.ToDecimal(reader["BQTY"].ToString());
+                        row.BCRAMT = reader.IsDBNull(11) ? 0 : Convert.ToDecimal(reader["BCRAMT"].ToString());
+                        row.CRINT = reader.IsDBNull(12) ? 0 : Convert.ToDecimal(reader["CRINT"].ToString());
+                        row.SFCODE = reader.IsDBNull(13) ? " " : reader["SFCODE"].ToString();
+                        row.CRRATIO = reader.IsDBNull(14) ? 0 : Convert.ToDecimal(reader["CRRATIO"].ToString());
+                        row.ASFAMT = reader.IsDBNull(15) ? 0 : Convert.ToDecimal(reader["ASFAMT"].ToString());
+                        row.FEE = reader.IsDBNull(16) ? 0 : Convert.ToDecimal(reader["FEE"].ToString());
+                        row.COST = reader.IsDBNull(17) ? 0 : Convert.ToDecimal(reader["COST"].ToString());
+                        row.TRDATE = reader.IsDBNull(18) ? " " : reader["TRDATE"].ToString();
+                        row.TRTIME = reader.IsDBNull(19) ? " " : reader["TRTIME"].ToString();
+                        row.MODDATE = reader.IsDBNull(20) ? " " : reader["MODDATE"].ToString();
+                        row.MODTIME = reader.IsDBNull(21) ? " " : reader["MODTIME"].ToString();
+                        row.MODUSER = reader.IsDBNull(22) ? " " : reader["MODUSER"].ToString();
+                        dbTCRUD.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+            return dbTCRUD;
+        }
+
+        //----------------------------------------------------------------------------------
+        // function selectTDBUD() - 查詢 TDBUD TABLE
+        //----------------------------------------------------------------------------------
+        public List<TDBUD> selectTDBUD(object o)
+        {
+            root SearchElement = o as root;
+            List<TDBUD> dbTDBUD = new List<TDBUD>();
+            string sqlQuery = "";
+            try
+            {
+                _sqlConn.Open();
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
+                {
+                    //加入查詢股票代號
+                    sqlQuery = @"SELECT TDATE, BHNO, DSEQ, DNO, CSEQ, STOCK, PRICE, QTY, DBAMT, GTAMT, DNAMT, BQTY, BDBAMT, BGTAMT, BDNAMT, GTINT, DNINT, DLFEE, DLINT, DBRATIO, SFCODE, AGTAMT, FEE, TAX, DBFEE, COST, STINTAX, HEALTHFEE, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
+                                FROM dbo.TDBUD
+                                WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND STOCK = @STOCK
+                                ORDER BY BHNO, CSEQ, STOCK";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
+                }
+                else
+                {
+                    sqlQuery = @"SELECT TDATE, BHNO, DSEQ, DNO, CSEQ, STOCK, PRICE, QTY, DBAMT, GTAMT, DNAMT, BQTY, BDBAMT, BGTAMT, BDNAMT, GTINT, DNINT, DLFEE, DLINT, DBRATIO, SFCODE, AGTAMT, FEE, TAX, DBFEE, COST, STINTAX, HEALTHFEE, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
+                                FROM dbo.TDBUD
+                                WHERE BHNO = @BHNO AND CSEQ = @CSEQ
+                                ORDER BY BHNO, CSEQ, STOCK";
+                }
+                sqlCmd.CommandText = sqlQuery;
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("reader has no rows");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new TDBUD();
+                        row.TDATE = reader.IsDBNull(0) ? " " : reader["TDATE"].ToString();
+                        row.BHNO = reader.IsDBNull(1) ? " " : reader["BHNO"].ToString();
+                        row.DSEQ = reader.IsDBNull(2) ? " " : reader["DSEQ"].ToString();
+                        row.DNO = reader.IsDBNull(3) ? " " : reader["DNO"].ToString();
+                        row.CSEQ = reader.IsDBNull(4) ? " " : reader["CSEQ"].ToString();
+                        row.STOCK = reader.IsDBNull(5) ? " " : reader["STOCK"].ToString();
+                        row.PRICE = reader.IsDBNull(6) ? 0 : Convert.ToDecimal(reader["PRICE"].ToString());
+                        row.QTY = reader.IsDBNull(7) ? 0 : Convert.ToDecimal(reader["QTY"].ToString());
+                        row.DBAMT = reader.IsDBNull(8) ? 0 : Convert.ToDecimal(reader["DBAMT"].ToString());
+                        row.GTAMT = reader.IsDBNull(9) ? 0 : Convert.ToDecimal(reader["GTAMT"].ToString());
+                        row.DNAMT = reader.IsDBNull(10) ? 0 : Convert.ToDecimal(reader["DNAMT"].ToString());
+                        row.BQTY = reader.IsDBNull(11) ? 0 : Convert.ToDecimal(reader["BQTY"].ToString());
+                        row.BDBAMT = reader.IsDBNull(12) ? 0 : Convert.ToDecimal(reader["BDBAMT"].ToString());
+                        row.BGTAMT = reader.IsDBNull(13) ? 0 : Convert.ToDecimal(reader["BGTAMT"].ToString());
+                        row.BDNAMT = reader.IsDBNull(14) ? 0 : Convert.ToDecimal(reader["BDNAMT"].ToString());
+                        row.GTINT = reader.IsDBNull(15) ? 0 : Convert.ToDecimal(reader["GTINT"].ToString());
+                        row.DNINT = reader.IsDBNull(16) ? 0 : Convert.ToDecimal(reader["DNINT"].ToString());
+                        row.DLFEE = reader.IsDBNull(17) ? 0 : Convert.ToDecimal(reader["DLFEE"].ToString());
+                        row.DLINT = reader.IsDBNull(18) ? 0 : Convert.ToDecimal(reader["DLINT"].ToString());
+                        row.DBRATIO = reader.IsDBNull(19) ? 0 : Convert.ToDecimal(reader["DBRATIO"].ToString());
+                        row.SFCODE = reader.IsDBNull(20) ? " " : reader["SFCODE"].ToString();
+                        row.AGTAMT = reader.IsDBNull(21) ? 0 : Convert.ToDecimal(reader["AGTAMT"].ToString());
+                        row.FEE = reader.IsDBNull(22) ? 0 : Convert.ToDecimal(reader["FEE"].ToString());
+                        row.TAX = reader.IsDBNull(23) ? 0 : Convert.ToDecimal(reader["TAX"].ToString());
+                        row.DBFEE = reader.IsDBNull(24) ? 0 : Convert.ToDecimal(reader["DBFEE"].ToString());
+                        row.COST = reader.IsDBNull(25) ? 0 : Convert.ToDecimal(reader["COST"].ToString());
+                        row.STINTAX = reader.IsDBNull(26) ? 0 : Convert.ToDecimal(reader["STINTAX"].ToString());
+                        row.HEALTHFEE = reader.IsDBNull(27) ? 0 : Convert.ToDecimal(reader["HEALTHFEE"].ToString());
+                        row.TRDATE = reader.IsDBNull(28) ? " " : reader["TRDATE"].ToString();
+                        row.TRTIME = reader.IsDBNull(29) ? " " : reader["TRTIME"].ToString();
+                        row.MODDATE = reader.IsDBNull(30) ? " " : reader["MODDATE"].ToString();
+                        row.MODTIME = reader.IsDBNull(31) ? " " : reader["MODTIME"].ToString();
+                        row.MODUSER = reader.IsDBNull(32) ? " " : reader["MODUSER"].ToString();
+                        dbTDBUD.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+            return dbTDBUD;
         }
 
         # region selectMSTMB

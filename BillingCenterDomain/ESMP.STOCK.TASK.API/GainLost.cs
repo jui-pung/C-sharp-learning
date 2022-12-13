@@ -25,7 +25,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function getGainLostSearch() - 未實現損益查詢的對外接口function
         //--------------------------------------------------------------------------------------------
-        public (string,string) getGainLostSearch(string QTYPE, string BHNO, string CSEQ, string stockSymbol, int type)
+        public (string,string) getGainLostSearch(string QTYPE, string BHNO, string CSEQ, string stockSymbol, string TTYPE, int type)
         {
             //宣告物件 變數
             _type = type;
@@ -37,6 +37,8 @@ namespace ESMP.STOCK.TASK.API
             List<HCMIO> HCMIOList = new List<HCMIO>();                                      //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
             List<TCNTD> TCNTDList = new List<TCNTD>();                                      //自訂TCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             List<T210> T210List = new List<T210>();                                         //自訂T210類別List (ESMP.STOCK.DB.TABLE.API)
+            List<TCRUD> TCRUDList = new List<TCRUD>();                                      //自訂TCRUD類別List (ESMP.STOCK.DB.TABLE.API)
+            List<TDBUD> TDBUDList = new List<TDBUD>();                                      //自訂TDBUD類別List (ESMP.STOCK.DB.TABLE.API)
 
             List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();     //自訂unoffset_qtype_detail類別List (階層三:個股明細)
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();              //自訂unoffset_qtype_sum類別List    (階層二:個股未實現損益)
@@ -45,7 +47,7 @@ namespace ESMP.STOCK.TASK.API
             string txtSearchResultContent = "";
 
             //取得查詢xml或json格式字串
-            _searchStr = searchSerilizer(QTYPE, BHNO, CSEQ, stockSymbol, _type);
+            _searchStr = searchSerilizer(QTYPE, BHNO, CSEQ, stockSymbol, TTYPE, _type);
             txtSearchContent = _searchStr;
             //取得查詢字串Element
             var obj = GetElement(_searchStr, _type);
@@ -56,15 +58,25 @@ namespace ESMP.STOCK.TASK.API
             TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
             TCNTDList = _sqlSearch.selectTCNTD(SearchElement);
             T210List = _sqlSearch.selectT210(SearchElement);
-
+            //查詢融資餘額檔 ---TCRUD
+            if (SearchElement.ttype == "A" || SearchElement.ttype == "1")
+                TCRUDList = _sqlSearch.selectTCRUD(SearchElement);
+            //查詢融券餘額檔 ---TDBUD
+            else if (SearchElement.ttype == "A" || SearchElement.ttype == "2")
+                TDBUDList = _sqlSearch.selectTDBUD(SearchElement);
+            
             //盤中現股沖銷 當沖 現股賣出處理
             (TCNUDList, HCNRHList, HCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, TCNTDList, T210List, BHNO, CSEQ);
             
             if (TCNUDList.Count > 0)
             {
-                //未實現損益
-                sumList = searchSum(TCNUDList);
-                accsumList = searchAccSum(sumList);
+                //(現股)未實現損益
+                if (TTYPE == "0")
+                {
+                    sumList = searchSum(TCNUDList);
+                    accsumList = searchAccSum(sumList);
+                }
+                
                 //查詢結果
                 txtSearchResultContent = resultListSerilizer(accsumList, _type);
             }
@@ -77,14 +89,15 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function SearchSerilizer() - 將輸入的查詢資訊序列化為xml格式字串
         //--------------------------------------------------------------------------------------------
-        private string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string stockSymbol, int type)
+        private string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string stockSymbol, string TTYPE, int type)
         {
             var root = new root()
             {
                 qtype = QTYPE,
                 bhno = BHNO,
                 cseq = CSEQ,
-                stockSymbol = stockSymbol
+                stockSymbol = stockSymbol,
+                ttype = TTYPE
             };
             if (type == 0)
             {

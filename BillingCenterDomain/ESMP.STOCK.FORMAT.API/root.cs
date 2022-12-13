@@ -14,5 +14,6 @@ namespace ESMP.STOCK.FORMAT
         public string sdate { get; set; }
         public string edate { get; set; }
         public string stockSymbol { get; set; }
+        public string ttype { get; set; }
     }
 }
