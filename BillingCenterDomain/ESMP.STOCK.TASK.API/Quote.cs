@@ -22,10 +22,12 @@ namespace ESMP.STOCK.TASK.API
         /// </summary>
         /// <param name="stockNo">股票代號列表</param>
         /// <returns> Quote_Dic </returns>
+        //回傳Symbol
         public static Dictionary<string, List<Symbol>> Quote_Dic(string[] stockNo)
         {
             List<Symbol> SymbolList = new List<Symbol>();
             string strUrl = "http://10.10.56.182:8080/Quote/Stock.jsp?stock=";
+            //string.join
             string last = stockNo.Last();
             foreach (var item in stockNo)
             {

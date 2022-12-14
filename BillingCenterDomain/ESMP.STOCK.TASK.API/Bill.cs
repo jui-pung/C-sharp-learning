@@ -199,7 +199,7 @@ namespace ESMP.STOCK.TASK.API
                 List<HCNRH> HCNRHList_Part = HCNRHList.Where(x => x.SDSEQ == HCMIO_item.DSEQ && x.SDNO == HCMIO_item.DNO).ToList();
                 List<HCNTD> HCNTDList_Part = HCNTDList.Where(x => x.SDSEQ == HCMIO_item.DSEQ && x.SDNO == HCMIO_item.DNO).ToList();
 
-                if (HCNRHList_Part.Count > 0)
+                if (HCNRHList_Part.Count > 0 && HCNTDList_Part.Count > 0)
                 {
                     foreach (var HCNRH_item in HCNRHList)
                     {
@@ -215,7 +215,7 @@ namespace ESMP.STOCK.TASK.API
                         row.ETYPE = HCMIO_item.ETYPE;
                         row.BSTYPE = HCMIO_item.BSTYPE;
                         row.PRICE = HCMIO_item.PRICE;
-                        row.QTY = HCNRH_item.CQTY;          //合計成交股數????
+                        row.QTY = HCNRH_item.CQTY;          //合計成交股數
                         row.BQTY = 0;                       //未沖銷股數
                         row.AMT = decimal.Truncate(HCMIO_item.PRICE * row.QTY);
                         row.FEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.AMT) * 0.001425));
@@ -237,7 +237,7 @@ namespace ESMP.STOCK.TASK.API
                 }
                 foreach (var HCNTD_item in HCNTDList)
                 {
-                    HCMIO_item.QTY = HCNTD_item.CQTY;          //合計成交股數????
+                    HCMIO_item.QTY = HCNTD_item.CQTY;          //合計成交股數
                     HCMIO_item.AMT = decimal.Truncate(HCMIO_item.PRICE * HCMIO_item.QTY);
                     HCMIO_item.FEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(HCMIO_item.AMT) * 0.001425));
                     if (HCMIO_item.QTY >= 1000 && HCMIO_item.FEE < 20)

@@ -29,6 +29,15 @@ namespace ESMP.STOCK.FORMAT
         public decimal estimateFee { get; set; }
         public decimal estimateTax { get; set; }
         public decimal amt { get; set; }
+        public decimal cramt { get; set; }
+        public decimal bcramt { get; set; }
+        public decimal gtamt { get; set; }
+        public decimal bgtamt { get; set; }
+        public decimal dnamt { get; set; }
+        public decimal bdnamt { get; set; }
+        public decimal interest { get; set; }
+        public decimal dbfee { get; set; }
+
         [XmlElement("unoffset_qtype_detail")]
         [JsonProperty("unoffset_qtype_detail", NullValueHandling = NullValueHandling.Ignore)]
 
