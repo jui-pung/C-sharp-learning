@@ -162,8 +162,8 @@ namespace ESMP.STOCK.TASK.API
         {
             //挑出所有不重複股票列表 一次查完報價 存到dic中
             Dictionary<string, List<Symbol>> Quote_Dic = null;
-            //distinct
-            string[] stocks = TCNUDList.GroupBy(x => x.STOCK).Select(grp => grp.First()).Select(p => p.STOCK).ToArray();
+            string[] stocks = TCNUDList.Select(x => x.STOCK).Distinct().ToArray();
+            //string[] stocks = TCNUDList.GroupBy(x => x.STOCK).Select(grp => grp.First()).Select(p => p.STOCK).ToArray();
             Quote_Dic = Quote.Quote_Dic(stocks);
 
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
@@ -222,7 +222,7 @@ namespace ESMP.STOCK.TASK.API
                     detailList = AddDetailList(detailList, item, cprice, ttypename, bstype);
                 }
                 detailList.ForEach(p => p.marketvalue = (p.estimateAmt + p.estimateFee) * -1);
-                detailList.ToList().ForEach(p => p.profit = p.cost - p.marketvalue);
+                detailList.ForEach(p => p.profit = p.cost - p.marketvalue);
                 detailList.Where(x => x.cost != 0).ToList().ForEach(p => p.pl_ratio = decimal.Round(((p.profit / p.cost) * 100), 2).ToString() + "%");
                 detailList.Where(x => x.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
 
@@ -260,8 +260,7 @@ namespace ESMP.STOCK.TASK.API
             row.fee = TCNUD_item.FEE;
             row.ttypename = ttypename;
             row.bstype = bstype;
-            //==bstype
-            if (ttypename == "現買")
+            if (bstype == "B")
             {
                 row.mamt = row.bqty * row.mprice;
                 row.tax = 0;
@@ -272,7 +271,7 @@ namespace ESMP.STOCK.TASK.API
                     row.estimateFee = 20;
                 row.estimateTax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.estimateAmt) * 0.003));
             }
-            else if (ttypename == "現賣")
+            else if (bstype == "S")
             {
                 row.mamt = row.bqty * row.mprice * -1;
                 row.tax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.mamt) * 0.003));

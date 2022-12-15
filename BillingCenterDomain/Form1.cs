@@ -30,7 +30,11 @@ namespace BillingCenterDomain
         {
             txtSearchContent.Clear();
             txtSearchResultContent.Clear();
-            string strComboBoxTTYPE = comboBoxTTYPE.Text.Substring(0, 1);
+            string strComboBoxTTYPE = txtSearchContent.Text;
+            if (String.IsNullOrEmpty(strComboBoxTTYPE))
+                strComboBoxTTYPE = "";
+            else
+                strComboBoxTTYPE = comboBoxTTYPE.Text.Substring(0, 1);
 
             //未實現損益查詢
             if (comboBoxQTYPE.Text == "0001" && txtBHNO.Text.Length == 4 && txtCSEQ.Text.Length == 7)
@@ -96,7 +100,7 @@ namespace BillingCenterDomain
             if (comboBoxQTYPE.Text == "0003")
             {
                 txtBHNO.Text = "592S";
-                txtCSEQ.Text = "0098047";
+                txtCSEQ.Text = "0105354";
                 txtSDATE.Text = "20221001";
                 txtEDATE.Text = "20221031";
                 comboBoxTTYPE.Enabled = false;
