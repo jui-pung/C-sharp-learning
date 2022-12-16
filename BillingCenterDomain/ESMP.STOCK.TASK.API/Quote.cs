@@ -37,7 +37,7 @@ namespace ESMP.STOCK.TASK.API
                     strUrl += item;
             }
             string content = SearchQuote(strUrl);
-            if (content == null)
+            if (string.IsNullOrEmpty(content))
             {
                 Console.WriteLine("Quote站台 url回應為空");
             }

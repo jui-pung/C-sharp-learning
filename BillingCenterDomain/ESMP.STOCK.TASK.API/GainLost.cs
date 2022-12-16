@@ -43,6 +43,7 @@ namespace ESMP.STOCK.TASK.API
             List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();     //自訂unoffset_qtype_detail類別List (階層三:個股明細)
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();              //自訂unoffset_qtype_sum類別List    (階層二:個股未實現損益)
             List<unoffset_qtype_accsum> accsumList = new List<unoffset_qtype_accsum>();     //自訂unoffset_qtype_accsum類別List (階層一:帳戶未實現損益)
+            unoffset_qtype_accsum accsum = new unoffset_qtype_accsum();                     //自訂unoffset_qtype_accsum類別List (階層一:帳戶未實現損益)
             string txtSearchContent = "";
             string txtSearchResultContent = "";
 
@@ -74,23 +75,23 @@ namespace ESMP.STOCK.TASK.API
                 if (TTYPE == "0")
                 {
                     sumList = searchSum(TCNUDList);
-                    accsumList = searchAccSum(sumList);
+                    accsum = searchAccSum(sumList);
                 }
                 //(融資)未實現損益
                 else if (TTYPE == "1")
                 {
                     sumList = searchSum_TCRUD(TCRUDList);
-                    //accsumList = searchAccSum(sumList);
+                    accsum = searchAccSum_TCRUD_TDBUD(sumList);
                 }
                 //(融券)未實現損益
                 else if (TTYPE == "2")
                 {
-                    //sumList = searchSum(TCNUDList);
-                    //accsumList = searchAccSum(sumList);
+                    sumList = searchSum_TDBUD(TDBUDList);
+                    accsum = searchAccSum_TCRUD_TDBUD(sumList);
                 }
 
                 //查詢結果
-                txtSearchResultContent = resultListSerilizer(accsumList, _type);
+                txtSearchResultContent = resultListSerilizer(accsum, _type);
             }
             else
             {
@@ -178,8 +179,10 @@ namespace ESMP.STOCK.TASK.API
                 List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();
                 foreach (var item in grp_item)
                 {
-                    //字典搜尋此股票 現價
-                    decimal cprice = Quote_Dic[item.STOCK][0].dealprice;
+                    //字典搜尋此股票 現價 (查詢不到假設為10)
+                    decimal cprice = 10;
+                    if (Quote_Dic.ContainsKey(item.STOCK))
+                        cprice = Quote_Dic[item.STOCK][0].dealprice;
                     string ttypename = "現買";
                     string bstype = "B";
                     detailList = AddDetailList(detailList, item, cprice, ttypename, bstype);
@@ -215,8 +218,10 @@ namespace ESMP.STOCK.TASK.API
                 List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();
                 foreach (var item in grp_item)
                 {
-                    //字典搜尋此股票 現價
-                    decimal cprice = Quote_Dic[item.STOCK][0].dealprice;
+                    //字典搜尋此股票 現價 (查詢不到假設為10)
+                    decimal cprice = 10;
+                    if (Quote_Dic.ContainsKey(item.STOCK))
+                        cprice = Quote_Dic[item.STOCK][0].dealprice;
                     string ttypename = "現賣";
                     string bstype = "S";
                     detailList = AddDetailList(detailList, item, cprice, ttypename, bstype);
@@ -331,47 +336,20 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function searchAccSum() - 計算取得 查詢回復階層一 帳戶未實現損益
         //--------------------------------------------------------------------------------------------
-        public List<unoffset_qtype_accsum> searchAccSum(List<unoffset_qtype_sum> sumList)
+        public unoffset_qtype_accsum searchAccSum(List<unoffset_qtype_sum> sumList)
         {
-            List<unoffset_qtype_accsum> accsumList = new List<unoffset_qtype_accsum>(); //自訂unoffset_qtype_accsum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
-            #region 方法一: foreach彙總帳戶未實現損益
-            //var row = new unoffset_qtype_accsum();
-            //row.bqty = sumList.Sum(x => x.bqty);
-            //foreach (var item in sumList)
-            //{
-            //    row.bqty += item.bqty;
-            //    row.cost += item.cost;
-            //    row.marketvalue += item.marketvalue;
-            //    row.estimateAmt += item.estimateAmt;
-            //    row.estimateFee += item.estimateFee;
-            //    row.estimateTax += item.estimateTax;
-            //    row.profit += item.profit;
-            //    row.fee += item.fee;
-            //    row.tax += item.tax;
-            //}
-            //accsumList.Add(row);
-            //foreach (var item in accsumList)
-            //{
-            //    item.pl_ratio = decimal.Round(((item.profit / item.cost) * 100), 2).ToString() + "%";
-            //    item.unoffset_qtype_sum = sumList;
-            //}
-            #endregion
-            //方法二: 使用linq
-            var row = new unoffset_qtype_accsum();
-            row.bqty = sumList.Sum(x => x.bqty);
-            row.cost = sumList.Sum(x => x.cost);
-            row.marketvalue = sumList.Sum(x => x.marketvalue);
-            row.estimateAmt = sumList.Sum(x => x.estimateAmt);
-            row.estimateTax = sumList.Sum(x => x.estimateTax);
-            row.profit = sumList.Sum(x => x.profit);
-            row.fee = sumList.Sum(x => x.fee);
-            row.tax = sumList.Sum(x => x.tax);
-            row.unoffset_qtype_sum = sumList;
-            accsumList.Add(row);
-
-            accsumList.ForEach(x => x.pl_ratio = decimal.Round(((x.profit / x.cost) * 100), 2).ToString() + "%");
-            accsumList.ForEach(x => x.unoffset_qtype_sum = sumList);
-            return accsumList;
+            unoffset_qtype_accsum accsum = new unoffset_qtype_accsum(); //自訂unoffset_qtype_accsum類別 (ESMP.STOCK.FORMAT.API) -函式回傳使用
+            accsum.bqty = sumList.Sum(x => x.bqty);
+            accsum.cost = sumList.Sum(x => x.cost);
+            accsum.marketvalue = sumList.Sum(x => x.marketvalue);
+            accsum.estimateAmt = sumList.Sum(x => x.estimateAmt);
+            accsum.estimateTax = sumList.Sum(x => x.estimateTax);
+            accsum.profit = sumList.Sum(x => x.profit);
+            accsum.fee = sumList.Sum(x => x.fee);
+            accsum.tax = sumList.Sum(x => x.tax);
+            accsum.unoffset_qtype_sum = sumList;
+            accsum.pl_ratio = (accsum.cost != 0) ? decimal.Round(((accsum.profit / accsum.cost) * 100), 2).ToString() + " %" : "0 %";
+            return accsum;
         }
 
         /// <summary>
@@ -406,7 +384,11 @@ namespace ESMP.STOCK.TASK.API
                     row.bqty = item.BQTY;
                     row.mprice = item.PRICE;
                     row.mamt = row.bqty * row.mprice;
-                    row.lastprice = Quote_Dic[item.STOCK][0].dealprice;
+                    //字典搜尋此股票 現價 (查詢不到假設為10)
+                    decimal cprice = 10;
+                    if (Quote_Dic.ContainsKey(item.STOCK))
+                        cprice = Quote_Dic[item.STOCK][0].dealprice;
+                    row.lastprice = cprice;
                     row.estimateAmt = row.lastprice * row.bqty;
                     row.estimateFee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.estimateAmt) * 0.001425));
                     row.estimateTax = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.estimateAmt) * 0.003));
@@ -483,81 +465,188 @@ namespace ESMP.STOCK.TASK.API
             return sumList;
         }
 
+        /// <summary>
+        /// 計算取得 查詢回復階層二的個股未實現損益與個股明細 --- 融券
+        /// </summary>
+        /// <param name="TDBUDList">融券餘額黨</param>
+        /// <returns></returns>
+        public List<unoffset_qtype_sum> searchSum_TDBUD(List<TDBUD> TDBUDList)
+        {
+            //挑出所有不重複股票列表 一次查完報價 存到dic中
+            Dictionary<string, List<Symbol>> Quote_Dic = null;
+            string[] stockNo = TDBUDList.GroupBy(x => x.STOCK).Select(grp => grp.First()).Select(p => p.STOCK).ToArray();
+            Quote_Dic = Quote.Quote_Dic(stockNo);
+
+            List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
+            //依照股票代號產生新的清單群組grp_TDBUD
+            var grp_TDBUD = TDBUDList.GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();
+            //迴圈處理grp_TDBUD群組資料 存入個股未實現損益 List
+            foreach (var grp_item in grp_TDBUD)
+            {
+                //取得個股明細資料 List (第三階層)
+                List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();
+                foreach (var item in grp_item)
+                {
+                    var row = new unoffset_qtype_detail();
+                    row.tdate = item.TDATE;
+                    row.ttype = "2";
+                    row.ttypename = "融券";
+                    row.bstype = "S";
+                    row.dseq = item.DSEQ;
+                    row.dno = item.DNO;
+                    row.bqty = item.BQTY;
+                    row.mprice = item.PRICE;
+                    row.mamt = row.bqty * row.mprice;
+                    //搜尋Quote字典 此股票現價 (查詢不到假設為10)
+                    decimal cprice = 10;
+                    if (Quote_Dic.ContainsKey(item.STOCK))
+                        cprice = Quote_Dic[item.STOCK][0].dealprice;
+                    row.lastprice = cprice;
+                    row.estimateAmt = row.lastprice * row.bqty * -1;
+                    row.estimateFee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.estimateAmt) * 0.001425));
+                    row.estimateTax = 0;
+                    row.bcramt = 0;
+                    row.fee = item.FEE;
+                    row.tax = item.TAX;
+                    row.cramt = 0;
+                    row.gtamt = item.GTAMT;
+                    row.bgtamt = item.BGTAMT;
+                    row.dnamt = item.DNAMT;
+                    row.bdnamt = item.BDNAMT;
+                    //融券利息 = 保證金利息 + 擔保品利息
+                    row.interest = item.GTINT + item.DNINT;
+                    row.dbfee = item.DBFEE;
+                    row.dlfee = item.DLFEE;
+                    row.dlint = item.DLINT;
+                    row.cost = item.COST;
+                    row.profit = row.marketvalue - row.cost;
+                    //融資維持率 = 融資餘額股數（TCRUD.BQTY） * 現價 / 未償還融資金額（TCRUD.BCRAMT）
+                    row.keeprate = decimal.Round(((item.BGTAMT + item.BDNAMT) / (item.BQTY * row.lastprice) * 100), 2).ToString() + "%";
+                    detailList.Add(row);
+                }
+                detailList.ForEach(p => p.marketvalue = p.estimateAmt - p.estimateFee - p.bcramt);
+                detailList.ForEach(p => p.profit = p.marketvalue - p.cost);
+                detailList.Where(x => x.cost != 0).ToList().ForEach(p => p.pl_ratio = decimal.Round(((p.profit / p.cost) * 100), 2).ToString() + "%");
+                detailList.Where(x => x.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
+
+                //字典搜尋客戶此股票 昨日庫存股數
+                decimal yesterdayBqty = 0;
+                string searchKey = grp_item.First().BHNO + grp_item.First().CSEQ + grp_item.First().STOCK;
+                if (BasicData._MCSRH_Dic.ContainsKey(searchKey))
+                    yesterdayBqty = BasicData._MCSRH_Dic[searchKey][0].CRAQTY + BasicData._MCSRH_Dic[searchKey][0].CROQTY;
+                else
+                    yesterdayBqty = 0;             //如果查不到昨日庫存股數, 假設昨日庫存股數為0
+
+                //字典搜尋此股票 中文名稱
+                string cname = "";
+                if (BasicData._MSTMB_Dic.ContainsKey(grp_item.First().STOCK))
+                    cname = BasicData._MSTMB_Dic[grp_item.First().STOCK][0].CNAME;
+                else
+                    cname = "";             //如果查不到股票中文名稱, 假設中文名稱為" "
+
+                //取得個股未實現損益 List (第二階層)
+                unoffset_qtype_sum row_Sum = new unoffset_qtype_sum();
+                row_Sum.stock = TDBUDList.First().STOCK;
+                row_Sum.stocknm = cname;
+                row_Sum.ttype = "1";
+                row_Sum.ttypename = detailList.First().ttypename;
+                row_Sum.bstype = "B";
+                row_Sum.bqty = yesterdayBqty;
+                row_Sum.real_qty = detailList.Sum(x => x.bqty);
+                row_Sum.cost = detailList.Sum(x => x.cost);
+                row_Sum.lastprice = detailList.First().lastprice;
+                row_Sum.marketvalue = detailList.Sum(x => x.marketvalue);
+                row_Sum.estimateAmt = detailList.Sum(x => x.estimateAmt);
+                row_Sum.estimateFee = detailList.Sum(x => x.estimateFee);
+                row_Sum.estimateTax = detailList.Sum(x => x.estimateTax);
+                row_Sum.profit = detailList.Sum(x => x.profit);
+                row_Sum.fee = detailList.Sum(x => x.fee);
+                row_Sum.tax = detailList.Sum(x => x.tax);
+                row_Sum.amt = detailList.Sum(x => x.mamt);
+                row_Sum.cramt = detailList.Sum(x => x.cramt);
+                row_Sum.bcramt = detailList.Sum(x => x.bcramt);
+                row_Sum.gtamt = detailList.Sum(x => x.gtamt);
+                row_Sum.bgtamt = detailList.Sum(x => x.bgtamt);
+                row_Sum.dnamt = detailList.Sum(x => x.dnamt);
+                row_Sum.bdnamt = detailList.Sum(x => x.bdnamt);
+                row_Sum.interest = detailList.Sum(x => x.interest);
+                row_Sum.dbfee = detailList.Sum(x => x.dbfee);
+
+                //第三階層資料存入第二階層List
+                row_Sum.unoffset_qtype_detail = detailList;
+                sumList.Add(row_Sum);
+                sumList.ForEach(x => x.avgprice = decimal.Round((x.cost / x.real_qty), 2));
+                sumList.Where(n => n.cost != 0).ToList().ForEach(x => x.pl_ratio = decimal.Round(((x.profit / x.cost) * 100), 2).ToString() + "%");
+                sumList.Where(n => n.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
+            }
+            return sumList;
+        }
+        public unoffset_qtype_accsum searchAccSum_TCRUD_TDBUD(List<unoffset_qtype_sum> sumList)
+        {
+            unoffset_qtype_accsum accsum = new unoffset_qtype_accsum(); //自訂unoffset_qtype_accsum類別 (ESMP.STOCK.FORMAT.API) -函式回傳使用
+            accsum.bqty = sumList.Sum(x => x.bqty);
+            accsum.real_qty = sumList.Sum((x) => x.real_qty);
+            accsum.cost = sumList.Sum(x => x.cost);
+            accsum.marketvalue = sumList.Sum(x => x.marketvalue);
+            accsum.estimateAmt = sumList.Sum(x => x.estimateAmt);
+            accsum.estimateFee = sumList.Sum(x => x.estimateFee);
+            accsum.estimateTax = sumList.Sum(x => x.estimateTax);
+            accsum.profit = sumList.Sum(x => x.profit);
+            accsum.fee = sumList.Sum(x => x.fee);
+            accsum.tax = sumList.Sum(x => x.tax);
+            accsum.cramt = sumList.Sum(x => x.cramt);   
+            accsum.bcramt = sumList.Sum(x => x.bcramt);
+            accsum.gtamt = sumList.Sum(x => x.gtamt);
+            accsum.bgtamt = sumList.Sum(x => x.bgtamt);
+            accsum.dnamt = sumList.Sum(x => x.dnamt);
+            accsum.bdnamt = sumList.Sum(x => x.bdnamt);
+            accsum.interest = sumList.Sum(x => x.interest);
+            accsum.dbfee = sumList.Sum(x => x.dbfee);
+            accsum.unoffset_qtype_sum = sumList;
+            accsum.pl_ratio = (accsum.cost != 0) ? decimal.Round(((accsum.profit / accsum.cost) * 100), 2).ToString() + " %" : "0 %";
+            return accsum;
+        }
+
         //--------------------------------------------------------------------------------------------
         //function resultListSerilizer() - 將QTYPE"0001"查詢結果 序列化為xml或json格式字串
         //--------------------------------------------------------------------------------------------
-        private string resultListSerilizer(List<unoffset_qtype_accsum> accsumList, int type)
+        private string resultListSerilizer(unoffset_qtype_accsum accsum, int type)
         {
-            foreach (var item in accsumList)
+            ////透過unoffset_qtype_accsum自訂類別反序列 -> accsumSer
+            //var accsumSer = new unoffset_qtype_accsum()
+            //{
+            //    errcode = "0000",
+            //    errmsg = "成功",
+            //    bqty = item.bqty,
+            //    marketvalue = item.marketvalue,
+            //    fee = item.fee,
+            //    tax = item.tax,
+            //    cost = item.cost,
+            //    estimateAmt = item.estimateAmt,
+            //    estimateFee = item.estimateFee,
+            //    estimateTax = item.estimateTax,
+            //    profit = item.profit,
+            //    pl_ratio = item.pl_ratio,
+            //    unoffset_qtype_sum = item.unoffset_qtype_sum
+            //};
+            //序列化為xml格式字串
+            if (type == 0)
             {
-                #region 重構前 處理第三階層反序列內容 
-                ////處理第三階層反序列內容 
-                //int index = 0;
-                //for (int i = 0; i < item.unoffset_qtype_sum.Count; i++)
-                //{
-                //    //初始化 unoffset_qtype_sum[].unoffset_qtype_detail 清單長度為detaillist長度
-                //    List<unoffset_qtype_detail> initialization = new List<unoffset_qtype_detail>();
-                //    int count = 0;
-                //    while (count < detailList.Count)
-                //    {
-                //        initialization.Add(null);
-                //        count++;
-                //    }
-                //    item.unoffset_qtype_sum[i].unoffset_qtype_detail = initialization;
-
-                //    for (int j = index; j < detailList.Count; j++)
-                //    {
-                //        //合併第三階層相同股票代號到第二階層
-                //        if (item.unoffset_qtype_sum[i].stock.Equals(detailList[j].stock))
-                //        {
-                //            item.unoffset_qtype_sum[i].unoffset_qtype_detail[j] = detailList[j];
-                //        }
-                //        else
-                //        {
-                //            index = j;
-                //            break;
-                //        }
-                //    }
-                //    item.unoffset_qtype_sum[i].unoffset_qtype_detail.RemoveAll(s => s == null);
-                //}
-                #endregion
-
-                //透過unoffset_qtype_accsum自訂類別反序列 -> accsumSer
-                var accsumSer = new unoffset_qtype_accsum()
+                using (var stringwriter = new System.IO.StringWriter())
                 {
-                    errcode = "0000",
-                    errmsg = "成功",
-                    bqty = item.bqty,
-                    marketvalue = item.marketvalue,
-                    fee = item.fee,
-                    tax = item.tax,
-                    cost = item.cost,
-                    estimateAmt = item.estimateAmt,
-                    estimateFee = item.estimateFee,
-                    estimateTax = item.estimateTax,
-                    profit = item.profit,
-                    pl_ratio = item.pl_ratio,
-                    unoffset_qtype_sum = item.unoffset_qtype_sum
-                };
-                //序列化為xml格式字串
-                if (type == 0)
-                {
-                    using (var stringwriter = new System.IO.StringWriter())
-                    {
-                        var serializer = new XmlSerializer(typeof(unoffset_qtype_accsum));
-                        serializer.Serialize(stringwriter, accsumSer);
-                        return stringwriter.ToString();
-                    }
+                    var serializer = new XmlSerializer(typeof(unoffset_qtype_accsum));
+                    serializer.Serialize(stringwriter, accsum);
+                    return stringwriter.ToString();
                 }
-                //序列化為json格式字串
-                else if (type == 1)
-                {
-                    var settings = new JsonSerializerSettings();
-                    settings.NullValueHandling = NullValueHandling.Ignore;
-                    settings.Formatting = Newtonsoft.Json.Formatting.Indented;
-                    string jsonString = JsonConvert.SerializeObject(accsumSer, settings);
-                    return jsonString.ToString();
-                }
+            }
+            //序列化為json格式字串
+            else if (type == 1)
+            {
+                var settings = new JsonSerializerSettings();
+                settings.NullValueHandling = NullValueHandling.Ignore;
+                settings.Formatting = Newtonsoft.Json.Formatting.Indented;
+                string jsonString = JsonConvert.SerializeObject(accsum, settings);
+                return jsonString.ToString();
             }
             return string.Empty;
         }

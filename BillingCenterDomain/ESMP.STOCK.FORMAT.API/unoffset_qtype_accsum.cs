@@ -13,6 +13,7 @@ namespace ESMP.STOCK.FORMAT
         public string errcode { get; set; }
         public string errmsg { get; set; }
         public decimal bqty { get; set; }
+        public decimal real_qty { get; set; }
         public decimal cost { get; set; }
         public decimal marketvalue { get; set; }
         public decimal profit { get; set; }

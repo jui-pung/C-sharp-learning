@@ -30,7 +30,7 @@ namespace BillingCenterDomain
         {
             txtSearchContent.Clear();
             txtSearchResultContent.Clear();
-            string strComboBoxTTYPE = txtSearchContent.Text;
+            string strComboBoxTTYPE = comboBoxTTYPE.Text;
             if (String.IsNullOrEmpty(strComboBoxTTYPE))
                 strComboBoxTTYPE = "";
             else
