@@ -40,9 +40,7 @@ namespace ESMP.STOCK.TASK.API
             List<TCRUD> TCRUDList = new List<TCRUD>();                                      //自訂TCRUD類別List (ESMP.STOCK.DB.TABLE.API)
             List<TDBUD> TDBUDList = new List<TDBUD>();                                      //自訂TDBUD類別List (ESMP.STOCK.DB.TABLE.API)
 
-            List<unoffset_qtype_detail> detailList = new List<unoffset_qtype_detail>();     //自訂unoffset_qtype_detail類別List (階層三:個股明細)
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();              //自訂unoffset_qtype_sum類別List    (階層二:個股未實現損益)
-            List<unoffset_qtype_accsum> accsumList = new List<unoffset_qtype_accsum>();     //自訂unoffset_qtype_accsum類別List (階層一:帳戶未實現損益)
             unoffset_qtype_accsum accsum = new unoffset_qtype_accsum();                     //自訂unoffset_qtype_accsum類別List (階層一:帳戶未實現損益)
             string txtSearchContent = "";
             string txtSearchResultContent = "";
@@ -81,13 +79,24 @@ namespace ESMP.STOCK.TASK.API
                 else if (TTYPE == "1")
                 {
                     sumList = searchSum_TCRUD(TCRUDList);
-                    accsum = searchAccSum_TCRUD_TDBUD(sumList);
+                    accsum = searchAccSum(sumList);
                 }
                 //(融券)未實現損益
                 else if (TTYPE == "2")
                 {
                     sumList = searchSum_TDBUD(TDBUDList);
-                    accsum = searchAccSum_TCRUD_TDBUD(sumList);
+                    accsum = searchAccSum(sumList);
+                }
+                //(全部)未實現損益
+                else if (TTYPE == "A")
+                {
+                    List<unoffset_qtype_sum> sumList_TCRUD = new List<unoffset_qtype_sum>();
+                    List<unoffset_qtype_sum> sumList_TDBUD = new List<unoffset_qtype_sum>();
+                    sumList = searchSum(TCNUDList);
+                    sumList_TCRUD = searchSum_TCRUD(TCRUDList);
+                    sumList_TDBUD = searchSum_TDBUD(TDBUDList);
+                    sumList.Concat(sumList_TCRUD).Concat(sumList_TDBUD);
+                    accsum = searchAccSum(sumList);
                 }
 
                 //查詢結果
@@ -340,13 +349,23 @@ namespace ESMP.STOCK.TASK.API
         {
             unoffset_qtype_accsum accsum = new unoffset_qtype_accsum(); //自訂unoffset_qtype_accsum類別 (ESMP.STOCK.FORMAT.API) -函式回傳使用
             accsum.bqty = sumList.Sum(x => x.bqty);
+            accsum.real_qty = sumList.Sum((x) => x.real_qty);
             accsum.cost = sumList.Sum(x => x.cost);
             accsum.marketvalue = sumList.Sum(x => x.marketvalue);
             accsum.estimateAmt = sumList.Sum(x => x.estimateAmt);
+            accsum.estimateFee = sumList.Sum(x => x.estimateFee);
             accsum.estimateTax = sumList.Sum(x => x.estimateTax);
             accsum.profit = sumList.Sum(x => x.profit);
             accsum.fee = sumList.Sum(x => x.fee);
             accsum.tax = sumList.Sum(x => x.tax);
+            accsum.cramt = sumList.Sum(x => x.cramt);
+            accsum.bcramt = sumList.Sum(x => x.bcramt);
+            accsum.gtamt = sumList.Sum(x => x.gtamt);
+            accsum.bgtamt = sumList.Sum(x => x.bgtamt);
+            accsum.dnamt = sumList.Sum(x => x.dnamt);
+            accsum.bdnamt = sumList.Sum(x => x.bdnamt);
+            accsum.interest = sumList.Sum(x => x.interest);
+            accsum.dbfee = sumList.Sum(x => x.dbfee);
             accsum.unoffset_qtype_sum = sumList;
             accsum.pl_ratio = (accsum.cost != 0) ? decimal.Round(((accsum.profit / accsum.cost) * 100), 2).ToString() + " %" : "0 %";
             return accsum;
@@ -401,13 +420,13 @@ namespace ESMP.STOCK.TASK.API
                     row.dnamt = 0;
                     row.bdnamt = 0;
                     row.interest = item.CRINT;
-                    row.cost = item.COST;
-                    row.profit = row.marketvalue - row.cost;
+                    row.cost = item.COST;       //DB資料為NULL??
                     //融資維持率 = 融資餘額股數（TCRUD.BQTY） * 現價 / 未償還融資金額（TCRUD.BCRAMT）
                     row.keeprate = decimal.Round(((item.BQTY * row.lastprice) / item.BCRAMT * 100), 2).ToString() + "%";
                     detailList.Add(row);
                 }
-                detailList.ForEach(p => p.marketvalue = p.estimateAmt - p.estimateFee - p.bcramt);
+                //市值(marketvalue) = 賣出價金 – 手續費 – 交易稅 – 融資金額 – 融資利息
+                detailList.ForEach(p => p.marketvalue = p.estimateAmt - p.estimateFee - p.estimateTax - p.bcramt - p.interest);
                 detailList.ForEach(p => p.profit = p.marketvalue - p.cost);
                 detailList.Where(x => x.cost != 0).ToList().ForEach(p => p.pl_ratio = decimal.Round(((p.profit / p.cost) * 100), 2).ToString() + "%");
                 detailList.Where(x => x.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
@@ -506,25 +525,27 @@ namespace ESMP.STOCK.TASK.API
                     row.estimateFee = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.estimateAmt) * 0.001425));
                     row.estimateTax = 0;
                     row.bcramt = 0;
-                    row.fee = item.FEE;
-                    row.tax = item.TAX;
+                    row.fee = item.FEE;     //DB資料為NULL??
+                    row.tax = item.TAX;     //DB資料為NULL??
                     row.cramt = 0;
+                    //保證金(GTAMT) = 賣出股價 x 股數 x 融券保證金成數
                     row.gtamt = item.GTAMT;
                     row.bgtamt = item.BGTAMT;
+                    //擔保品(DNAMT) = 賣出股價 x 股數 - 交易稅 - 手續費 - 借券費(dbfee)
                     row.dnamt = item.DNAMT;
                     row.bdnamt = item.BDNAMT;
                     //融券利息 = 保證金利息 + 擔保品利息
                     row.interest = item.GTINT + item.DNINT;
                     row.dbfee = item.DBFEE;
                     row.dlfee = item.DLFEE;
-                    row.dlint = item.DLINT;
-                    row.cost = item.COST;
-                    row.profit = row.marketvalue - row.cost;
-                    //融資維持率 = 融資餘額股數（TCRUD.BQTY） * 現價 / 未償還融資金額（TCRUD.BCRAMT）
+                    row.dlint = item.DLINT;     //DB資料為NULL??
+                    row.cost = item.COST;       //DB資料為NULL??
+                    //融券維持率 = （未償還擔保品（TDBUD.BGTAMT） + 未償還保證金（TDBUD.BDNAMT）） / （融券餘額股數（TDBUD.BQTY） * 現價）
                     row.keeprate = decimal.Round(((item.BGTAMT + item.BDNAMT) / (item.BQTY * row.lastprice) * 100), 2).ToString() + "%";
                     detailList.Add(row);
                 }
-                detailList.ForEach(p => p.marketvalue = p.estimateAmt - p.estimateFee - p.bcramt);
+                //市值(marketvalue) = bgtamt + bdnamt + gtint + dnint - dlfee - dlint - estimateAmt(絕對值) - estimateFee
+                detailList.ForEach(p => p.marketvalue = p.bgtamt + p.bdnamt + p.interest - p.dlfee - p.dlint - Math.Abs(p.estimateAmt) - p.estimateFee);
                 detailList.ForEach(p => p.profit = p.marketvalue - p.cost);
                 detailList.Where(x => x.cost != 0).ToList().ForEach(p => p.pl_ratio = decimal.Round(((p.profit / p.cost) * 100), 2).ToString() + "%");
                 detailList.Where(x => x.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
@@ -580,31 +601,6 @@ namespace ESMP.STOCK.TASK.API
                 sumList.Where(n => n.cost == 0).ToList().ForEach(p => p.pl_ratio = "0%");
             }
             return sumList;
-        }
-        public unoffset_qtype_accsum searchAccSum_TCRUD_TDBUD(List<unoffset_qtype_sum> sumList)
-        {
-            unoffset_qtype_accsum accsum = new unoffset_qtype_accsum(); //自訂unoffset_qtype_accsum類別 (ESMP.STOCK.FORMAT.API) -函式回傳使用
-            accsum.bqty = sumList.Sum(x => x.bqty);
-            accsum.real_qty = sumList.Sum((x) => x.real_qty);
-            accsum.cost = sumList.Sum(x => x.cost);
-            accsum.marketvalue = sumList.Sum(x => x.marketvalue);
-            accsum.estimateAmt = sumList.Sum(x => x.estimateAmt);
-            accsum.estimateFee = sumList.Sum(x => x.estimateFee);
-            accsum.estimateTax = sumList.Sum(x => x.estimateTax);
-            accsum.profit = sumList.Sum(x => x.profit);
-            accsum.fee = sumList.Sum(x => x.fee);
-            accsum.tax = sumList.Sum(x => x.tax);
-            accsum.cramt = sumList.Sum(x => x.cramt);   
-            accsum.bcramt = sumList.Sum(x => x.bcramt);
-            accsum.gtamt = sumList.Sum(x => x.gtamt);
-            accsum.bgtamt = sumList.Sum(x => x.bgtamt);
-            accsum.dnamt = sumList.Sum(x => x.dnamt);
-            accsum.bdnamt = sumList.Sum(x => x.bdnamt);
-            accsum.interest = sumList.Sum(x => x.interest);
-            accsum.dbfee = sumList.Sum(x => x.dbfee);
-            accsum.unoffset_qtype_sum = sumList;
-            accsum.pl_ratio = (accsum.cost != 0) ? decimal.Round(((accsum.profit / accsum.cost) * 100), 2).ToString() + " %" : "0 %";
-            return accsum;
         }
 
         //--------------------------------------------------------------------------------------------

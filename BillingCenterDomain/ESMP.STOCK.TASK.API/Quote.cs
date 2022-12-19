@@ -27,15 +27,7 @@ namespace ESMP.STOCK.TASK.API
         {
             List<Symbol> SymbolList = new List<Symbol>();
             string strUrl = "http://10.10.56.182:8080/Quote/Stock.jsp?stock=";
-            //string.join
-            string last = stockNo.Last();
-            foreach (var item in stockNo)
-            {
-                if (!item.Equals(last))
-                    strUrl += item + ",";
-                else
-                    strUrl += item;
-            }
+            strUrl += string.Join("," , stockNo);
             string content = SearchQuote(strUrl);
             if (string.IsNullOrEmpty(content))
             {
