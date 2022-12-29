@@ -1,5 +1,6 @@
 ﻿using ESMP.STOCK.DB.TABLE;
 using ESMP.STOCK.FORMAT;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,32 +17,61 @@ namespace ESMP.STOCK.TASK.API
 {
     public class Quote
     {
-        public static Dictionary<string, List<Symbol>> _Quote_Dic = null;
         /// <summary>
         /// 依照給定股票代號列表 查詢Quote站台資料
         /// </summary>
-        /// <param name="stockNo">股票代號列表</param>
-        /// <returns> Quote_Dic </returns>
-        //回傳Symbol
-        public static Dictionary<string, List<Symbol>> Quote_Dic(string[] stockNo)
+        /// <param name="stocks">股票代號列表</param>
+        /// <returns> Dictionary<string, List<Symbol>> </returns>
+        public static Dictionary<string, List<Symbol>> GetQuoteDic(string[] stocks)
         {
-            List<Symbol> SymbolList = new List<Symbol>();
+            int maxStockQty = 250;                  //允許查詢股票參數數量最大值(2048-47(strUrl.Length)/7(股票6位加逗號))
+            int currStockQty = stocks.Length;       //目前輸入查詢股票參數數量
+            string[] quoteResponse = new string[currStockQty / maxStockQty + 1];        //查詢結果xml字串陣列 (陣列大小為分批查詢次數)
+            Dictionary<string, List<Symbol>> dic = new Dictionary<string, List<Symbol>>();
+            List<Symbol> symbolList = new List<Symbol>();
             string strUrl = "http://10.10.56.182:8080/Quote/Stock.jsp?stock=";
-            strUrl += string.Join("," , stockNo);
-            string content = SearchQuote(strUrl);
-            if (string.IsNullOrEmpty(content))
+            
+            //一次查詢完成
+            if (currStockQty <= maxStockQty)
             {
-                Console.WriteLine("Quote站台 url回應為空");
+                string stockQuery = string.Empty;
+                stockQuery = string.Join(",", stocks);
+                Console.WriteLine(strUrl.Length + stockQuery.Length);
+                quoteResponse[0] = SearchQuote(strUrl + stockQuery);
             }
+            //分次查詢 (處理url長度限制問題)
             else
             {
-                Symbols symbols = new Symbols();
-                XmlSerializer ser = new XmlSerializer(typeof(Symbols));
-                Symbols obj = (Symbols)ser.Deserialize(new StringReader(content));
-                SymbolList = obj.Symbol;
+                int index = 0;
+                for (int i = 0; i < currStockQty; i = i + maxStockQty)
+                {
+                    string stockQuery = string.Empty;
+                    if (i + maxStockQty < currStockQty)
+                        stockQuery = string.Join(",", stocks, i, maxStockQty);
+                    else
+                        stockQuery = string.Join(",", stocks, i, currStockQty - i);
+                    quoteResponse[index] = SearchQuote(strUrl + stockQuery);
+                    index++;
+                }
             }
-            _Quote_Dic = SymbolList.GroupBy(d => d.id).ToDictionary(x => x.Key, x => x.ToList());
-            return _Quote_Dic;
+            foreach (var item in quoteResponse)
+            {
+                List<Symbol> currSymbolList = new List<Symbol>();
+                if (string.IsNullOrEmpty(item))
+                {
+                    Console.WriteLine("Quote站台 url回應為空");
+                }
+                else
+                {
+                    Symbols symbols = new Symbols();
+                    XmlSerializer ser = new XmlSerializer(typeof(Symbols));
+                    Symbols obj = (Symbols)ser.Deserialize(new StringReader(item));
+                    currSymbolList = obj.Symbol;
+                }
+                symbolList = symbolList.Concat(currSymbolList).ToList();
+            }
+            dic = symbolList.GroupBy(d => d.id).ToDictionary(x => x.Key, x => x.ToList());
+            return dic;
         }
 
         /// <summary>
@@ -51,38 +81,25 @@ namespace ESMP.STOCK.TASK.API
         /// <returns>傳回來自url的回應(xml格式)</returns>
         private static string SearchQuote(string strUrl)
         {
-            string responseBody = string.Empty;
-            try
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(strUrl);
+            request.Method = "GET";
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.Timeout = 30000;
+
+            string result = "";
+            //取得回應資料
+            using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(strUrl);
-
-                // Set some reasonable limits on resources used by this request
-                request.MaximumAutomaticRedirections = 4;
-                request.MaximumResponseHeadersLength = 4;
-                // Set credentials to use for this request.
-                request.Credentials = CredentialCache.DefaultCredentials;
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
                 Console.WriteLine("Content length is {0}", response.ContentLength);
                 Console.WriteLine("Content type is {0}", response.ContentType);
-
-                // Get the stream associated with the response.
-                Stream receiveStream = response.GetResponseStream();
-
-                // Pipes the stream to a higher level stream reader with the required encoding format.
-                StreamReader readStream = new StreamReader(receiveStream, Encoding.UTF8);
-                responseBody = readStream.ReadToEnd();
-                Console.WriteLine("Response stream received.");
-                Console.WriteLine(readStream.ReadToEnd());
+                using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+                {
+                    result = sr.ReadToEnd();
+                    sr.Close();
+                }
                 response.Close();
-                readStream.Close();
             }
-            catch (Exception e)
-            {
-                Console.WriteLine("\nException Caught!");
-                Console.WriteLine("Message :{0} ", e.Message);
-            }
-            return responseBody;
+            return result;
         }
     }
 }

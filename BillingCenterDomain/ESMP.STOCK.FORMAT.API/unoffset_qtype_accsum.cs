@@ -8,10 +8,20 @@ using System.Xml.Serialization;
 
 namespace ESMP.STOCK.FORMAT
 {
-    public class unoffset_qtype_accsum
+    public class ResponseBase
     {
+        [XmlElement("errcode")]
         public string errcode { get; set; }
+        [XmlElement("errmsg")]
         public string errmsg { get; set; }
+    }
+    /// <summary>
+    /// 未實現損益 - 帳號彙總
+    /// </summary>
+    public class unoffset_qtype_accsum : ResponseBase
+    {
+        //public string errcode { get; set; }
+        //public string errmsg { get; set; }
         public decimal bqty { get; set; }
         public decimal real_qty { get; set; }
         public decimal cost { get; set; }

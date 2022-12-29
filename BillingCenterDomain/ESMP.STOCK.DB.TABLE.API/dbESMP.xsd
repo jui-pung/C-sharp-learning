@@ -1,0 +1,432 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="dbESMP" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xs:element name="dbESMP" msdata:IsDataSet="true" msdata:UseCurrentLocale="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="HCMIO">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="BHNO" type="xs:string" minOccurs="0" />
+              <xs:element name="CSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="DSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="DNO" type="xs:string" minOccurs="0" />
+              <xs:element name="WTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="STOCK" type="xs:string" minOccurs="0" />
+              <xs:element name="TTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="ETYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="BSTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="PRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="QTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="AMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="FEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TAX" type="xs:decimal" minOccurs="0" />
+              <xs:element name="RVINT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="NETAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DBFEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CRAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DNAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CRINT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DNINT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DLFEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BFINT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="OBAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="INTAX" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SFCODE" type="xs:string" minOccurs="0" />
+              <xs:element name="CDTDQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ORIGN" type="xs:string" minOccurs="0" />
+              <xs:element name="SALES" type="xs:string" minOccurs="0" />
+              <xs:element name="DATAFLAG" type="xs:string" minOccurs="0" />
+              <xs:element name="IOFLAG" type="xs:string" minOccurs="0" />
+              <xs:element name="ADJCOST" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ADJDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="STINTAX" type="xs:decimal" minOccurs="0" />
+              <xs:element name="HEALTHFEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TDBUD">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="BHNO" type="xs:string" minOccurs="0" />
+              <xs:element name="DSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="DNO" type="xs:string" minOccurs="0" />
+              <xs:element name="CSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="STOCK" type="xs:string" minOccurs="0" />
+              <xs:element name="PRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="QTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DBAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="GTAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DNAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BDBAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BGTAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BDNAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="GTINT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DNINT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DLFEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DLINT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DBRATIO" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SFCODE" type="xs:string" minOccurs="0" />
+              <xs:element name="AGTAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="FEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TAX" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DBFEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="COST" type="xs:decimal" minOccurs="0" />
+              <xs:element name="STINTAX" type="xs:decimal" minOccurs="0" />
+              <xs:element name="HEALTHFEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TMHIO">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="BHNO" type="xs:string" minOccurs="0" />
+              <xs:element name="DSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="JRNUM" type="xs:string" minOccurs="0" />
+              <xs:element name="MTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="CSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="TTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="ETYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="BSTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="STOCK" type="xs:string" minOccurs="0" />
+              <xs:element name="QTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="PRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SALES" type="xs:string" minOccurs="0" />
+              <xs:element name="ORGIN" type="xs:string" minOccurs="0" />
+              <xs:element name="MTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="TRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="MSTMB">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="STOCK" type="xs:string" minOccurs="0" />
+              <xs:element name="CNAME" type="xs:string" minOccurs="0" />
+              <xs:element name="ENAME" type="xs:string" minOccurs="0" />
+              <xs:element name="MTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="STYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="SCLASS" type="xs:string" minOccurs="0" />
+              <xs:element name="TSDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TEDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="CLDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="CPRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TPRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BPRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TSTATUS" type="xs:string" minOccurs="0" />
+              <xs:element name="BRKNO" type="xs:string" minOccurs="0" />
+              <xs:element name="IDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="IRATE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="IDAY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CURRENCY" type="xs:string" minOccurs="0" />
+              <xs:element name="COUNTRY" type="xs:string" minOccurs="0" />
+              <xs:element name="SHARE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="WARNING" type="xs:string" minOccurs="0" />
+              <xs:element name="TMARK" type="xs:string" minOccurs="0" />
+              <xs:element name="MFLAG" type="xs:string" minOccurs="0" />
+              <xs:element name="WMARK" type="xs:string" minOccurs="0" />
+              <xs:element name="TAXTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="PTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="DRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="PDRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="CDIV" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SDIV" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CNTDTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TCSIO">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="BHNO" type="xs:string" minOccurs="0" />
+              <xs:element name="DSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="DNO" type="xs:string" minOccurs="0" />
+              <xs:element name="CSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="STOCK" type="xs:string" minOccurs="0" />
+              <xs:element name="BSTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="QTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="IOFLAG" type="xs:string" minOccurs="0" />
+              <xs:element name="REMARK" type="xs:string" minOccurs="0" />
+              <xs:element name="JRNUM" type="xs:string" minOccurs="0" />
+              <xs:element name="TRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="MSYS">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="VARNAME" type="xs:string" minOccurs="0" />
+              <xs:element name="NUMBER" type="xs:decimal" minOccurs="0" />
+              <xs:element name="VALUE" type="xs:string" minOccurs="0" />
+              <xs:element name="VARDESC" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="MCUMS">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="BHNO" type="xs:string" minOccurs="0" />
+              <xs:element name="CSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="BTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="IDNO" type="xs:string" minOccurs="0" />
+              <xs:element name="ACCOUNTTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="DCBFLAG" type="xs:string" minOccurs="0" />
+              <xs:element name="SALES" type="xs:string" minOccurs="0" />
+              <xs:element name="OTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="ODATE" type="xs:string" minOccurs="0" />
+              <xs:element name="FDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="DSTATUS" type="xs:string" minOccurs="0" />
+              <xs:element name="CNACNO" type="xs:string" minOccurs="0" />
+              <xs:element name="SFCODE" type="xs:string" minOccurs="0" />
+              <xs:element name="DAYSDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="DAYRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="CONTRA" type="xs:string" minOccurs="0" />
+              <xs:element name="CRLEVEL" type="xs:string" minOccurs="0" />
+              <xs:element name="DBLEVEL" type="xs:string" minOccurs="0" />
+              <xs:element name="RATIO" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CRCREDIT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DBCREDIT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CNACOTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="CALCN" type="xs:string" minOccurs="0" />
+              <xs:element name="SELFQUR" type="xs:string" minOccurs="0" />
+              <xs:element name="EMAIL" type="xs:string" minOccurs="0" />
+              <xs:element name="NOLMTMINFEE" type="xs:string" minOccurs="0" />
+              <xs:element name="FEECRFREE" type="xs:string" minOccurs="0" />
+              <xs:element name="FEECOUNT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="KIND" type="xs:string" minOccurs="0" />
+              <xs:element name="SBHNO" type="xs:string" minOccurs="0" />
+              <xs:element name="IBNO" type="xs:string" minOccurs="0" />
+              <xs:element name="CALSIT" type="xs:string" minOccurs="0" />
+              <xs:element name="CALHF" type="xs:string" minOccurs="0" />
+              <xs:element name="CNTDTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TCNUD">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="BHNO" type="xs:string" minOccurs="0" />
+              <xs:element name="CSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="STOCK" type="xs:string" minOccurs="0" />
+              <xs:element name="PRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="QTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="FEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="COST" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="DNO" type="xs:string" minOccurs="0" />
+              <xs:element name="ADJDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="WTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+              <xs:element name="IOFLAG" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="MCSRH">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="BHNO" type="xs:string" minOccurs="0" />
+              <xs:element name="CSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="STOCK" type="xs:string" minOccurs="0" />
+              <xs:element name="CNQBAL" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CRAQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CROQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DBAQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DBOQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CLDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+              <xs:element name="CNQBAL_DE" type="xs:decimal" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TCNTD">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="BHNO" type="xs:string" minOccurs="0" />
+              <xs:element name="BDSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="BDNO" type="xs:string" minOccurs="0" />
+              <xs:element name="SDSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="SDNO" type="xs:string" minOccurs="0" />
+              <xs:element name="CSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="STOCK" type="xs:string" minOccurs="0" />
+              <xs:element name="CQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BPRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BFEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SPRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SFEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TAX" type="xs:decimal" minOccurs="0" />
+              <xs:element name="INCOME" type="xs:decimal" minOccurs="0" />
+              <xs:element name="COST" type="xs:decimal" minOccurs="0" />
+              <xs:element name="PROFIT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="STINTAX" type="xs:decimal" minOccurs="0" />
+              <xs:element name="JRNUM" type="xs:string" minOccurs="0" />
+              <xs:element name="TRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="HCNRH">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="BHNO" type="xs:string" minOccurs="0" />
+              <xs:element name="TDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="RDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="CSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="BDSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="BDNO" type="xs:string" minOccurs="0" />
+              <xs:element name="SDSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="SDNO" type="xs:string" minOccurs="0" />
+              <xs:element name="STOCK" type="xs:string" minOccurs="0" />
+              <xs:element name="CQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BPRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BFEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SPRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SFEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TAX" type="xs:decimal" minOccurs="0" />
+              <xs:element name="INCOME" type="xs:decimal" minOccurs="0" />
+              <xs:element name="COST" type="xs:decimal" minOccurs="0" />
+              <xs:element name="PROFIT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ADJDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="WTYPE" type="xs:string" minOccurs="0" />
+              <xs:element name="BQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="STINTAX" type="xs:decimal" minOccurs="0" />
+              <xs:element name="IOFLAG" type="xs:string" minOccurs="0" />
+              <xs:element name="TRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="T210">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TDate" type="xs:string" minOccurs="0" />
+              <xs:element name="BhNo" type="xs:string" minOccurs="0" />
+              <xs:element name="CSeq" type="xs:string" minOccurs="0" />
+              <xs:element name="DSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="Stock" type="xs:string" minOccurs="0" />
+              <xs:element name="Price" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TrDate" type="xs:string" minOccurs="0" />
+              <xs:element name="TrTime" type="xs:string" minOccurs="0" />
+              <xs:element name="ModDate" type="xs:string" minOccurs="0" />
+              <xs:element name="ModTime" type="xs:string" minOccurs="0" />
+              <xs:element name="ModUser" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TCRUD">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="BHNO" type="xs:string" minOccurs="0" />
+              <xs:element name="DSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="PRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="DNO" type="xs:string" minOccurs="0" />
+              <xs:element name="CSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="STOCK" type="xs:string" minOccurs="0" />
+              <xs:element name="QTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CRAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="PAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BCRAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="CRINT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SFCODE" type="xs:string" minOccurs="0" />
+              <xs:element name="CRRATIO" type="xs:decimal" minOccurs="0" />
+              <xs:element name="ASFAMT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="FEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="COST" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="HCNTD">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="BHNO" type="xs:string" minOccurs="0" />
+              <xs:element name="TDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="CSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="BDSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="BDNO" type="xs:string" minOccurs="0" />
+              <xs:element name="SDSEQ" type="xs:string" minOccurs="0" />
+              <xs:element name="SDNO" type="xs:string" minOccurs="0" />
+              <xs:element name="STOCK" type="xs:string" minOccurs="0" />
+              <xs:element name="CQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BPRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BFEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SPRICE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SFEE" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TAX" type="xs:decimal" minOccurs="0" />
+              <xs:element name="INCOME" type="xs:decimal" minOccurs="0" />
+              <xs:element name="COST" type="xs:decimal" minOccurs="0" />
+              <xs:element name="PROFIT" type="xs:decimal" minOccurs="0" />
+              <xs:element name="BQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="SQTY" type="xs:decimal" minOccurs="0" />
+              <xs:element name="TRDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="TRTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODDATE" type="xs:string" minOccurs="0" />
+              <xs:element name="MODTIME" type="xs:string" minOccurs="0" />
+              <xs:element name="MODUSER" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

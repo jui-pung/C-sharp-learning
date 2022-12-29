@@ -41,6 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="dbESMP.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dbESMP.xsd</DependentUpon>
+    </Compile>
     <Compile Include="HCMIO.cs" />
     <Compile Include="HCNRH.cs" />
     <Compile Include="HCNTD.cs" />
@@ -56,6 +61,19 @@
     <Compile Include="TCSIO.cs" />
     <Compile Include="TDBUD.cs" />
     <Compile Include="TMHIO.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dbESMP.xsc">
+      <DependentUpon>dbESMP.xsd</DependentUpon>
+    </None>
+    <None Include="dbESMP.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dbESMP.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="dbESMP.xss">
+      <DependentUpon>dbESMP.xsd</DependentUpon>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

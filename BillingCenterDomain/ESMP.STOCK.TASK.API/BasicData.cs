@@ -15,11 +15,11 @@ namespace ESMP.STOCK.TASK.API
         static SqlSearch _sqlSearch;
         private static object chekLock = new object();
         private static Dictionary<string, string> _MsysDict = null;
-        static List<MSTMB> _MSTMBList = new List<MSTMB>();                  //自訂MSTMB類別List (ESMP.STOCK.DB.TABLE.API)
+        static List<MSTMB> _MSTMBList = new List<MSTMB>();                  //自訂MSTMB類別List (dbESMP.STOCK.DB.TABLE.API)
         public static Dictionary<string, List<MSTMB>> _MSTMB_Dic = null;
-        static List<MCSRH> _MCSRHList = new List<MCSRH>();                  //自訂MCUMS類別List (ESMP.STOCK.DB.TABLE.API)
+        static List<MCSRH> _MCSRHList = new List<MCSRH>();                  //自訂MCUMS類別List (dbESMP.STOCK.DB.TABLE.API)
         public static Dictionary<string, List<MCSRH>> _MCSRH_Dic = null;
-        static List<MCUMS> _MCUMSList = new List<MCUMS>();                  //自訂MCUMS類別List (ESMP.STOCK.DB.TABLE.API)
+        static List<MCUMS> _MCUMSList = new List<MCUMS>();                  //自訂MCUMS類別List (dbESMP.STOCK.DB.TABLE.API)
         public static Dictionary<string, List<MCUMS>> _MCUMS_Dic = null;
 
         public static Dictionary<string, string> MsysDict
@@ -148,6 +148,73 @@ namespace ESMP.STOCK.TASK.API
                 ioflagNameDic.Add(dtRow["VARNAME"].ToString().Substring(6), dtRow["VALUE"].ToString());
             }
             return ioflagNameDic;
+        }
+
+        public static void GetDBToXml()
+        {
+            string dbName = "ESMP";
+            string connstr = $"Server=localhost;Integrated security=SSPI;database={dbName}";
+            string cmdstr = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES";
+            List<string> tableNames = new List<string>();
+            using (SqlConnection conn = new SqlConnection(connstr))
+            {
+                using (SqlCommand cmd = new SqlCommand(cmdstr, conn))
+                {
+                    try
+                    {
+                        conn.Open();
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            tableNames.Add((string)reader["TABLE_NAME"]);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        throw;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+            cmdstr = "";
+            foreach (var item in tableNames)
+            {
+                cmdstr = String.Concat(cmdstr, $"SELECT Top 0 * FROM dbo.{item}; ");
+            }
+            DataSet dbESMP = new DataSet();
+            dbESMP.DataSetName = "dbESMP";
+            using (SqlConnection conn = new SqlConnection(connstr))
+            {
+                using (SqlCommand cmd = new SqlCommand(cmdstr, conn))
+                {
+                    try
+                    {
+                        SqlDataAdapter adapter = new SqlDataAdapter();
+                        adapter.SelectCommand = cmd;
+
+                        conn.Open();
+                        adapter.Fill(dbESMP);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        throw;
+                    }
+                    finally
+                    {
+                        conn.Close();
+                    }
+                }
+            }
+            for (int i = 0; i < dbESMP.Tables.Count; i++)
+            {
+                dbESMP.Tables[i].TableName = tableNames[i];
+            }
+            dbESMP.WriteXml(@"C:\temp\dbESMP.xml", XmlWriteMode.WriteSchema);
         }
     }
 }

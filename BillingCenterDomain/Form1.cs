@@ -24,6 +24,7 @@ namespace BillingCenterDomain
             _ = BasicData.MSTMB_Dic;
             _ = BasicData.MCSRH_Dic;
             _ = BasicData.MCUMS_Dic;
+            //BasicData.GetDBToXml();
         }
 
         private void btnSearch_Click(object sender, EventArgs e)

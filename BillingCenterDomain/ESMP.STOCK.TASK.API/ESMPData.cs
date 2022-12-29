@@ -187,9 +187,11 @@ namespace ESMP.STOCK.TASK.API
             List<HCNTD> HCNTDList = new List<HCNTD>();          //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             foreach (var TCNTD_item in TCNTDList)
             {
-                HCMIO HCMIOSell_item = HCMIOList.Where(x => x.BSTYPE == "S" && x.DSEQ == TCNTD_item.SDSEQ && x.DNO == TCNTD_item.SDNO).First();
-                HCMIO HCMIOBuy_item = HCMIOList.Where(x => x.BSTYPE == "B" && x.DSEQ == TCNTD_item.BDSEQ && x.DNO == TCNTD_item.BDNO).First();
-                
+                HCMIO HCMIOSell_item = HCMIOList.Where(x => x.BSTYPE == "S" && x.DSEQ == TCNTD_item.SDSEQ && x.DNO == TCNTD_item.SDNO).FirstOrDefault();
+                HCMIO HCMIOBuy_item = HCMIOList.Where(x => x.BSTYPE == "B" && x.DSEQ == TCNTD_item.BDSEQ && x.DNO == TCNTD_item.BDNO).FirstOrDefault();
+                if (HCMIOBuy_item == null || HCMIOSell_item == null)
+                    break;
+
                 decimal originalSFEE = HCMIOSell_item.FEE;          //原始剩餘賣出手續費
                 decimal originalTAX = HCMIOSell_item.TAX;           //原始剩餘賣出交易稅
                 decimal originalBQTY = HCMIOSell_item.BQTY;         //原始剩餘賣出股數
@@ -204,7 +206,7 @@ namespace ESMP.STOCK.TASK.API
 
                 HCMIOSell_item.BQTY -= CQTY;        //賣單剩餘未冲股數
                 HCMIOBuy_item.BQTY -= CQTY;         //買單剩餘未冲股數
-                                                    //全部當沖賣出，剩餘的SFEE、TAX與INCOME放入最後一筆資料
+                //全部當沖賣出，剩餘的SFEE、TAX與INCOME放入最後一筆資料
                 if (HCMIOSell_item.BQTY == 0)
                 {
                     SFEE = HCMIOSell_item.FEE;

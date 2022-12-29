@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -22,9 +23,16 @@ namespace ESMP.STOCK.TASK.API
         string _searchStr;                                  //查詢xml或json格式字串
         SqlSearch _sqlSearch = new SqlSearch();             //自訂SqlSearch類別 (ESMP.STOCK.TASK.API)                                           
 
-        //--------------------------------------------------------------------------------------------
-        //function getGainLostSearch() - 未實現損益查詢的對外接口function
-        //--------------------------------------------------------------------------------------------
+        /// <summary>
+        /// 未實現損益查詢的對外接口
+        /// </summary>
+        /// <param name="QTYPE"></param>
+        /// <param name="BHNO"></param>
+        /// <param name="CSEQ"></param>
+        /// <param name="stockSymbol"></param>
+        /// <param name="TTYPE"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public (string,string) getGainLostSearch(string QTYPE, string BHNO, string CSEQ, string stockSymbol, string TTYPE, int type)
         {
             //宣告物件 變數
@@ -52,6 +60,7 @@ namespace ESMP.STOCK.TASK.API
             var obj = GetElement(_searchStr, _type);
             root SearchElement = obj as root;
             //查詢資料庫資料
+            _ = _sqlSearch.SelectTCNUDUseXsd(SearchElement);    //(測試)
             TCNUDList = _sqlSearch.selectTCNUD(SearchElement);
             TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
             TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
@@ -113,7 +122,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         private string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string stockSymbol, string TTYPE, int type)
         {
-            var root = new root()
+            root Root = new root()
             {
                 qtype = QTYPE,
                 bhno = BHNO,
@@ -121,22 +130,37 @@ namespace ESMP.STOCK.TASK.API
                 stockSymbol = stockSymbol,
                 ttype = TTYPE
             };
+            Console.WriteLine(Root.ToString());
             if (type == 0)
             {
                 using (var stringwriter = new System.IO.StringWriter())
                 {
                     var serializer = new XmlSerializer(typeof(root));
-                    serializer.Serialize(stringwriter, root);
+                    serializer.Serialize(stringwriter, Root);
                     return stringwriter.ToString();
                 }
             }
             else if (type == 1)
             {
-                var settings = new JsonSerializerSettings();
-                settings.NullValueHandling = NullValueHandling.Ignore;
-                settings.Formatting = Newtonsoft.Json.Formatting.Indented;
-                string jsonString = JsonConvert.SerializeObject(root, settings);
-                return jsonString;
+                //方法一 : 使用Newtonsoft.Json套件
+                //var settings = new JsonSerializerSettings();
+                //settings.NullValueHandling = NullValueHandling.Ignore;
+                //settings.Formatting = Newtonsoft.Json.Formatting.Indented;
+                //string jsonString = JsonConvert.SerializeObject(root, settings);
+                //return jsonString;
+
+                //方法二 : 使用DataContractJsonSerializer類
+                var serializer = new DataContractJsonSerializer(typeof(root));
+                MemoryStream msObj = new MemoryStream();
+                //將序列化之後的Json格式資料寫入流中
+                serializer.WriteObject(msObj, Root);
+                msObj.Position = 0;
+                //從0這個位置開始讀取流中的資料
+                StreamReader sr = new StreamReader(msObj, Encoding.UTF8);
+                string stringwriter = sr.ReadToEnd();
+                sr.Close();
+                msObj.Close();
+                return stringwriter;
             }
             return "";
         }
@@ -174,7 +198,7 @@ namespace ESMP.STOCK.TASK.API
             Dictionary<string, List<Symbol>> Quote_Dic = null;
             string[] stocks = TCNUDList.Select(x => x.STOCK).Distinct().ToArray();
             //string[] stocks = TCNUDList.GroupBy(x => x.STOCK).Select(grp => grp.First()).Select(p => p.STOCK).ToArray();
-            Quote_Dic = Quote.Quote_Dic(stocks);
+            Quote_Dic = Quote.GetQuoteDic(stocks);
 
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TCNUD ----現賣 現買
@@ -381,7 +405,7 @@ namespace ESMP.STOCK.TASK.API
             //挑出所有不重複股票列表 一次查完報價 存到dic中
             Dictionary<string, List<Symbol>> Quote_Dic = null;
             string[] stockNo = TCRUDList.GroupBy(x => x.STOCK).Select(grp => grp.First()).Select(p => p.STOCK).ToArray();
-            Quote_Dic = Quote.Quote_Dic(stockNo);
+            Quote_Dic = Quote.GetQuoteDic(stockNo);
 
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TCRUD
@@ -494,7 +518,7 @@ namespace ESMP.STOCK.TASK.API
             //挑出所有不重複股票列表 一次查完報價 存到dic中
             Dictionary<string, List<Symbol>> Quote_Dic = null;
             string[] stockNo = TDBUDList.GroupBy(x => x.STOCK).Select(grp => grp.First()).Select(p => p.STOCK).ToArray();
-            Quote_Dic = Quote.Quote_Dic(stockNo);
+            Quote_Dic = Quote.GetQuoteDic(stockNo);
 
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TDBUD
@@ -608,23 +632,8 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         private string resultListSerilizer(unoffset_qtype_accsum accsum, int type)
         {
-            ////透過unoffset_qtype_accsum自訂類別反序列 -> accsumSer
-            //var accsumSer = new unoffset_qtype_accsum()
-            //{
-            //    errcode = "0000",
-            //    errmsg = "成功",
-            //    bqty = item.bqty,
-            //    marketvalue = item.marketvalue,
-            //    fee = item.fee,
-            //    tax = item.tax,
-            //    cost = item.cost,
-            //    estimateAmt = item.estimateAmt,
-            //    estimateFee = item.estimateFee,
-            //    estimateTax = item.estimateTax,
-            //    profit = item.profit,
-            //    pl_ratio = item.pl_ratio,
-            //    unoffset_qtype_sum = item.unoffset_qtype_sum
-            //};
+            accsum.errcode = "0000";
+            accsum.errmsg = "成功";
             //序列化為xml格式字串
             if (type == 0)
             {
@@ -671,6 +680,7 @@ namespace ESMP.STOCK.TASK.API
             //序列化為json格式字串
             else if (type == 1)
             {
+                //使用Newtonsoft.Json套件
                 var settings = new JsonSerializerSettings();
                 settings.NullValueHandling = NullValueHandling.Ignore;
                 settings.Formatting = Newtonsoft.Json.Formatting.Indented;

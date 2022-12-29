@@ -1,20 +1,23 @@
 ﻿using ESMP.STOCK.DB.TABLE;
 using ESMP.STOCK.FORMAT;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using static ESMP.STOCK.DB.TABLE.dbESMP;
 
 namespace ESMP.STOCK.TASK.API
 {
     public class SqlSearch
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        static int _dateDiff = -63;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
+        static int _dateDiff = -73;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
@@ -86,6 +89,44 @@ namespace ESMP.STOCK.TASK.API
             }
             return dbTCNUD;
         }
+
+        #region 方法二:使用Xsd產生的DataTable c#類別讀取sql資料
+        public List<TCNUD> SelectTCNUDUseXsd(object o)
+        {
+            dbESMP ds = new dbESMP();
+            root SearchElement = o as root;
+            IDbCommand cmd = new SqlCommand();
+            cmd.Connection = new SqlConnection(_sqlSet);
+            cmd.CommandText = @"SELECT BHNO, CSEQ, STOCK, TDATE, DSEQ, DNO, QTY, BQTY, PRICE, FEE, COST
+                                FROM dbo.TCNUD
+                                WHERE BHNO = @BHNO AND CSEQ = @CSEQ
+                                ORDER BY BHNO, CSEQ, STOCK, TDATE, WTYPE, DNO";
+            cmd.Parameters.Add(new SqlParameter("@BHNO", SearchElement.bhno));
+            cmd.Parameters.Add(new SqlParameter("@CSEQ", SearchElement.cseq));
+            //DBManager.ConvertCommandText(cmd);
+
+            //TCNUDDataTable dtTCNUD = new TCNUDDataTable();
+            SqlDataAdapter daSqlServer = new SqlDataAdapter((SqlCommand)cmd);
+            daSqlServer.Fill(ds.TCNUD);
+            List<TCNUD> TCNUDList = new List<TCNUD>();
+            TCNUDList = (from DataRow dr in ds.TCNUD.Rows
+                           select new TCNUD()
+                           {
+                               BHNO = dr["BHNO"].ToString(),
+                               CSEQ = dr["CSEQ"].ToString(),
+                               STOCK = dr["STOCK"].ToString(),
+                               TDATE = dr["TDATE"].ToString(),
+                               DSEQ = dr["DSEQ"].ToString(),
+                               DNO = dr["DNO"].ToString(),
+                               QTY = Convert.ToDecimal(dr["QTY"].ToString()),
+                               BQTY = Convert.ToDecimal(dr["BQTY"].ToString()),
+                               PRICE = Convert.ToDecimal(dr["PRICE"].ToString()),
+                               FEE = Convert.ToDecimal(dr["FEE"].ToString()),
+                               COST = Convert.ToDecimal(dr["COST"].ToString())
+                           }).ToList();
+            return TCNUDList;
+        }
+        #endregion
 
         //----------------------------------------------------------------------------------
         // function selectTCRUD() - 查詢 TCRUD TABLE
