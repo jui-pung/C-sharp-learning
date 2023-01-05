@@ -78,22 +78,30 @@ namespace ESMP.STOCK.TASK.API
             
             if (TCNUDList.Count > 0 || TCRUDList.Count > 0 || TDBUDList.Count > 0)
             {
+                //挑出所有不重複股票列表 一次查完報價 存到dic中
+                Dictionary<string, List<Symbol>> Quote_Dic = null;
+                List<string> tempStocks = new List<string>();
+                tempStocks = TCNUDList.Select(x => x.STOCK).ToList();
+                tempStocks = tempStocks.Concat(TCRUDList.Select(x => x.STOCK).ToList()).Concat(TDBUDList.Select(x => x.STOCK).ToList()).ToList();
+                string[] stocks = tempStocks.Distinct().ToArray();
+                Quote_Dic = Quote.GetQuoteDic(stocks);
+
                 //(現股)未實現損益
                 if (TTYPE == "0")
                 {
-                    sumList = searchSum(TCNUDList);
+                    sumList = searchSum(TCNUDList, Quote_Dic);
                     accsum = searchAccSum(sumList);
                 }
                 //(融資)未實現損益
                 else if (TTYPE == "1")
                 {
-                    sumList = searchSum_TCRUD(TCRUDList);
+                    sumList = searchSum_TCRUD(TCRUDList, Quote_Dic);
                     accsum = searchAccSum(sumList);
                 }
                 //(融券)未實現損益
                 else if (TTYPE == "2")
                 {
-                    sumList = searchSum_TDBUD(TDBUDList);
+                    sumList = searchSum_TDBUD(TDBUDList, Quote_Dic);
                     accsum = searchAccSum(sumList);
                 }
                 //(全部)未實現損益
@@ -101,10 +109,10 @@ namespace ESMP.STOCK.TASK.API
                 {
                     List<unoffset_qtype_sum> sumList_TCRUD = new List<unoffset_qtype_sum>();
                     List<unoffset_qtype_sum> sumList_TDBUD = new List<unoffset_qtype_sum>();
-                    sumList = searchSum(TCNUDList);
-                    sumList_TCRUD = searchSum_TCRUD(TCRUDList);
-                    sumList_TDBUD = searchSum_TDBUD(TDBUDList);
-                    sumList.Concat(sumList_TCRUD).Concat(sumList_TDBUD);
+                    sumList = searchSum(TCNUDList, Quote_Dic);
+                    sumList_TCRUD = searchSum_TCRUD(TCRUDList, Quote_Dic);
+                    sumList_TDBUD = searchSum_TDBUD(TDBUDList, Quote_Dic);
+                    sumList = sumList.Concat(sumList_TCRUD).Concat(sumList_TDBUD).ToList();
                     accsum = searchAccSum(sumList);
                 }
 
@@ -192,14 +200,8 @@ namespace ESMP.STOCK.TASK.API
         /// </summary>
         /// <param name="TCNUDList">現股餘額 List</param>
         /// <returns> unoffset_qtype_sum List </returns>
-        public List<unoffset_qtype_sum> searchSum(List<TCNUD> TCNUDList)
+        public List<unoffset_qtype_sum> searchSum(List<TCNUD> TCNUDList, Dictionary<string, List<Symbol>> Quote_Dic)
         {
-            //挑出所有不重複股票列表 一次查完報價 存到dic中
-            Dictionary<string, List<Symbol>> Quote_Dic = null;
-            string[] stocks = TCNUDList.Select(x => x.STOCK).Distinct().ToArray();
-            //string[] stocks = TCNUDList.GroupBy(x => x.STOCK).Select(grp => grp.First()).Select(p => p.STOCK).ToArray();
-            Quote_Dic = Quote.GetQuoteDic(stocks);
-
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TCNUD ----現賣 現買
             var grp_TCNUD_Buy = TCNUDList.Where(x => x.BQTY > 0).GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();
@@ -400,13 +402,8 @@ namespace ESMP.STOCK.TASK.API
         /// </summary>
         /// <param name="TCRUDList"></param>
         /// <returns></returns>
-        public List<unoffset_qtype_sum> searchSum_TCRUD(List<TCRUD> TCRUDList)
+        public List<unoffset_qtype_sum> searchSum_TCRUD(List<TCRUD> TCRUDList, Dictionary<string, List<Symbol>> Quote_Dic)
         {
-            //挑出所有不重複股票列表 一次查完報價 存到dic中
-            Dictionary<string, List<Symbol>> Quote_Dic = null;
-            string[] stockNo = TCRUDList.GroupBy(x => x.STOCK).Select(grp => grp.First()).Select(p => p.STOCK).ToArray();
-            Quote_Dic = Quote.GetQuoteDic(stockNo);
-
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TCRUD
             var grp_TCRUD = TCRUDList.GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();
@@ -513,13 +510,8 @@ namespace ESMP.STOCK.TASK.API
         /// </summary>
         /// <param name="TDBUDList">融券餘額黨</param>
         /// <returns></returns>
-        public List<unoffset_qtype_sum> searchSum_TDBUD(List<TDBUD> TDBUDList)
+        public List<unoffset_qtype_sum> searchSum_TDBUD(List<TDBUD> TDBUDList, Dictionary<string, List<Symbol>> Quote_Dic)
         {
-            //挑出所有不重複股票列表 一次查完報價 存到dic中
-            Dictionary<string, List<Symbol>> Quote_Dic = null;
-            string[] stockNo = TDBUDList.GroupBy(x => x.STOCK).Select(grp => grp.First()).Select(p => p.STOCK).ToArray();
-            Quote_Dic = Quote.GetQuoteDic(stockNo);
-
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TDBUD
             var grp_TDBUD = TDBUDList.GroupBy(d => d.STOCK).Select(grp => grp.ToList()).ToList();

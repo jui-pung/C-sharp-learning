@@ -26,7 +26,10 @@ namespace ESMP.STOCK.TASK.API
         {
             int maxStockQty = 250;                  //允許查詢股票參數數量最大值(2048-47(strUrl.Length)/7(股票6位加逗號))
             int currStockQty = stocks.Length;       //目前輸入查詢股票參數數量
-            string[] quoteResponse = new string[currStockQty / maxStockQty + 1];        //查詢結果xml字串陣列 (陣列大小為分批查詢次數)
+            int quoteResLength = currStockQty / maxStockQty;
+            if (currStockQty % maxStockQty > 0)
+                quoteResLength++;
+            string[] quoteResponse = new string[quoteResLength];        //查詢結果xml字串陣列 (陣列大小為分批查詢次數)
             Dictionary<string, List<Symbol>> dic = new Dictionary<string, List<Symbol>>();
             List<Symbol> symbolList = new List<Symbol>();
             string strUrl = "http://10.10.56.182:8080/Quote/Stock.jsp?stock=";
@@ -42,16 +45,14 @@ namespace ESMP.STOCK.TASK.API
             //分次查詢 (處理url長度限制問題)
             else
             {
-                int index = 0;
-                for (int i = 0; i < currStockQty; i = i + maxStockQty)
+                for (int i = 0; i < quoteResLength; i++)
                 {
                     string stockQuery = string.Empty;
-                    if (i + maxStockQty < currStockQty)
-                        stockQuery = string.Join(",", stocks, i, maxStockQty);
+                    if (i == quoteResLength -1)
+                        stockQuery = string.Join(",", stocks, i * maxStockQty, currStockQty - i * maxStockQty);
                     else
-                        stockQuery = string.Join(",", stocks, i, currStockQty - i);
-                    quoteResponse[index] = SearchQuote(strUrl + stockQuery);
-                    index++;
+                        stockQuery = string.Join(",", stocks, i * maxStockQty, maxStockQty);
+                    quoteResponse[i] = SearchQuote(strUrl + stockQuery);
                 }
             }
             foreach (var item in quoteResponse)

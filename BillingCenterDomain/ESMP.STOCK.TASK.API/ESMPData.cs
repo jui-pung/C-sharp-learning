@@ -138,8 +138,8 @@ namespace ESMP.STOCK.TASK.API
             if (BasicData._MCUMS_Dic.ContainsKey(client))
                 cseqCNTDTYPE = BasicData._MCUMS_Dic[client][0].CNTDTYPE;
             else
-                //cseqCNTDTYPE = "N";             //如果查不到客戶的沖銷資格, 假設此客戶不可現股當沖
-                cseqCNTDTYPE = "X";           //(測試)如果查不到客戶的沖銷資格, 假設此客戶可先賣後買
+                cseqCNTDTYPE = "N";             //如果查不到客戶的沖銷資格, 假設此客戶不可現股當沖
+                //cseqCNTDTYPE = "X";           //(測試)如果查不到客戶的沖銷資格, 假設此客戶可先賣後買
             return cseqCNTDTYPE;
         }
 
@@ -155,8 +155,8 @@ namespace ESMP.STOCK.TASK.API
             else
                 stockCNTDTYPE = "N";            //如果查不到股票的沖銷資格, 假設此股票不可現股當沖
             if (string.IsNullOrWhiteSpace(stockCNTDTYPE))
-                //stockCNTDTYPE = "N";            //如果股票的沖銷資格為空白, 假設此股票不可現股當沖
-                stockCNTDTYPE = "X";           //(測試)如果股票的沖銷資格為空白, 假設此股票可先賣後買
+                stockCNTDTYPE = "N";            //如果股票的沖銷資格為空白, 假設此股票不可現股當沖
+                //stockCNTDTYPE = "X";           //(測試)如果股票的沖銷資格為空白, 假設此股票可先賣後買
             return stockCNTDTYPE;
         }
 
@@ -187,6 +187,11 @@ namespace ESMP.STOCK.TASK.API
             List<HCNTD> HCNTDList = new List<HCNTD>();          //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             foreach (var TCNTD_item in TCNTDList)
             {
+                //判斷指定當沖資料是否存在當日交易明細中
+                //if(!HCMIOList.Exists(x => x.DSEQ.Contains(TCNTD_item.SDSEQ) && x.DNO.Contains(TCNTD_item.SDNO)))
+                //    break;
+                //if (!HCMIOList.Exists(x => x.DSEQ.Contains(TCNTD_item.BDSEQ) && x.DNO.Contains(TCNTD_item.BDNO)))
+                //    break;
                 HCMIO HCMIOSell_item = HCMIOList.Where(x => x.BSTYPE == "S" && x.DSEQ == TCNTD_item.SDSEQ && x.DNO == TCNTD_item.SDNO).FirstOrDefault();
                 HCMIO HCMIOBuy_item = HCMIOList.Where(x => x.BSTYPE == "B" && x.DSEQ == TCNTD_item.BDSEQ && x.DNO == TCNTD_item.BDNO).FirstOrDefault();
                 if (HCMIOBuy_item == null || HCMIOSell_item == null)
@@ -207,13 +212,13 @@ namespace ESMP.STOCK.TASK.API
                 HCMIOSell_item.BQTY -= CQTY;        //賣單剩餘未冲股數
                 HCMIOBuy_item.BQTY -= CQTY;         //買單剩餘未冲股數
                 //全部當沖賣出，剩餘的SFEE、TAX與INCOME放入最後一筆資料
-                if (HCMIOSell_item.BQTY == 0)
+                if (HCMIOSell_item.BQTY == 0 || HCMIOSell_item.QTY == CQTY)
                 {
                     SFEE = HCMIOSell_item.FEE;
                     TAX = HCMIOSell_item.TAX;
                     INCOME = HCMIOSell_item.NETAMT;
                 }
-                if (HCMIOBuy_item.BQTY == 0)
+                if (HCMIOBuy_item.BQTY == 0 || HCMIOBuy_item.QTY == CQTY)
                 {
                     BFEE = HCMIOBuy_item.FEE;
                 }

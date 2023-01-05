@@ -18,6 +18,9 @@ namespace ESMP.STOCK.FORMAT
         public string pl_ratio { get; set; }
         public decimal fee { get; set; }
         public decimal tax { get; set; }
+        public decimal dbfee { get; set; }
+        public decimal interest { get; set; }
+        public decimal ccramt { get; set; }
         [XmlElement("profit_sum")]
         public List<profit_sum> profit_sum { get; set; }
     }

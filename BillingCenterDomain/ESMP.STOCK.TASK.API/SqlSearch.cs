@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
@@ -17,7 +19,7 @@ namespace ESMP.STOCK.TASK.API
     public class SqlSearch
     {
         static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        static int _dateDiff = -73;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
+        static int _dateDiff = -77;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
@@ -90,8 +92,8 @@ namespace ESMP.STOCK.TASK.API
             return dbTCNUD;
         }
 
-        #region 方法二:使用Xsd產生的DataTable c#類別讀取sql資料
-        public List<TCNUD> SelectTCNUDUseXsd(object o)
+        #region 方法二:使用Xsd產生的DataTable 讀取sql資料
+        public List<TCNUDRow> SelectTCNUDUseXsd(object o)
         {
             dbESMP ds = new dbESMP();
             root SearchElement = o as root;
@@ -108,22 +110,43 @@ namespace ESMP.STOCK.TASK.API
             //TCNUDDataTable dtTCNUD = new TCNUDDataTable();
             SqlDataAdapter daSqlServer = new SqlDataAdapter((SqlCommand)cmd);
             daSqlServer.Fill(ds.TCNUD);
-            List<TCNUD> TCNUDList = new List<TCNUD>();
-            TCNUDList = (from DataRow dr in ds.TCNUD.Rows
-                           select new TCNUD()
-                           {
-                               BHNO = dr["BHNO"].ToString(),
-                               CSEQ = dr["CSEQ"].ToString(),
-                               STOCK = dr["STOCK"].ToString(),
-                               TDATE = dr["TDATE"].ToString(),
-                               DSEQ = dr["DSEQ"].ToString(),
-                               DNO = dr["DNO"].ToString(),
-                               QTY = Convert.ToDecimal(dr["QTY"].ToString()),
-                               BQTY = Convert.ToDecimal(dr["BQTY"].ToString()),
-                               PRICE = Convert.ToDecimal(dr["PRICE"].ToString()),
-                               FEE = Convert.ToDecimal(dr["FEE"].ToString()),
-                               COST = Convert.ToDecimal(dr["COST"].ToString())
-                           }).ToList();
+            List<TCNUDRow> TCNUDList = new List<TCNUDRow>();
+            dbESMP.TCNUDDataTable tcnud = new dbESMP.TCNUDDataTable();
+            dbESMP.TCNUDRow drTCNUD = tcnud.NewTCNUDRow();
+            foreach (var item in ds.TCNUD)
+            {
+                drTCNUD.BHNO = item.BHNO;
+                drTCNUD.CSEQ = item.CSEQ;
+                drTCNUD.STOCK = item.STOCK;
+                drTCNUD.TDATE = item.TDATE;
+                drTCNUD.DSEQ = item.DSEQ;
+                drTCNUD.DNO = item.DNO;
+                drTCNUD.QTY = item.QTY;
+                drTCNUD.BQTY = item.BQTY;
+                drTCNUD.PRICE = item.PRICE;
+                drTCNUD.FEE = item.FEE;
+                drTCNUD.COST = item.COST;
+                TCNUDList.Add(drTCNUD);
+            }
+            //var dtDistTCNUD = (from x in ds.TCNUD.AsEnumerable()
+            //                   select new { x.BHNO, x.CSEQ }).Distinct();
+            //使用自定義class回傳list
+            //List<TCNUD> TCNUDList = new List<TCNUD>();
+            //TCNUDList = (from DataRow dr in ds.TCNUD.Rows
+            //               select new TCNUD()
+            //               {
+            //                   BHNO = dtDistTCNUD.First().BHNO,
+            //                   CSEQ = dtDistTCNUD.First().CSEQ,
+            //                   STOCK = dr["STOCK"].ToString(),
+            //                   TDATE = dr["TDATE"].ToString(),
+            //                   DSEQ = dr["DSEQ"].ToString(),
+            //                   DNO = dr["DNO"].ToString(),
+            //                   QTY = Convert.ToDecimal(dr["QTY"].ToString()),
+            //                   BQTY = Convert.ToDecimal(dr["BQTY"].ToString()),
+            //                   PRICE = Convert.ToDecimal(dr["PRICE"].ToString()),
+            //                   FEE = Convert.ToDecimal(dr["FEE"].ToString()),
+            //                   COST = Convert.ToDecimal(dr["COST"].ToString())
+            //               }).ToList();
             return TCNUDList;
         }
         #endregion
@@ -1246,6 +1269,283 @@ namespace ESMP.STOCK.TASK.API
                 _sqlConn.Close();
             }
             return dbT210;
+        }
+
+        /// <summary>
+        /// 查詢 HCRRH TABLE 歷史融資沖銷檔
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public List<HCRRH> selectHCRRH(object o)
+        {
+            root SearchElement = o as root;
+            List<HCRRH> dbHCRRH = new List<HCRRH>();
+            string sqlQuery = "";
+            try
+            {
+                _sqlConn.Open();
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
+                {
+                    sqlQuery = @"SELECT BHNO, TDATE, DSEQ, DNO, RDATE, RDSEQ, RDNO, CSEQ, RCODE, STOCK, BPRICE, BQTY, CQTY, CCRAMT, CCRINT, BFEE, SPRICE, SQTY, SFEE, TAX, INCOME, COST, PROFIT, SFCODE, STINTAX, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
+                                    FROM dbo.HCRRH
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND STOCK = @STOCK AND TDATE BETWEEN @SDATE AND @EDATE
+                                    ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
+                }
+                else
+                {
+                    sqlQuery = @"SELECT BHNO, TDATE, DSEQ, DNO, RDATE, RDSEQ, RDNO, CSEQ, RCODE, STOCK, BPRICE, BQTY, CQTY, CCRAMT, CCRINT, BFEE, SPRICE, SQTY, SFEE, TAX, INCOME, COST, PROFIT, SFCODE, STINTAX, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER
+                                    FROM dbo.HCRRH
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
+                                    ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                }
+
+                sqlCmd.CommandText = sqlQuery;
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
+                sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("沒有歷史融資沖銷");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new HCRRH();
+                        row.BHNO = reader["BHNO"].ToString();
+                        row.TDATE = reader["TDATE"].ToString();
+                        row.DSEQ = reader["DSEQ"].ToString();
+                        row.DNO = reader["DNO"].ToString();
+                        row.RDATE = reader["RDATE"].ToString();
+                        row.RDSEQ = reader["RDSEQ"].ToString();
+                        row.RDNO = reader["RDNO"].ToString();
+                        row.CSEQ = reader["CSEQ"].ToString();
+                        row.RCODE = reader["RCODE"].ToString();
+                        row.STOCK = reader["STOCK"].ToString();
+                        row.BPRICE = Convert.ToDecimal(reader["BPRICE"].ToString());
+                        row.BQTY = Convert.ToDecimal(reader["BQTY"].ToString());
+                        row.CQTY = Convert.ToDecimal(reader["CQTY"].ToString());
+                        row.CCRAMT = Convert.ToDecimal(reader["CCRAMT"].ToString());
+                        row.CCRINT = Convert.ToDecimal(reader["CCRINT"].ToString());
+                        row.BFEE = Convert.ToDecimal(reader["BFEE"].ToString());
+                        row.SPRICE = Convert.ToDecimal(reader["SPRICE"].ToString());
+                        row.SQTY = Convert.ToDecimal(reader["SQTY"].ToString());
+                        row.SFEE = Convert.ToDecimal(reader["SFEE"].ToString());
+                        row.TAX = Convert.ToDecimal(reader["TAX"].ToString());
+                        row.INCOME = Convert.ToDecimal(reader["INCOME"].ToString());
+                        row.COST = Convert.ToDecimal(reader["COST"].ToString());
+                        row.PROFIT = Convert.ToDecimal(reader["PROFIT"].ToString());
+                        row.SFCODE = reader["SFCODE"].ToString();
+                        row.STINTAX = Convert.ToDecimal(reader["STINTAX"].ToString());
+                        row.TRDATE = reader["TRDATE"].ToString();
+                        row.TRTIME = reader["TRTIME"].ToString();
+                        row.MODDATE = reader["MODDATE"].ToString();
+                        row.MODTIME = reader["MODTIME"].ToString();
+                        row.MODUSER = reader["MODUSER"].ToString();
+
+                        dbHCRRH.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+            return dbHCRRH;
+        }
+
+        /// <summary>
+        /// 查詢 HDBRH TABLE 歷史融券沖銷檔
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public List<HDBRH> selectHDBRH(object o)
+        {
+            root SearchElement = o as root;
+            List<HDBRH> dbHDBRH = new List<HDBRH>();
+            string sqlQuery = "";
+            try
+            {
+                _sqlConn.Open();
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
+                {
+                    sqlQuery = @"SELECT BHNO, TDATE, DSEQ, DNO, RDATE, RDSEQ, RDNO, CSEQ, RCODE, STOCK, SPRICE, SQTY, CQTY, CDBAMT, CGTAMT, CGTINT, CDNAMT, CDNINT, CDLFEE, LBFINT, SFEE, TAX, DBFEE, BPRICE, BQTY, BFEE, INCOME, COST, PROFIT, SFCODE, STINTAX, HEALTHFEE, TRDATE, TRTIME, MODDATE, MODTIME
+                                    FROM dbo.HDBRH
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND STOCK = @STOCK AND TDATE BETWEEN @SDATE AND @EDATE
+                                    ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
+                }
+                else
+                {
+                    sqlQuery = @"SELECT BHNO, TDATE, DSEQ, DNO, RDATE, RDSEQ, RDNO, CSEQ, RCODE, STOCK, SPRICE, SQTY, CQTY, CDBAMT, CGTAMT, CGTINT, CDNAMT, CDNINT, CDLFEE, LBFINT, SFEE, TAX, DBFEE, BPRICE, BQTY, BFEE, INCOME, COST, PROFIT, SFCODE, STINTAX, HEALTHFEE, TRDATE, TRTIME, MODDATE, MODTIME
+                                    FROM dbo.HDBRH
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
+                                    ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                }
+
+                sqlCmd.CommandText = sqlQuery;
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
+                sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("沒有歷史融券沖銷檔");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new HDBRH();
+                        row.BHNO = reader["BHNO"].ToString();
+                        row.TDATE = reader["TDATE"].ToString();
+                        row.DSEQ = reader["DSEQ"].ToString();
+                        row.DNO = reader["DNO"].ToString();
+                        row.RDATE = reader["RDATE"].ToString();
+                        row.RDSEQ = reader["RDSEQ"].ToString();
+                        row.RDNO = reader["RDNO"].ToString();
+                        row.CSEQ = reader["CSEQ"].ToString();
+                        row.RCODE = reader["RCODE"].ToString();
+                        row.STOCK = reader["STOCK"].ToString();
+                        row.SPRICE = Convert.ToDecimal(reader["SPRICE"].ToString());
+                        row.SQTY = Convert.ToDecimal(reader["SQTY"].ToString());
+                        row.CQTY = Convert.ToDecimal(reader["CQTY"].ToString());
+                        row.CDBAMT = Convert.ToDecimal(reader["CDBAMT"].ToString());
+                        row.CGTAMT = Convert.ToDecimal(reader["CGTAMT"].ToString());
+                        row.CGTINT = Convert.ToDecimal(reader["CGTINT"].ToString());
+                        row.CDNAMT = Convert.ToDecimal(reader["CDNAMT"].ToString());
+                        row.CDNINT = Convert.ToDecimal(reader["CDNINT"].ToString());
+                        row.CDLFEE = Convert.ToDecimal(reader["CDLFEE"].ToString());
+                        row.LBFINT = Convert.ToDecimal(reader["LBFINT"].ToString());
+                        row.SFEE = Convert.ToDecimal(reader["SFEE"].ToString());
+                        row.TAX = Convert.ToDecimal(reader["TAX"].ToString());
+                        row.DBFEE = Convert.ToDecimal(reader["DBFEE"].ToString());
+                        row.BPRICE = Convert.ToDecimal(reader["BPRICE"].ToString());
+                        row.BQTY = Convert.ToDecimal(reader["BQTY"].ToString());
+                        row.BFEE = Convert.ToDecimal(reader["BFEE"].ToString());
+                        row.INCOME = Convert.ToDecimal(reader["INCOME"].ToString());
+                        row.COST = Convert.ToDecimal(reader["COST"].ToString());
+                        row.PROFIT = Convert.ToDecimal(reader["PROFIT"].ToString());
+                        row.SFCODE = reader["SFCODE"].ToString();
+                        row.STINTAX = Convert.ToDecimal(reader["STINTAX"].ToString());
+                        row.HEALTHFEE = Convert.ToDecimal(reader["HEALTHFEE"].ToString());
+                        row.TRDATE = reader["TRDATE"].ToString();
+                        row.TRTIME = reader["TRTIME"].ToString();
+                        row.MODDATE = reader["MODDATE"].ToString();
+                        row.MODTIME = reader["MODTIME"].ToString();
+
+                        dbHDBRH.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+            return dbHDBRH;
+        }
+
+        public List<HCDTD> selectHCDTD(object o)
+        {
+            root SearchElement = o as root;
+            List<HCDTD> dbHCDTD = new List<HCDTD>();
+            string sqlQuery = "";
+            try
+            {
+                _sqlConn.Open();
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.Connection = _sqlConn;
+                if (!string.IsNullOrWhiteSpace(SearchElement.stockSymbol))
+                {
+                    sqlQuery = @"SELECT TDATE, BHNO, CRDSEQ, CRDNO, DBDSEQ, DBDNO, CSEQ, STOCK, QTY, BPRICE, BQTY, BFEE, SPRICE, SQTY, SFEE, TAX, DBFEE, INCOME, COST, PROFIT, SFCODE, STINTAX, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER				
+                                    FROM dbo.HCDTD
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND STOCK = @STOCK AND TDATE BETWEEN @SDATE AND @EDATE
+                                    ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                    sqlCmd.Parameters.AddWithValue("@STOCK", SearchElement.stockSymbol);
+                }
+                else
+                {
+                    sqlQuery = @"SELECT TDATE, BHNO, CRDSEQ, CRDNO, DBDSEQ, DBDNO, CSEQ, STOCK, QTY, BPRICE, BQTY, BFEE, SPRICE, SQTY, SFEE, TAX, DBFEE, INCOME, COST, PROFIT, SFCODE, STINTAX, TRDATE, TRTIME, MODDATE, MODTIME, MODUSER				
+                                    FROM dbo.HCDTD
+                                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ AND TDATE BETWEEN @SDATE AND @EDATE
+                                    ORDER BY BHNO, CSEQ, STOCK, TDATE";
+                }
+
+                sqlCmd.CommandText = sqlQuery;
+                sqlCmd.Parameters.AddWithValue("@BHNO", SearchElement.bhno);
+                sqlCmd.Parameters.AddWithValue("@CSEQ", SearchElement.cseq);
+                sqlCmd.Parameters.AddWithValue("@SDATE", SearchElement.sdate);
+                sqlCmd.Parameters.AddWithValue("@EDATE", SearchElement.edate);
+
+                using (SqlDataReader reader = sqlCmd.ExecuteReader())
+                {
+                    if (!reader.HasRows)
+                    {
+                        Console.WriteLine("沒有歷史融券沖銷檔");
+                    }
+                    while (reader.Read())
+                    {
+                        var row = new HCDTD();
+                        row.TDATE = reader["TDATE"].ToString();
+                        row.BHNO = reader["BHNO"].ToString();
+                        row.CRDSEQ = reader["CRDSEQ"].ToString();
+                        row.CRDNO = reader["CRDNO"].ToString();
+                        row.DBDSEQ = reader["DBDSEQ"].ToString();
+                        row.DBDNO = reader["DBDNO"].ToString();
+                        row.CSEQ = reader["CSEQ"].ToString();
+                        row.STOCK = reader["STOCK"].ToString();                        row.SQTY = Convert.ToDecimal(reader["SQTY"].ToString());
+                        row.QTY = Convert.ToDecimal(reader["QTY"].ToString());
+                        row.BPRICE = Convert.ToDecimal(reader["BPRICE"].ToString());
+                        row.BQTY = Convert.ToDecimal(reader["BQTY"].ToString());
+                        row.BFEE = Convert.ToDecimal(reader["BFEE"].ToString());
+                        row.SPRICE = Convert.ToDecimal(reader["SPRICE"].ToString());
+                        row.SQTY = Convert.ToDecimal(reader["SQTY"].ToString());
+                        row.SFEE = Convert.ToDecimal(reader["SFEE"].ToString());
+                        row.TAX = Convert.ToDecimal(reader["TAX"].ToString());
+                        row.DBFEE = Convert.ToDecimal(reader["DBFEE"].ToString());
+                        row.INCOME = Convert.ToDecimal(reader["INCOME"].ToString());
+                        row.COST = Convert.ToDecimal(reader["COST"].ToString());
+                        row.PROFIT = Convert.ToDecimal(reader["PROFIT"].ToString());
+                        row.SFCODE = reader["SFCODE"].ToString();
+                        row.STINTAX = Convert.ToDecimal(reader["STINTAX"].ToString());
+                        row.TRDATE = reader["TRDATE"].ToString();
+                        row.TRTIME = reader["TRTIME"].ToString();
+                        row.MODDATE = reader["MODDATE"].ToString();
+                        row.MODTIME = reader["MODTIME"].ToString();
+                        row.MODUSER = reader["MODUSER"].ToString();
+
+                        dbHCDTD.Add(row);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                _sqlConn.Close();
+            }
+            return dbHCDTD;
         }
     }
 }

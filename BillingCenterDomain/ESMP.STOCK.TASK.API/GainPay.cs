@@ -26,7 +26,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function getGainPaySearch() - 已實現損益查詢的對外接口function
         //--------------------------------------------------------------------------------------------
-        public (string,string) getGainPaySearch(string QTYPE, string BHNO, string CSEQ, string SDATE, string EDATE, string stockSymbol, int type)
+        public (string,string) getGainPaySearch(string QTYPE, string BHNO, string CSEQ, string SDATE, string EDATE, string stockSymbol, string TTYPE, int type)
         {
             _type = type;
             List<TCNUD> TCNUDList = new List<TCNUD>();                                      //自訂TCNUD類別List (ESMP.STOCK.DB.TABLE.API)
@@ -39,6 +39,9 @@ namespace ESMP.STOCK.TASK.API
             List<HCNTD> addHCNTDList = new List<HCNTD>();                                   //自訂HCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             List<TCNTD> TCNTDList = new List<TCNTD>();                                      //自訂TCNTD類別List (ESMP.STOCK.DB.TABLE.API)
             List<T210> T210List = new List<T210>();                                         //自訂T210類別List (ESMP.STOCK.DB.TABLE.API)
+            List<HCRRH> HCRRHList = new List<HCRRH>();                                      //自訂HCRRH類別List (ESMP.STOCK.DB.TABLE.API)
+            List<HDBRH> HDBRHList = new List<HDBRH>();                                      //自訂HDBRH類別List (ESMP.STOCK.DB.TABLE.API)
+            List<HCDTD> HCDTDList = new List<HCDTD>();                                      //自訂HCDTD類別List (ESMP.STOCK.DB.TABLE.API)
             List<profit_sum> sumProfitList_HCNRH = new List<profit_sum>();                  //自訂profit_sum類別List            (階層二:個股已實現損益)  
             List<profit_sum> sumProfitList_HCNTD = new List<profit_sum>();                  //自訂profit_sum類別List            (階層二:個股已實現損益)  
             List<profit_sum> sumProfitList = new List<profit_sum>();                        //自訂profit_sum類別List            (階層二:個股已實現損益)  
@@ -47,7 +50,7 @@ namespace ESMP.STOCK.TASK.API
             string txtSearchResultContent = "";
 
             //取得查詢xml或json格式字串
-            _searchStr = searchSerilizer(QTYPE, BHNO, CSEQ, SDATE, EDATE, stockSymbol, _type);
+            _searchStr = searchSerilizer(QTYPE, BHNO, CSEQ, SDATE, EDATE, stockSymbol, TTYPE, _type);
             txtSearchContent = _searchStr;
             //取得查詢字串Element
             var obj = GetElement(_searchStr, _type);
@@ -60,20 +63,35 @@ namespace ESMP.STOCK.TASK.API
             HCNTDList = _sqlSearch.selectHCNTD(SearchElement);
             TCNTDList = _sqlSearch.selectTCNTD(SearchElement);
             T210List = _sqlSearch.selectT210(SearchElement);
+            //查詢歷史融資沖銷檔 ---HCRRH
+            if (SearchElement.ttype == "A" || SearchElement.ttype == "1")
+                HCRRHList = _sqlSearch.selectHCRRH(SearchElement);
+            //查詢歷史融券沖銷檔 ---HDBRH
+            else if (SearchElement.ttype == "A" || SearchElement.ttype == "2")
+                HDBRHList = _sqlSearch.selectHDBRH(SearchElement);
+            //查詢歷史信用當沖檔 ---HCDTD
+            else if (SearchElement.ttype == "A" || SearchElement.ttype == "3")
+                HCDTDList = _sqlSearch.selectHCDTD(SearchElement);
 
             //盤中現股沖銷 當沖 處理
             (TCNUDList, addHCNRHList, addHCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, TCNTDList, T210List, BHNO, CSEQ);
             HCNRHList = HCNRHList.Concat(addHCNRHList).ToList();
             HCNTDList = HCNTDList.Concat(addHCNTDList).ToList();
-            if (HCNRHList.Count > 0 || HCNTDList.Count > 0)
+            if (HCNRHList.Count > 0 || HCNTDList.Count > 0 && TTYPE == "0")
             {
-                sumProfitList_HCNRH = searchSum_HCNRH(HCNRHList, BHNO, CSEQ);
-                sumProfitList_HCNTD = searchSum_HCNTD(HCNTDList, BHNO, CSEQ);
+                sumProfitList_HCNRH = searchSum(HCNRHList, BHNO, CSEQ);
+                sumProfitList_HCNTD = searchSum(HCNTDList, BHNO, CSEQ);
                 //合併沖銷與當沖資料
                 sumProfitList = sumProfitList_HCNRH.Concat(sumProfitList_HCNTD).ToList();
                 accsumProfitList = searchAccSum(sumProfitList);
                 //呈現查詢結果
                 txtSearchResultContent = resultListSerilizer(accsumProfitList, _type);
+            }
+            //融資(已實現損益)
+            else if (TTYPE == "1" && HCRRHList.Count > 0)
+            {
+                sumProfitList = searchSum(HCRRHList, BHNO, CSEQ);
+                accsumProfitList = searchAccSum(sumProfitList);
             }
             else
             {
@@ -84,7 +102,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         //function SearchSerilizer() - 將輸入的查詢資訊序列化為xml格式字串
         //--------------------------------------------------------------------------------------------
-        private string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string SDATE, string EDATE, string stockSymbol, int type)
+        private string searchSerilizer(string QTYPE, string BHNO, string CSEQ, string SDATE, string EDATE, string stockSymbol, string TTYPE, int type)
         {
             var root = new root()
             {
@@ -94,6 +112,7 @@ namespace ESMP.STOCK.TASK.API
                 sdate = SDATE,
                 edate = EDATE,
                 stockSymbol = stockSymbol,
+                ttype = TTYPE,
             };
             if (type == 0)
             {
@@ -137,10 +156,14 @@ namespace ESMP.STOCK.TASK.API
             return root;
         }
 
-        //--------------------------------------------------------------------------------------------
-        // function searchSum_HCNRH() - 計算取得 查詢回復階層二 個股已實現損益(沖銷)
-        //--------------------------------------------------------------------------------------------
-        private List<profit_sum> searchSum_HCNRH(List<HCNRH> dbHCNRH, string BHNO, string CSEQ)
+        /// <summary>
+        /// 計算取得 查詢回復階層二 個股已實現損益(沖銷)
+        /// </summary>
+        /// <param name="dbHCNRH"></param>
+        /// <param name="BHNO"></param>
+        /// <param name="CSEQ"></param>
+        /// <returns></returns>
+        private List<profit_sum> searchSum(List<HCNRH> dbHCNRH, string BHNO, string CSEQ)
         {
             List<profit_sum> sumList = new List<profit_sum>();              //自訂profit_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             
@@ -231,10 +254,14 @@ namespace ESMP.STOCK.TASK.API
             return sumList;
         }
 
-        //--------------------------------------------------------------------------------------------
-        // function searchSum_HCNTD() - 計算取得 查詢回復階層二 個股已實現損益(當沖)
-        //--------------------------------------------------------------------------------------------
-        private List<profit_sum> searchSum_HCNTD(List<HCNTD> dbHCNTD, string BHNO, string CSEQ)
+        /// <summary>
+        /// 計算取得 查詢回復階層二 個股已實現損益(當沖)
+        /// </summary>
+        /// <param name="dbHCNTD"></param>
+        /// <param name="BHNO"></param>
+        /// <param name="CSEQ"></param>
+        /// <returns></returns>
+        private List<profit_sum> searchSum(List<HCNTD> dbHCNTD, string BHNO, string CSEQ)
         {
             List<profit_sum> sumList = new List<profit_sum>();              //自訂profit_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
 
@@ -318,6 +345,133 @@ namespace ESMP.STOCK.TASK.API
             return sumList;
         }
 
+        /// <summary>
+        /// 計算取得 查詢回復階層二 個股已實現損益(融資)
+        /// </summary>
+        /// <param name="HCRRH"></param>
+        /// <param name="BHNO"></param>
+        /// <param name="CSEQ"></param>
+        /// <returns></returns>
+        private List<profit_sum> searchSum(List<HCRRH> HCRRH, string BHNO, string CSEQ)
+        {
+            List<profit_sum> sumList = new List<profit_sum>();              //自訂profit_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
+
+            //依照交易日、委託書號、分單號產生新的清單群組grp_HCRRH
+            var grp_HCRRH = HCRRH.GroupBy(d => new { d.TDATE, d.DSEQ, d.DNO }).Select(grp => grp.ToList()).ToList();
+
+            //迴圈處理grp_HCRRH群組資料 存入個股彙總資料 List
+            foreach (var grp_HCRRH_item in grp_HCRRH)
+            {
+                //取得個股明細資料 (買入) List (第三階層)
+                List<profit_detail> lst_detail = new List<profit_detail>();
+                foreach (var item in grp_HCRRH_item)
+                {
+                    var row = new profit_detail();
+                    row.tdate = item.RDATE;
+                    row.dseq = item.RDSEQ;
+                    row.dno = item.RDNO;
+                    row.mqty = item.BQTY;
+                    row.cqty = item.CQTY;
+                    row.mprice = item.BPRICE.ToString();
+                    row.cost = item.COST;
+                    row.income = item.INCOME;
+                    row.netamt = item.COST * -1;
+                    row.ccramt = item.CCRAMT;
+                    row.cdnamt = 0;
+                    row.cgtamt = 0;
+                    row.fee = item.BFEE;
+                    row.interest = 0;
+                    row.tax = 0;
+                    row.dbfee = 0;
+                    row.dlfee = 0;
+                    row.adjdate = string.Empty;
+                    row.ttype = "1";
+                    if (row.ttype == "1")
+                        row.ttypename = "融資";
+                    row.bstype = "B";
+                    row.wtype = "0";
+                    row.profit = item.PROFIT;
+                    row.ctype = "1";
+                    row.ioflag = "0";
+                    row.ioname = " ";
+                    row.ttypename2 = "資買";
+                    lst_detail.Add(row);
+                }
+                //計算明細資料(買入)的成交價金、報酬率
+                lst_detail.ForEach(x => x.mamt = (x.mqty * Convert.ToDecimal(x.mprice)).ToString());
+                lst_detail.ForEach(x => x.pl_ratio = decimal.Round(((x.profit / x.cost) * 100), 2).ToString() + "%");
+
+                //取得個股明細資料 (賣出) Class (第三階層)
+                profit_detail_out detail_out = new profit_detail_out();
+                detail_out.tdate = grp_HCRRH_item.First().TDATE;
+                detail_out.dseq = grp_HCRRH_item.First().DSEQ;
+                detail_out.dno = grp_HCRRH_item.First().DNO;
+                detail_out.mqty = grp_HCRRH_item.First().SQTY;
+                detail_out.cqty = grp_HCRRH_item.Sum(s => s.CQTY);
+                detail_out.mprice = grp_HCRRH_item.First().SPRICE.ToString();
+                detail_out.cost = grp_HCRRH_item.Sum(s => s.COST);
+                detail_out.income = grp_HCRRH_item.Sum(s => s.INCOME);
+                detail_out.netamt = detail_out.income;
+                detail_out.ccramt = grp_HCRRH_item.Sum(s => s.CCRAMT);
+                detail_out.cdnamt = 0;
+                detail_out.cgtamt = 0;
+                detail_out.fee = grp_HCRRH_item.Sum(s => s.SFEE);
+                detail_out.interest = grp_HCRRH_item.Sum(s => s.CCRINT);
+                detail_out.tax = grp_HCRRH_item.Sum(s => s.TAX);
+                detail_out.dbfee = 0;
+                detail_out.dlfee = 0;
+                detail_out.adjdate = string.Empty;
+                detail_out.ttype = "1";
+                if (detail_out.ttype == "1")
+                    detail_out.ttypename = "融資";
+                detail_out.bstype = "S";
+                detail_out.wtype = "0";
+                detail_out.profit = grp_HCRRH_item.Sum(s => s.PROFIT);
+                detail_out.ctype = "1";
+                detail_out.ttypename2 = "資賣";
+
+                //字典搜尋此股票 中文名稱
+                string cname = "";
+                if (BasicData._MSTMB_Dic.ContainsKey(grp_HCRRH_item.First().STOCK))
+                    cname = BasicData._MSTMB_Dic[grp_HCRRH_item.First().STOCK][0].CNAME;
+                else
+                    cname = "";             //如果查不到股票中文名稱, 假設中文名稱為" "
+
+                //取得個股彙總資料 List (第二階層)
+                profit_sum profitSum = new profit_sum();
+                profitSum.bhno = BHNO;
+                profitSum.cseq = CSEQ;
+                profitSum.tdate = detail_out.tdate;
+                profitSum.dseq = detail_out.dseq;
+                profitSum.dno = detail_out.dno;
+                profitSum.ttype = detail_out.ttype;
+                profitSum.ttypename = detail_out.ttypename;
+                profitSum.bstype = "S";
+                profitSum.stock = grp_HCRRH_item.First().STOCK;
+                profitSum.stocknm = cname;
+                profitSum.cqty = detail_out.cqty;
+                profitSum.mprice = detail_out.mprice;
+                profitSum.ccramt = lst_detail.Sum(x => x.ccramt);
+                profitSum.cdnamt = lst_detail.Sum(x => x.cdnamt);
+                profitSum.cgtamt = lst_detail.Sum(x => x.cgtamt);
+                profitSum.fee = detail_out.fee;
+                profitSum.interest = lst_detail.Sum(x => x.interest);
+                profitSum.tax = detail_out.tax;
+                profitSum.dbfee = lst_detail.Sum(x => x.dbfee);
+                profitSum.cost = detail_out.cost;
+                profitSum.income = detail_out.income;
+                profitSum.profit = detail_out.profit;
+                profitSum.pl_ratio = decimal.Round(((profitSum.profit / profitSum.cost) * 100), 2).ToString() + "%";
+                profitSum.ctype = "1";
+                profitSum.ttypename2 = "資賣";
+                //第三階層資料存入第二階層List
+                profitSum.profit_detail = lst_detail;
+                profitSum.profit_detail_out = detail_out;
+                sumList.Add(profitSum);
+            }
+            return sumList;
+        }
+
         //--------------------------------------------------------------------------------------------
         // function searchAccSum() - 計算取得 查詢回復階層一 帳戶已實現損益
         //--------------------------------------------------------------------------------------------
@@ -332,6 +486,9 @@ namespace ESMP.STOCK.TASK.API
             row.profit = sumList.Sum(x => x.profit);
             row.fee = sumList.Sum(x => x.fee);
             row.tax = sumList.Sum(x => x.tax);
+            row.dbfee = sumList.Sum(x => x.dbfee);
+            row.interest = sumList.Sum(x => x.interest);
+            row.ccramt = sumList.Sum(x => x.ccramt);
             accsumList.Add(row);
 
             accsumList.ForEach(x => x.pl_ratio = decimal.Round(((x.profit / x.cost) * 100), 2).ToString() + "%");

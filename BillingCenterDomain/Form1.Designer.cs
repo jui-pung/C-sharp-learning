@@ -63,7 +63,7 @@
             "0002",
             "0003"});
             this.comboBoxQTYPE.Location = new System.Drawing.Point(156, 44);
-            this.comboBoxQTYPE.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxQTYPE.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxQTYPE.Name = "comboBoxQTYPE";
             this.comboBoxQTYPE.Size = new System.Drawing.Size(121, 32);
             this.comboBoxQTYPE.TabIndex = 32;
@@ -92,7 +92,7 @@
             // txtEDATE
             // 
             this.txtEDATE.Location = new System.Drawing.Point(633, 108);
-            this.txtEDATE.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtEDATE.Margin = new System.Windows.Forms.Padding(4);
             this.txtEDATE.Name = "txtEDATE";
             this.txtEDATE.Size = new System.Drawing.Size(125, 36);
             this.txtEDATE.TabIndex = 29;
@@ -100,7 +100,7 @@
             // txtSDATE
             // 
             this.txtSDATE.Location = new System.Drawing.Point(396, 108);
-            this.txtSDATE.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtSDATE.Margin = new System.Windows.Forms.Padding(4);
             this.txtSDATE.Name = "txtSDATE";
             this.txtSDATE.Size = new System.Drawing.Size(125, 36);
             this.txtSDATE.TabIndex = 28;
@@ -118,7 +118,7 @@
             // txtStockSymbol
             // 
             this.txtStockSymbol.Location = new System.Drawing.Point(921, 44);
-            this.txtStockSymbol.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtStockSymbol.Margin = new System.Windows.Forms.Padding(4);
             this.txtStockSymbol.Name = "txtStockSymbol";
             this.txtStockSymbol.Size = new System.Drawing.Size(125, 36);
             this.txtStockSymbol.TabIndex = 26;
@@ -157,7 +157,7 @@
             // txtCSEQ
             // 
             this.txtCSEQ.Location = new System.Drawing.Point(633, 44);
-            this.txtCSEQ.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtCSEQ.Margin = new System.Windows.Forms.Padding(4);
             this.txtCSEQ.Name = "txtCSEQ";
             this.txtCSEQ.Size = new System.Drawing.Size(125, 36);
             this.txtCSEQ.TabIndex = 22;
@@ -165,7 +165,7 @@
             // txtBHNO
             // 
             this.txtBHNO.Location = new System.Drawing.Point(396, 44);
-            this.txtBHNO.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtBHNO.Margin = new System.Windows.Forms.Padding(4);
             this.txtBHNO.Name = "txtBHNO";
             this.txtBHNO.Size = new System.Drawing.Size(125, 36);
             this.txtBHNO.TabIndex = 21;
@@ -176,7 +176,7 @@
             this.radioBtnJson.AutoSize = true;
             this.radioBtnJson.Font = new System.Drawing.Font("新細明體", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.radioBtnJson.Location = new System.Drawing.Point(826, 180);
-            this.radioBtnJson.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.radioBtnJson.Margin = new System.Windows.Forms.Padding(4);
             this.radioBtnJson.Name = "radioBtnJson";
             this.radioBtnJson.Size = new System.Drawing.Size(88, 26);
             this.radioBtnJson.TabIndex = 35;
@@ -192,7 +192,7 @@
             this.radioBtnXml.Checked = true;
             this.radioBtnXml.Font = new System.Drawing.Font("新細明體", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.radioBtnXml.Location = new System.Drawing.Point(737, 180);
-            this.radioBtnXml.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.radioBtnXml.Margin = new System.Windows.Forms.Padding(4);
             this.radioBtnXml.Name = "radioBtnXml";
             this.radioBtnXml.Size = new System.Drawing.Size(85, 26);
             this.radioBtnXml.TabIndex = 34;
@@ -205,7 +205,7 @@
             // 
             this.btnSearch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSearch.Location = new System.Drawing.Point(921, 164);
-            this.btnSearch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnSearch.Margin = new System.Windows.Forms.Padding(4);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(124, 44);
             this.btnSearch.TabIndex = 33;
@@ -221,7 +221,7 @@
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Location = new System.Drawing.Point(43, 240);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(4);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1023, 582);
@@ -231,9 +231,9 @@
             // 
             this.tabPage1.Controls.Add(this.txtSearchResultContent);
             this.tabPage1.Location = new System.Drawing.Point(8, 39);
-            this.tabPage1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(4);
             this.tabPage1.Size = new System.Drawing.Size(1007, 535);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Search Result Content   ";
@@ -246,7 +246,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearchResultContent.Font = new System.Drawing.Font("微軟正黑體", 10.875F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.txtSearchResultContent.Location = new System.Drawing.Point(4, 8);
-            this.txtSearchResultContent.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtSearchResultContent.Margin = new System.Windows.Forms.Padding(4);
             this.txtSearchResultContent.Multiline = true;
             this.txtSearchResultContent.Name = "txtSearchResultContent";
             this.txtSearchResultContent.ScrollBars = System.Windows.Forms.ScrollBars.Both;
@@ -257,9 +257,9 @@
             // 
             this.tabPage2.Controls.Add(this.txtSearchContent);
             this.tabPage2.Location = new System.Drawing.Point(8, 39);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(4);
             this.tabPage2.Size = new System.Drawing.Size(1007, 535);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Search Content   ";
@@ -272,7 +272,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSearchContent.Font = new System.Drawing.Font("微軟正黑體", 10.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
             this.txtSearchContent.Location = new System.Drawing.Point(4, 4);
-            this.txtSearchContent.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.txtSearchContent.Margin = new System.Windows.Forms.Padding(4);
             this.txtSearchContent.Multiline = true;
             this.txtSearchContent.Name = "txtSearchContent";
             this.txtSearchContent.Size = new System.Drawing.Size(999, 528);
@@ -295,7 +295,9 @@
             "A - 全部",
             "0 - 現股",
             "1 - 融資",
-            "2 - 融券"});
+            "2 - 融券",
+            "3 - 信用當沖(已實現)",
+            "4 - 現股當沖(已實現)"});
             this.comboBoxTTYPE.Location = new System.Drawing.Point(156, 112);
             this.comboBoxTTYPE.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxTTYPE.Name = "comboBoxTTYPE";
@@ -325,7 +327,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtCSEQ);
             this.Controls.Add(this.txtBHNO);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.tabControl1.ResumeLayout(false);

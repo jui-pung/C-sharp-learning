@@ -49,7 +49,7 @@ namespace BillingCenterDomain
             {
                 GainPay gainPay = new GainPay();                //自訂GainPay類別   (ESMP.STOCK.TASK.API)
                 //呈現查詢結果
-                (txtSearchContent.Text, txtSearchResultContent.Text) = gainPay.getGainPaySearch(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, txtSDATE.Text, txtEDATE.Text, txtStockSymbol.Text, _type);
+                (txtSearchContent.Text, txtSearchResultContent.Text) = gainPay.getGainPaySearch(comboBoxQTYPE.Text, txtBHNO.Text, txtCSEQ.Text, txtSDATE.Text, txtEDATE.Text, txtStockSymbol.Text, strComboBoxTTYPE, _type);
             }
             //對帳單查詢
             else if (comboBoxQTYPE.Text == "0003" && txtBHNO.Text.Length == 4 && txtCSEQ.Text.Length == 7 && txtEDATE.Text.Length == 8 && txtSDATE.Text.Length == 8)
@@ -93,7 +93,7 @@ namespace BillingCenterDomain
                 txtCSEQ.Text = "0123938";
                 txtSDATE.Text = "20210101";
                 txtEDATE.Text = "20210121";
-                comboBoxTTYPE.Enabled = false;
+                comboBoxTTYPE.Enabled = true;
                 txtSDATE.Enabled = true;
                 txtEDATE.Enabled = true;
                 txtStockSymbol.Text = "";

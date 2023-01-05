@@ -21,8 +21,13 @@ namespace ESMP.STOCK.FORMAT
         public string stocknm { get; set; }
         public decimal cqty { get; set; }
         public string mprice { get; set; }
+        public decimal ccramt { get; set; }
+        public decimal cdnamt { get; set; }
+        public decimal cgtamt { get; set; }
         public decimal fee { get; set; }
+        public decimal interest { get; set; }
         public decimal tax { get; set; }
+        public decimal dbfee { get; set; }
         public decimal cost { get; set; }
         public decimal income { get; set; }
         public decimal profit { get; set; }

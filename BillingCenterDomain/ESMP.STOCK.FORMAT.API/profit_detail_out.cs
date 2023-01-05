@@ -12,7 +12,7 @@ namespace ESMP.STOCK.FORMAT
     {
         [XmlIgnore]
         [JsonIgnore]
-        public string stock { get; set; }
+        //public string stock { get; set; }
         public string tdate { get; set; }
         public string dseq { get; set; }
         public string dno { get; set; }
@@ -23,8 +23,15 @@ namespace ESMP.STOCK.FORMAT
         public decimal cost { get; set; }
         public decimal income { get; set; }
         public decimal netamt { get; set; }
+        public decimal ccramt { get; set; }
+        public decimal cdnamt { get; set; }
+        public decimal cgtamt { get; set; }
         public decimal fee { get; set; }
+        public decimal interest { get; set; }
         public decimal tax { get; set; }
+        public decimal dbfee { get; set; }
+        public decimal dlfee { get; set; }
+        public string adjdate { get; set; }
         public string ttype { get; set; } = "0";
         public string ttypename { get; set; } = "現股";
         public string bstype { get; set; } = "S";

@@ -46,9 +46,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>dbESMP.xsd</DependentUpon>
     </Compile>
+    <Compile Include="HCDTD.cs" />
     <Compile Include="HCMIO.cs" />
     <Compile Include="HCNRH.cs" />
     <Compile Include="HCNTD.cs" />
+    <Compile Include="HCRRH.cs" />
+    <Compile Include="HDBRH.cs" />
     <Compile Include="MCSRH.cs" />
     <Compile Include="MCUMS.cs" />
     <Compile Include="MSTMB.cs" />
