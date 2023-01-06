@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ESMP.STOCK.DB.TABLE
 {
+    /// <summary>
+    /// 歷史融資沖銷檔
+    /// </summary>
     public class HCRRH
     {
         public string BHNO { get; set; }

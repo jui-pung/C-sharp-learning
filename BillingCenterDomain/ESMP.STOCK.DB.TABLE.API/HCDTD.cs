@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ESMP.STOCK.DB.TABLE
 {
+    /// <summary>
+    /// 歷史信用當沖檔
+    /// </summary>
     public class HCDTD
     {
         public string TDATE { get; set; }

@@ -72,7 +72,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(529, 116);
+            this.label5.Location = new System.Drawing.Point(635, 116);
             this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(96, 24);
@@ -82,7 +82,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(292, 116);
+            this.label6.Location = new System.Drawing.Point(398, 116);
             this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(95, 24);
@@ -91,7 +91,7 @@
             // 
             // txtEDATE
             // 
-            this.txtEDATE.Location = new System.Drawing.Point(633, 108);
+            this.txtEDATE.Location = new System.Drawing.Point(739, 108);
             this.txtEDATE.Margin = new System.Windows.Forms.Padding(4);
             this.txtEDATE.Name = "txtEDATE";
             this.txtEDATE.Size = new System.Drawing.Size(125, 36);
@@ -99,7 +99,7 @@
             // 
             // txtSDATE
             // 
-            this.txtSDATE.Location = new System.Drawing.Point(396, 108);
+            this.txtSDATE.Location = new System.Drawing.Point(502, 108);
             this.txtSDATE.Margin = new System.Windows.Forms.Padding(4);
             this.txtSDATE.Name = "txtSDATE";
             this.txtSDATE.Size = new System.Drawing.Size(125, 36);
@@ -301,7 +301,7 @@
             this.comboBoxTTYPE.Location = new System.Drawing.Point(156, 112);
             this.comboBoxTTYPE.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxTTYPE.Name = "comboBoxTTYPE";
-            this.comboBoxTTYPE.Size = new System.Drawing.Size(121, 32);
+            this.comboBoxTTYPE.Size = new System.Drawing.Size(200, 32);
             this.comboBoxTTYPE.TabIndex = 38;
             // 
             // Form1
