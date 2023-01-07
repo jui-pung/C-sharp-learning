@@ -26,7 +26,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             _ = BasicData.MSTMB_Dic;
             _ = BasicData.MCSRH_Dic;
             GainLost gainLost = new GainLost();
-            sumList = gainLost.searchSum(dbTCNUD);
+            //sumList = gainLost.searchSum(dbTCNUD);
             detailList = sumList[0].unoffset_qtype_detail;
             foreach (var item in detailList)
             {

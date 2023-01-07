@@ -89,10 +89,10 @@ namespace BillingCenterDomain
             }
             if (comboBoxQTYPE.Text == "0002")
             {
-                txtBHNO.Text = "592S";
-                txtCSEQ.Text = "0123938";
+                txtBHNO.Text = "5920";
+                txtCSEQ.Text = "9813603";
                 txtSDATE.Text = "20210101";
-                txtEDATE.Text = "20210121";
+                txtEDATE.Text = "20221231";
                 comboBoxTTYPE.Enabled = true;
                 txtSDATE.Enabled = true;
                 txtEDATE.Enabled = true;

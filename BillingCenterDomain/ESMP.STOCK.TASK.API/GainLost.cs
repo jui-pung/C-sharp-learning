@@ -67,11 +67,16 @@ namespace ESMP.STOCK.TASK.API
             TCNTDList = _sqlSearch.selectTCNTD(SearchElement);
             T210List = _sqlSearch.selectT210(SearchElement);
             //查詢融資餘額檔 ---TCRUD
-            if (SearchElement.ttype == "A" || SearchElement.ttype == "1")
+            if (SearchElement.ttype == "1")
                 TCRUDList = _sqlSearch.selectTCRUD(SearchElement);
             //查詢融券餘額檔 ---TDBUD
-            else if (SearchElement.ttype == "A" || SearchElement.ttype == "2")
+            else if (SearchElement.ttype == "2")
                 TDBUDList = _sqlSearch.selectTDBUD(SearchElement);
+            else if (SearchElement.ttype == "A")
+            {
+                TCRUDList = _sqlSearch.selectTCRUD(SearchElement);
+                TDBUDList = _sqlSearch.selectTDBUD(SearchElement);
+            }
             
             //盤中現股沖銷 當沖 現股賣出處理
             (TCNUDList, HCNRHList, HCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, TCNTDList, T210List, BHNO, CSEQ);
@@ -369,7 +374,7 @@ namespace ESMP.STOCK.TASK.API
         }
 
         //--------------------------------------------------------------------------------------------
-        // function searchAccSum() - 計算取得 查詢回復階層一 帳戶未實現損益
+        // function SearchAccSum() - 計算取得 查詢回復階層一 帳戶未實現損益
         //--------------------------------------------------------------------------------------------
         public unoffset_qtype_accsum searchAccSum(List<unoffset_qtype_sum> sumList)
         {
@@ -620,7 +625,7 @@ namespace ESMP.STOCK.TASK.API
         }
 
         //--------------------------------------------------------------------------------------------
-        //function resultListSerilizer() - 將QTYPE"0001"查詢結果 序列化為xml或json格式字串
+        //function ResultListSerilizer() - 將QTYPE"0001"查詢結果 序列化為xml或json格式字串
         //--------------------------------------------------------------------------------------------
         private string resultListSerilizer(unoffset_qtype_accsum accsum, int type)
         {

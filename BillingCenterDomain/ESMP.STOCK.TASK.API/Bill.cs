@@ -341,7 +341,7 @@ namespace ESMP.STOCK.TASK.API
         }
 
         //--------------------------------------------------------------------------------------------
-        // function searchSum() - 計算取得 查詢回復階層二 對帳單匯總
+        // function SearchSum() - 計算取得 查詢回復階層二 對帳單匯總
         //--------------------------------------------------------------------------------------------
         public billSum searchSum(List<profile> detailList)
         {
@@ -378,7 +378,7 @@ namespace ESMP.STOCK.TASK.API
         }
 
         //--------------------------------------------------------------------------------------------
-        //function resultListSerilizer() - 將QTYPE"0003"查詢結果 序列化為xml或json格式字串
+        //function ResultListSerilizer() - 將QTYPE"0003"查詢結果 序列化為xml或json格式字串
         //--------------------------------------------------------------------------------------------
         private string resultListSerilizer(profile_sum profileSum, int type)
         {
