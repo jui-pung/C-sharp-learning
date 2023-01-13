@@ -11,6 +11,14 @@ namespace ESMP.STOCK.TASK.APITests
 {
     public class SubGainPay:GainPay
     {
+        public static List<profit_sum> SubSearchSum(List<HCNRH> HCNRH, string BHNO, string CSEQ)
+        {
+            return SearchSum(HCNRH, BHNO, CSEQ);
+        }
+        public static List<profit_sum> SubSearchSum(List<HCNTD> HCNTD, string BHNO, string CSEQ)
+        {
+            return SearchSum(HCNTD, BHNO, CSEQ);
+        }
         public static List<profit_sum> SubSearchSum(List<HCRRH> HCRRH, string BHNO, string CSEQ)
         {
             return SearchSum(HCRRH, BHNO, CSEQ);

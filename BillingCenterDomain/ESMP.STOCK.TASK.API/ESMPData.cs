@@ -59,74 +59,81 @@ namespace ESMP.STOCK.TASK.API
         protected static List<HCMIO> GetHCMIO(List<TCSIO> TCSIOList, List<TMHIO> TMHIOList)
         {
             List<HCMIO> HCMIOList = new List<HCMIO>();          //自訂HCMIO類別List (ESMP.STOCK.DB.TABLE.API)
-            foreach (var TCSIO_item in TCSIOList)
+            if (TCSIOList.Count > 0)
             {
-                var row = new HCMIO();
-                row.TDATE = TCSIO_item.TDATE;
-                row.BHNO = TCSIO_item.BHNO;
-                row.CSEQ = TCSIO_item.CSEQ;
-                row.DSEQ = TCSIO_item.DSEQ;
-                row.DNO = TCSIO_item.DNO;
-                row.WTYPE = "A";
-                row.STOCK = TCSIO_item.STOCK;
-                row.BSTYPE = TCSIO_item.BSTYPE;
-                row.PRICE = 0;
-                row.QTY = TCSIO_item.QTY;       //原始股數
-                row.BQTY = TCSIO_item.QTY;      //未沖銷股數
-                row.AMT = 0;
-                row.FEE = 0;
-                row.TAX = 0;
-                row.IOFLAG = TCSIO_item.IOFLAG;
-                row.TRDATE = TCSIO_item.TRDATE;
-                row.TRTIME = TCSIO_item.TRTIME;
-                row.MODDATE = TCSIO_item.MODDATE;
-                row.MODTIME = TCSIO_item.MODTIME;
-                row.MODUSER = TCSIO_item.MODUSER;
-                HCMIOList.Add(row);
-            }
-            foreach (var TMHIO_item in TMHIOList)
-            {
-                var row = new HCMIO();
-                row.TDATE = TMHIO_item.TDATE;
-                row.BHNO = TMHIO_item.BHNO;
-                row.CSEQ = TMHIO_item.CSEQ;
-                row.DSEQ = TMHIO_item.DSEQ;
-                row.DNO = TMHIO_item.JRNUM;
-                row.WTYPE = "0";
-                row.STOCK = TMHIO_item.STOCK;
-                row.TTYPE = TMHIO_item.TTYPE;
-                row.ETYPE = TMHIO_item.ETYPE;
-                row.BSTYPE = TMHIO_item.BSTYPE;
-                row.PRICE = TMHIO_item.PRICE;
-                row.QTY = TMHIO_item.QTY;       //原始股數
-                row.BQTY = TMHIO_item.QTY;      //未沖銷股數
-                row.AMT = decimal.Truncate(TMHIO_item.PRICE * TMHIO_item.QTY);
-                row.FEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.AMT) * 0.001425));
-                if (TMHIO_item.QTY >= 1000 && row.FEE < 20)
-                    row.FEE = 20;
-                else if(TMHIO_item.QTY < 1000 && row.FEE < 1)
-                    row.FEE = 1;
-                if (TMHIO_item.BSTYPE == "S")
+                foreach (var TCSIO_item in TCSIOList)
                 {
-                    row.TAX = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.AMT) * 0.003));
-                    row.NETAMT = row.AMT - row.FEE - row.TAX;
-                }
-                else if(TMHIO_item.BSTYPE == "B")
-                {
+                    var row = new HCMIO();
+                    row.TDATE = TCSIO_item.TDATE;
+                    row.BHNO = TCSIO_item.BHNO;
+                    row.CSEQ = TCSIO_item.CSEQ;
+                    row.DSEQ = TCSIO_item.DSEQ;
+                    row.DNO = TCSIO_item.DNO;
+                    row.WTYPE = "A";
+                    row.STOCK = TCSIO_item.STOCK;
+                    row.BSTYPE = TCSIO_item.BSTYPE;
+                    row.PRICE = 0;
+                    row.QTY = TCSIO_item.QTY;       //原始股數
+                    row.BQTY = TCSIO_item.QTY;      //未沖銷股數
+                    row.AMT = 0;
+                    row.FEE = 0;
                     row.TAX = 0;
-                    row.NETAMT = (row.AMT + row.FEE) * -1;
-                }    
-                row.ORIGN = TMHIO_item.ORGIN;
-                row.SALES = TMHIO_item.SALES;
-                row.TRDATE = TMHIO_item.TRDATE;
-                row.TRTIME = TMHIO_item.TRTIME;
-                row.MODDATE = TMHIO_item.MODDATE;
-                row.MODTIME = TMHIO_item.MODTIME;
-                row.MODUSER = TMHIO_item.MODUSER;
-                HCMIOList.Add(row);
+                    row.IOFLAG = TCSIO_item.IOFLAG;
+                    row.TRDATE = TCSIO_item.TRDATE;
+                    row.TRTIME = TCSIO_item.TRTIME;
+                    row.MODDATE = TCSIO_item.MODDATE;
+                    row.MODTIME = TCSIO_item.MODTIME;
+                    row.MODUSER = TCSIO_item.MODUSER;
+                    HCMIOList.Add(row);
+                }
+            }
+            if (TMHIOList.Count > 0)
+            {
+                foreach (var TMHIO_item in TMHIOList)
+                {
+                    var row = new HCMIO();
+                    row.TDATE = TMHIO_item.TDATE;
+                    row.BHNO = TMHIO_item.BHNO;
+                    row.CSEQ = TMHIO_item.CSEQ;
+                    row.DSEQ = TMHIO_item.DSEQ;
+                    row.DNO = TMHIO_item.JRNUM;
+                    row.WTYPE = "0";
+                    row.STOCK = TMHIO_item.STOCK;
+                    row.TTYPE = TMHIO_item.TTYPE;
+                    row.ETYPE = TMHIO_item.ETYPE;
+                    row.BSTYPE = TMHIO_item.BSTYPE;
+                    row.PRICE = TMHIO_item.PRICE;
+                    row.QTY = TMHIO_item.QTY;       //原始股數
+                    row.BQTY = TMHIO_item.QTY;      //未沖銷股數
+                    row.AMT = decimal.Truncate(TMHIO_item.PRICE * TMHIO_item.QTY);
+                    row.FEE = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.AMT) * 0.001425));
+                    if (TMHIO_item.QTY >= 1000 && row.FEE < 20)
+                        row.FEE = 20;
+                    else if (TMHIO_item.QTY < 1000 && row.FEE < 1)
+                        row.FEE = 1;
+                    if (TMHIO_item.BSTYPE == "S")
+                    {
+                        row.TAX = decimal.Truncate(Convert.ToDecimal(decimal.ToDouble(row.AMT) * 0.003));
+                        row.NETAMT = row.AMT - row.FEE - row.TAX;
+                    }
+                    else if (TMHIO_item.BSTYPE == "B")
+                    {
+                        row.TAX = 0;
+                        row.NETAMT = (row.AMT + row.FEE) * -1;
+                    }
+                    row.ORIGN = TMHIO_item.ORGIN;
+                    row.SALES = TMHIO_item.SALES;
+                    row.TRDATE = TMHIO_item.TRDATE;
+                    row.TRTIME = TMHIO_item.TRTIME;
+                    row.MODDATE = TMHIO_item.MODDATE;
+                    row.MODTIME = TMHIO_item.MODTIME;
+                    row.MODUSER = TMHIO_item.MODUSER;
+                    HCMIOList.Add(row);
+                }
             }
             return HCMIOList;
         }
+
         //--------------------------------------------------------------------------------------------
         //function GetClientCNTDTYPE() - 取得客戶當沖資格
         //--------------------------------------------------------------------------------------------

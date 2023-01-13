@@ -3,6 +3,7 @@ using ESMP.STOCK.FORMAT;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -18,8 +19,8 @@ namespace ESMP.STOCK.TASK.API
 {
     public class SqlSearch
     {
-        static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
-        static int _dateDiff = -77;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
+        static string _sqlSet = ConfigurationManager.AppSettings.Get("ESMPConnectionString");
+        static int _dateDiff = -88;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------

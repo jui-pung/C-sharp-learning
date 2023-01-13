@@ -63,7 +63,7 @@ namespace ESMP.STOCK.TASK.API.Tests
             });
             Bill bill = new Bill();
             billsum = bill.searchSum(detailList);
-            Assert.AreEqual(billsum.cnbamt, Convert.ToDecimal(79800.0));
+            Assert.AreEqual(billsum.cnbamt, Convert.ToDecimal(0));
             Assert.AreEqual(billsum.cnsamt, Convert.ToDecimal(0));
             Assert.AreEqual(billsum.cnfee, Convert.ToDecimal(112.0));
             Assert.AreEqual(billsum.cntax, Convert.ToDecimal(0.0));

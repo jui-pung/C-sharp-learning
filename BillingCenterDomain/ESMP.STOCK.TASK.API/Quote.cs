@@ -3,6 +3,7 @@ using ESMP.STOCK.FORMAT;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -32,8 +33,8 @@ namespace ESMP.STOCK.TASK.API
             string[] quoteResponse = new string[quoteResLength];        //查詢結果xml字串陣列 (陣列大小為分批查詢次數)
             Dictionary<string, List<Symbol>> dic = new Dictionary<string, List<Symbol>>();
             List<Symbol> symbolList = new List<Symbol>();
-            string strUrl = "http://10.10.56.182:8080/Quote/Stock.jsp?stock=";
-            
+            string strUrl = ConfigurationManager.AppSettings.Get("QuoteUrl");
+
             //一次查詢完成
             if (currStockQty <= maxStockQty)
             {

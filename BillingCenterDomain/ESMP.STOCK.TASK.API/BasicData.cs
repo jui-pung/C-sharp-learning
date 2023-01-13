@@ -6,12 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ESMP.STOCK.DB.TABLE;
+using System.Configuration;
 
 namespace ESMP.STOCK.TASK.API
 {
     public sealed class BasicData
     {
-        static string _sqlSet = "Data Source = .; Initial Catalog = ESMP; Integrated Security = True;";
+        static string _sqlSet = ConfigurationManager.AppSettings.Get("ESMPConnectionString");
         static SqlSearch _sqlSearch;
         private static object chekLock = new object();
         private static Dictionary<string, string> _MsysDict = null;

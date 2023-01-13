@@ -14,24 +14,227 @@ namespace ESMP.STOCK.TASK.API.Tests
     [TestClass()]
     public class GainPayTests
     {
-        [TestMethod()]
-        public void searchAccSumTest()
+        /// <summary>
+        /// 現股現賣已實現損益 單元測試
+        /// </summary>
+        [TestMethod]
+        public void HCNRHTest_1()
         {
             List<profit_sum> sumList = new List<profit_sum>();
             List<profit_accsum> accsumList = new List<profit_accsum>();
-
-            sumList.Add(new profit_sum() { bhno = "592S", cseq = "0123938", tdate = "20210108", dseq = "j0394", dno = "0000002", ttype = "0", ttypename = "現股", bstype = "S", stock = "2303", stocknm = "聯  電", cqty = Convert.ToDecimal(10000.0), mprice = "47.4500", fee = Convert.ToDecimal(676.00), tax = Convert.ToDecimal(1423.00), cost = Convert.ToDecimal(465560.00), income = Convert.ToDecimal(472401.00), profit = Convert.ToDecimal(6841.00), pl_ratio = "1.47%", ctype = "0", ttypename2 = "現賣" });
-            sumList.Add(new profit_sum() { bhno = "592S", cseq = "0123938", tdate = "20210108", dseq = "j0394", dno = "0000002", ttype = "0", ttypename = "現股", bstype = "S", stock = "2303", stocknm = "聯  電", cqty = Convert.ToDecimal(10000.0), mprice = "47.4500", fee = Convert.ToDecimal(676.00), tax = Convert.ToDecimal(1423.00), cost = Convert.ToDecimal(465560.00), income = Convert.ToDecimal(472401.00), profit = Convert.ToDecimal(6841.00), pl_ratio = "1.47%", ctype = "0", ttypename2 = "現賣" });
-            foreach (var item in accsumList)
+            List<HCNRH> dbHCNRH = new List<HCNRH>();
+            _ = BasicData.MSTMB_Dic;
+            #region 3筆HCNRH資料 3筆(同TDATE、SDSEQ、SDNO)
+            dbHCNRH.Add(new HCNRH()
             {
-                accsumList = SubGainPay.SubSearchAccSum(sumList);
-                Assert.AreEqual(item.cqty, Convert.ToDecimal(20000.0));
-                Assert.AreEqual(item.cost, Convert.ToDecimal(931120.00));
-                Assert.AreEqual(item.income, Convert.ToDecimal(944802.00));
-                Assert.AreEqual(item.profit, Convert.ToDecimal(13682.00));
-                Assert.AreEqual(item.fee, Convert.ToDecimal(1352.00));
-                Assert.AreEqual(item.tax, Convert.ToDecimal(2846.00));
-            }
+                BHNO = "592S",
+                TDATE = "20210104",
+                RDATE = "20071009",
+                CSEQ = "0027432",
+                BDSEQ = "2414A",
+                BDNO = "000000",
+                SDSEQ = "30004",
+                SDNO = "0000001",
+                STOCK = "2303",
+                CQTY = Convert.ToDecimal(218),
+                BPRICE = Convert.ToDecimal(0.0000),
+                BFEE = Convert.ToDecimal(0.00),
+                SPRICE = Convert.ToDecimal(45.6500),
+                SFEE = Convert.ToDecimal(14.00),
+                TAX = Convert.ToDecimal(29.00),
+                INCOME = Convert.ToDecimal(9908.00),
+                COST = Convert.ToDecimal(0.00),
+                PROFIT = Convert.ToDecimal(9908.00),
+                ADJDATE = "",
+                WTYPE = "A",
+                BQTY = Convert.ToDecimal(2001),
+                SQTY = Convert.ToDecimal(1000),
+                STINTAX = Convert.ToDecimal(0),
+                IOFLAG = "",
+                TRDATE = "",
+                TRTIME = "",
+                MODDATE = "",
+                MODTIME = "",
+                MODUSER = ""
+            });
+            dbHCNRH.Add(new HCNRH()
+            {
+                BHNO = "592S",
+                TDATE = "20210104",
+                RDATE = "20071009",
+                CSEQ = "0027432",
+                BDSEQ = "2414A",
+                BDNO = "000000",
+                SDSEQ = "30004",
+                SDNO = "0000001",
+                STOCK = "2303",
+                CQTY = Convert.ToDecimal(218),
+                BPRICE = Convert.ToDecimal(0.0000),
+                BFEE = Convert.ToDecimal(0.00),
+                SPRICE = Convert.ToDecimal(45.6500),
+                SFEE = Convert.ToDecimal(14.00),
+                TAX = Convert.ToDecimal(29.00),
+                INCOME = Convert.ToDecimal(9908.00),
+                COST = Convert.ToDecimal(0.00),
+                PROFIT = Convert.ToDecimal(9908.00),
+                ADJDATE = "",
+                WTYPE = "A",
+                BQTY = Convert.ToDecimal(2001),
+                SQTY = Convert.ToDecimal(1000),
+                STINTAX = Convert.ToDecimal(0),
+                IOFLAG = "",
+                TRDATE = "",
+                TRTIME = "",
+                MODDATE = "",
+                MODTIME = "",
+                MODUSER = ""
+            });
+            dbHCNRH.Add(new HCNRH()
+            {
+                BHNO = "592S",
+                TDATE = "20210104",
+                RDATE = "20071009",
+                CSEQ = "0027432",
+                BDSEQ = "2414A",
+                BDNO = "000000",
+                SDSEQ = "30004",
+                SDNO = "0000001",
+                STOCK = "2303",
+                CQTY = Convert.ToDecimal(218),
+                BPRICE = Convert.ToDecimal(0.0000),
+                BFEE = Convert.ToDecimal(0.00),
+                SPRICE = Convert.ToDecimal(45.6500),
+                SFEE = Convert.ToDecimal(14.00),
+                TAX = Convert.ToDecimal(29.00),
+                INCOME = Convert.ToDecimal(9908.00),
+                COST = Convert.ToDecimal(0.00),
+                PROFIT = Convert.ToDecimal(9908.00),
+                ADJDATE = "",
+                WTYPE = "A",
+                BQTY = Convert.ToDecimal(2001),
+                SQTY = Convert.ToDecimal(1000),
+                STINTAX = Convert.ToDecimal(0),
+                IOFLAG = "",
+                TRDATE = "",
+                TRTIME = "",
+                MODDATE = "",
+                MODTIME = "",
+                MODUSER = ""
+            });
+            #endregion
+            sumList = SubGainPay.SubSearchSum(dbHCNRH, "5920", "9813603");
+            accsumList = SubGainPay.SubSearchAccSum(sumList);
+            Assert.AreEqual(accsumList.Count, 1);
+            Assert.AreEqual(sumList.Count, 1);
+            Assert.AreEqual(sumList[0].profit_detail.Count, 3);
+            Assert.AreEqual(sumList[0].ttypename2, "現賣");
+            Assert.AreEqual(sumList[0].profit_detail[0].mamt, "0");
+            Assert.AreEqual(sumList[0].profit_detail_out.cqty, Convert.ToDecimal(654));
+            Assert.AreEqual(sumList[0].profit_detail_out.cost, Convert.ToDecimal(0));
+        }
+
+        /// <summary>
+        /// 現股當沖已實現損益 單元測試
+        /// </summary>
+        [TestMethod]
+        public void HCNTDTest_2()
+        {
+            List<profit_sum> sumList = new List<profit_sum>();
+            List<profit_accsum> accsumList = new List<profit_accsum>();
+            List<HCNTD> dbHCNTD = new List<HCNTD>();
+            _ = BasicData.MSTMB_Dic;
+            #region 3筆HCNTD資料 3筆(同TDATE、SDSEQ、SDNO)
+            dbHCNTD.Add(new HCNTD()
+            {
+                BHNO = "592S",
+                TDATE = "20210104",
+                CSEQ = "0006822",
+                BDSEQ = "j0558",
+                BDNO = "0000003",
+                SDSEQ = "j0612",
+                SDNO = "0000004",
+                STOCK = "2317",
+                CQTY = Convert.ToDecimal(5000),
+                BPRICE = Convert.ToDecimal(98.3000),
+                BFEE = Convert.ToDecimal(700),
+                SPRICE = Convert.ToDecimal(99.9000),
+                SFEE = Convert.ToDecimal(711),
+                TAX = Convert.ToDecimal(749),
+                INCOME = Convert.ToDecimal(498040),
+                COST = Convert.ToDecimal(492200),
+                PROFIT = Convert.ToDecimal(5840),
+                BQTY = Convert.ToDecimal(5000),
+                SQTY = Convert.ToDecimal(5000),
+                TRDATE = "20210104",
+                TRTIME = "175407",
+                MODDATE = "",
+                MODTIME = "",
+                MODUSER = ""
+            });
+            dbHCNTD.Add(new HCNTD()
+            {
+                BHNO = "592S",
+                TDATE = "20210104",
+                CSEQ = "0006822",
+                BDSEQ = "j0558",
+                BDNO = "0000003",
+                SDSEQ = "j0612",
+                SDNO = "0000004",
+                STOCK = "2317",
+                CQTY = Convert.ToDecimal(5000),
+                BPRICE = Convert.ToDecimal(98.3000),
+                BFEE = Convert.ToDecimal(700),
+                SPRICE = Convert.ToDecimal(99.9000),
+                SFEE = Convert.ToDecimal(711),
+                TAX = Convert.ToDecimal(749),
+                INCOME = Convert.ToDecimal(498040),
+                COST = Convert.ToDecimal(492200),
+                PROFIT = Convert.ToDecimal(5840),
+                BQTY = Convert.ToDecimal(5000),
+                SQTY = Convert.ToDecimal(5000),
+                TRDATE = "20210104",
+                TRTIME = "175407",
+                MODDATE = "",
+                MODTIME = "",
+                MODUSER = ""
+            });
+            dbHCNTD.Add(new HCNTD()
+            {
+                BHNO = "592S",
+                TDATE = "20210104",
+                CSEQ = "0006822",
+                BDSEQ = "j0558",
+                BDNO = "0000003",
+                SDSEQ = "j0612",
+                SDNO = "0000004",
+                STOCK = "2317",
+                CQTY = Convert.ToDecimal(5000),
+                BPRICE = Convert.ToDecimal(98.3000),
+                BFEE = Convert.ToDecimal(700),
+                SPRICE = Convert.ToDecimal(99.9000),
+                SFEE = Convert.ToDecimal(711),
+                TAX = Convert.ToDecimal(749),
+                INCOME = Convert.ToDecimal(498040),
+                COST = Convert.ToDecimal(492200),
+                PROFIT = Convert.ToDecimal(5840),
+                BQTY = Convert.ToDecimal(5000),
+                SQTY = Convert.ToDecimal(5000),
+                TRDATE = "20210104",
+                TRTIME = "175407",
+                MODDATE = "",
+                MODTIME = "",
+                MODUSER = ""
+            });
+            #endregion
+            sumList = SubGainPay.SubSearchSum(dbHCNTD, "5920", "9813603");
+            accsumList = SubGainPay.SubSearchAccSum(sumList);
+            Assert.AreEqual(accsumList.Count, 1);
+            Assert.AreEqual(sumList.Count, 1);
+            Assert.AreEqual(sumList[0].profit_detail.Count, 3);
+            Assert.AreEqual(sumList[0].ttypename2, "現沖");
+            Assert.AreEqual(sumList[0].profit_detail[0].mamt, "491500.0");
+            Assert.AreEqual(sumList[0].profit_detail_out.cqty, Convert.ToDecimal(15000));
+            Assert.AreEqual(sumList[0].profit_detail_out.cost, Convert.ToDecimal(1476600));
         }
 
         /// <summary>
@@ -439,167 +642,5 @@ namespace ESMP.STOCK.TASK.API.Tests
             Assert.AreEqual(sumList[1].profit_detail_out.cqty, Convert.ToDecimal(3000));
             Assert.AreEqual(sumList[1].profit_detail_out.cost, Convert.ToDecimal(74805));
         }
-
-        //[TestMethod()]
-        //public void searchSumTest()
-        //{
-        //    List<profit_detail_out> detailOutList = new List<profit_detail_out>();
-        //    List<profit_sum> sumList = new List<profit_sum>();
-
-        //    detailOutList.Add(new profit_detail_out() { tdate = "20210108", dseq = "j0394", dno = "0000002", mqty = Convert.ToDecimal(10000.0), cqty = Convert.ToDecimal(10000.0), mprice = "47.4500", mamt = "474500.0000", cost = Convert.ToDecimal(465560.00), income = Convert.ToDecimal(472401.00), netamt = Convert.ToDecimal(472401.00), fee = Convert.ToDecimal(676.00), tax = Convert.ToDecimal(1423.00), ttype = "0", ttypename = "現股", bstype = "S", wtype = "0", profit = Convert.ToDecimal(6841.00), pl_ratio = "1.47%", ctype = "0", ttypename2 = "現賣" });
-
-        //    foreach (var item in sumList)
-        //    {
-        //        GainPay gainPay = new GainPay();
-        //        sumList = gainPay.searchSum(detailOutList);
-        //        Assert.AreEqual(item.cqty, Convert.ToDecimal(10000.0));
-        //        Assert.AreEqual(item.cost, Convert.ToDecimal(465560.00));
-        //        Assert.AreEqual(item.income, Convert.ToDecimal(472401.00));
-        //        Assert.AreEqual(item.profit, Convert.ToDecimal(6841.00));
-        //    }
-        //}
-
-        //[TestMethod()]
-        //public void searchDetailsTest()
-        //{
-        //    List<profit_detail_out> detailOutList = new List<profit_detail_out>();
-        //    List<profit_detail_out> ResultList = new List<profit_detail_out>();
-
-        //    //3筆HCNRH(同TDATE、SDSEQ、SDNO)資料
-        //    detailOutList.Add(new profit_detail_out()
-        //    {
-        //        tdate = "20210108",
-        //        dseq = "i0450",
-        //        dno = "0000003",
-        //        mqty = Convert.ToDecimal(5000.0),
-        //        cqty = Convert.ToDecimal(3000.0),
-        //        mprice = "42.5500",
-        //        cost = Convert.ToDecimal(127080.00),
-        //        income = Convert.ToDecimal(127085.00),
-        //        fee = Convert.ToDecimal(182.00),
-        //        tax = Convert.ToDecimal(383.00),
-        //        ttype = "0",
-        //        ttypename = "現股",
-        //        bstype = "S",
-        //        wtype = "0",
-        //        profit = Convert.ToDecimal(5.00)
-        //    }); 
-        //    detailOutList.Add(new profit_detail_out()
-        //    {
-        //        tdate = "20210108",
-        //        dseq = "i0450",
-        //        dno = "0000003",
-        //        mqty = Convert.ToDecimal(5000.0),
-        //        cqty = Convert.ToDecimal(1000.0),
-        //        mprice = "42.5500",
-        //        cost = Convert.ToDecimal(42360.00),
-        //        income = Convert.ToDecimal(42361.00),
-        //        fee = Convert.ToDecimal(61.00),
-        //        tax = Convert.ToDecimal(128.00),
-        //        ttype = "0",
-        //        ttypename = "現股",
-        //        bstype = "S",
-        //        wtype = "0",
-        //        profit = Convert.ToDecimal(1.00)
-        //    });
-        //    detailOutList.Add(new profit_detail_out()
-        //    {
-        //        tdate = "20210108",
-        //        dseq = "i0450",
-        //        dno = "0000003",
-        //        mqty = Convert.ToDecimal(5000.0),
-        //        cqty = Convert.ToDecimal(1000.0),
-        //        mprice = "42.5500",
-        //        cost = Convert.ToDecimal(42411.00),
-        //        income = Convert.ToDecimal(42363.00),
-        //        fee = Convert.ToDecimal(60.00),
-        //        tax = Convert.ToDecimal(127.00),
-        //        ttype = "0",
-        //        ttypename = "現股",
-        //        bstype = "S",
-        //        wtype = "0",
-        //        profit = Convert.ToDecimal(-48.00)
-        //    });
-
-        //    //3筆HCNTD(同TDATE、SDSEQ、SDNO)資料
-        //    detailOutList.Add(new profit_detail_out()
-        //    {
-        //        tdate = "20210104",
-        //        dseq = "h0057",
-        //        dno = "0000037",
-        //        mqty = Convert.ToDecimal(5000.0),
-        //        cqty = Convert.ToDecimal(2000.0),
-        //        mprice = "28.4000",
-        //        cost = Convert.ToDecimal(56981.0),
-        //        income = Convert.ToDecimal(56635.0),
-        //        netamt = Convert.ToDecimal(141585.0),
-        //        fee = Convert.ToDecimal(80.0),
-        //        tax = Convert.ToDecimal(85.0),
-        //        ttype = "0",
-        //        ttypename = "現股",
-        //        bstype = "S",
-        //        wtype = "0",
-        //        profit = Convert.ToDecimal(-346.0),
-        //        ctype = "0",
-        //        ttypename2 = "賣沖"
-        //    });
-        //    detailOutList.Add(new profit_detail_out()
-        //    {
-        //        tdate = "20210104",
-        //        dseq = "h0057",
-        //        dno = "0000037",
-        //        mqty = Convert.ToDecimal(5000.0),
-        //        cqty = Convert.ToDecimal(1000.0),
-        //        mprice = "28.4000",
-        //        cost = Convert.ToDecimal(28340.0),
-        //        income = Convert.ToDecimal(28315.0),
-        //        fee = Convert.ToDecimal(42.0),
-        //        tax = Convert.ToDecimal(43.0),
-        //        ttype = "0",
-        //        ttypename = "現股",
-        //        bstype = "S",
-        //        wtype = "0",
-        //        profit = Convert.ToDecimal(-25.0),
-        //        ctype = "0",
-        //        ttypename2 = "賣沖"
-        //    });
-        //    detailOutList.Add(new profit_detail_out()
-        //    {
-        //        tdate = "20210104",
-        //        dseq = "h0057",
-        //        dno = "0000037",
-        //        mqty = Convert.ToDecimal(5000.0),
-        //        cqty = Convert.ToDecimal(2000.0),
-        //        mprice = "28.4000",
-        //        cost = Convert.ToDecimal(56580.0),
-        //        income = Convert.ToDecimal(56635.0),
-        //        fee = Convert.ToDecimal(80.0),
-        //        tax = Convert.ToDecimal(85.0),
-        //        ttype = "0",
-        //        ttypename = "現股",
-        //        bstype = "S",
-        //        wtype = "0",
-        //        profit = Convert.ToDecimal(55.0),
-        //        ctype = "0",
-        //        ttypename2 = "賣沖"
-        //    });
-        //    GainPay gainPay = new GainPay();
-        //    //ResultList = gainPay.searchDetails(detailOutList);
-
-        //    Assert.AreEqual(ResultList[0].cqty, Convert.ToDecimal(5000.0));
-        //    Assert.AreEqual(ResultList[0].cost, Convert.ToDecimal(211851.00));
-        //    Assert.AreEqual(ResultList[0].income, Convert.ToDecimal(211809.00));
-        //    Assert.AreEqual(ResultList[0].fee, Convert.ToDecimal(303.00));
-        //    Assert.AreEqual(ResultList[0].tax, Convert.ToDecimal(638.00));
-        //    Assert.AreEqual(ResultList[0].profit, Convert.ToDecimal(-42.00));
-
-        //    Assert.AreEqual(ResultList[1].cqty, Convert.ToDecimal(5000.0));
-        //    Assert.AreEqual(ResultList[1].cost, Convert.ToDecimal(141901.00));
-        //    Assert.AreEqual(ResultList[1].income, Convert.ToDecimal(141585.00));
-        //    Assert.AreEqual(ResultList[1].fee, Convert.ToDecimal(202.00));
-        //    Assert.AreEqual(ResultList[1].tax, Convert.ToDecimal(213.00));
-        //    Assert.AreEqual(ResultList[1].profit, Convert.ToDecimal(-316.00));
-
-        //}
     }
 }

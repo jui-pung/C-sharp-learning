@@ -80,54 +80,30 @@ namespace ESMP.STOCK.TASK.API
             
             //盤中現股沖銷 當沖 現股賣出處理
             (TCNUDList, HCNRHList, HCNTDList, HCMIOList) = ESMPData.GetESMPData(TCNUDList, TMHIOList, TCSIOList, TCNTDList, T210List, BHNO, CSEQ);
-            
-            if (TCNUDList.Count > 0 || TCRUDList.Count > 0 || TDBUDList.Count > 0)
-            {
-                //挑出所有不重複股票列表 一次查完報價 存到dic中
-                Dictionary<string, List<Symbol>> Quote_Dic = null;
-                List<string> tempStocks = new List<string>();
-                tempStocks = TCNUDList.Select(x => x.STOCK).ToList();
-                tempStocks = tempStocks.Concat(TCRUDList.Select(x => x.STOCK).ToList()).Concat(TDBUDList.Select(x => x.STOCK).ToList()).ToList();
-                string[] stocks = tempStocks.Distinct().ToArray();
-                Quote_Dic = Quote.GetQuoteDic(stocks);
 
-                //(現股)未實現損益
-                if (TTYPE == "0")
-                {
-                    sumList = searchSum(TCNUDList, Quote_Dic);
-                    accsum = searchAccSum(sumList);
-                }
-                //(融資)未實現損益
-                else if (TTYPE == "1")
-                {
-                    sumList = searchSum_TCRUD(TCRUDList, Quote_Dic);
-                    accsum = searchAccSum(sumList);
-                }
-                //(融券)未實現損益
-                else if (TTYPE == "2")
-                {
-                    sumList = searchSum_TDBUD(TDBUDList, Quote_Dic);
-                    accsum = searchAccSum(sumList);
-                }
-                //(全部)未實現損益
-                else if (TTYPE == "A")
-                {
-                    List<unoffset_qtype_sum> sumList_TCRUD = new List<unoffset_qtype_sum>();
-                    List<unoffset_qtype_sum> sumList_TDBUD = new List<unoffset_qtype_sum>();
-                    sumList = searchSum(TCNUDList, Quote_Dic);
-                    sumList_TCRUD = searchSum_TCRUD(TCRUDList, Quote_Dic);
-                    sumList_TDBUD = searchSum_TDBUD(TDBUDList, Quote_Dic);
-                    sumList = sumList.Concat(sumList_TCRUD).Concat(sumList_TDBUD).ToList();
-                    accsum = searchAccSum(sumList);
-                }
+            //挑出所有不重複股票列表 一次查完報價 存到dic中
+            Dictionary<string, List<Symbol>> Quote_Dic = null;
+            List<string> tempStocks = new List<string>();
+            tempStocks = TCNUDList.Select(x => x.STOCK).ToList();
+            tempStocks = tempStocks.Concat(TCRUDList.Select(x => x.STOCK).ToList()).Concat(TDBUDList.Select(x => x.STOCK).ToList()).ToList();
+            string[] stocks = tempStocks.Distinct().ToArray();
+            Quote_Dic = Quote.GetQuoteDic(stocks);
 
-                //查詢結果
-                txtSearchResultContent = resultListSerilizer(accsum, _type);
-            }
-            else
-            {
-                txtSearchResultContent = resultErrListSerilizer(_type);
-            }
+            //現股
+            if (TTYPE == "0" && TCNUDList.Count > 0)
+                sumList = SearchSum(TCNUDList, Quote_Dic);
+            //融資
+            else if (TTYPE == "1" && TCRUDList.Count > 0)
+                sumList = SearchSum(TCRUDList, Quote_Dic);
+            //融券
+            else if (TTYPE == "2" && TDBUDList.Count > 0)
+                sumList = SearchSum(TDBUDList, Quote_Dic);
+            //全部
+            else if (TTYPE == "A" && TCNUDList.Count > 0 || TCRUDList.Count > 0 || TDBUDList.Count > 0)
+                sumList = SearchSum(TCNUDList, Quote_Dic).Concat(SearchSum(TCRUDList, Quote_Dic)).Concat(SearchSum(TDBUDList, Quote_Dic)).ToList();
+            accsum = SearchAccSum(sumList);
+            //查詢結果
+            txtSearchResultContent = resultListSerilizer(accsum, _type);
             return (txtSearchContent, txtSearchResultContent);
         }
         //--------------------------------------------------------------------------------------------
@@ -201,11 +177,11 @@ namespace ESMP.STOCK.TASK.API
         }
 
         /// <summary>
-        /// 計算取得 查詢回復階層二的個股未實現損益與個股明細
+        /// 計算取得 查詢回復階層二的個股未實現損益與個股明細(現股)
         /// </summary>
         /// <param name="TCNUDList">現股餘額 List</param>
         /// <returns> unoffset_qtype_sum List </returns>
-        public List<unoffset_qtype_sum> searchSum(List<TCNUD> TCNUDList, Dictionary<string, List<Symbol>> Quote_Dic)
+        protected static List<unoffset_qtype_sum> SearchSum(List<TCNUD> TCNUDList, Dictionary<string, List<Symbol>> Quote_Dic)
         {
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TCNUD ----現賣 現買
@@ -376,7 +352,7 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         // function SearchAccSum() - 計算取得 查詢回復階層一 帳戶未實現損益
         //--------------------------------------------------------------------------------------------
-        public unoffset_qtype_accsum searchAccSum(List<unoffset_qtype_sum> sumList)
+        protected static unoffset_qtype_accsum SearchAccSum(List<unoffset_qtype_sum> sumList)
         {
             unoffset_qtype_accsum accsum = new unoffset_qtype_accsum(); //自訂unoffset_qtype_accsum類別 (ESMP.STOCK.FORMAT.API) -函式回傳使用
             accsum.bqty = sumList.Sum(x => x.bqty);
@@ -403,11 +379,11 @@ namespace ESMP.STOCK.TASK.API
         }
 
         /// <summary>
-        /// 計算取得 查詢回復階層二的個股未實現損益與個股明細 --- 融資
+        /// 計算取得 查詢回復階層二的個股未實現損益與個股明細(融資)
         /// </summary>
         /// <param name="TCRUDList"></param>
         /// <returns></returns>
-        public List<unoffset_qtype_sum> searchSum_TCRUD(List<TCRUD> TCRUDList, Dictionary<string, List<Symbol>> Quote_Dic)
+        protected static List<unoffset_qtype_sum> SearchSum(List<TCRUD> TCRUDList, Dictionary<string, List<Symbol>> Quote_Dic)
         {
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TCRUD
@@ -511,11 +487,11 @@ namespace ESMP.STOCK.TASK.API
         }
 
         /// <summary>
-        /// 計算取得 查詢回復階層二的個股未實現損益與個股明細 --- 融券
+        /// 計算取得 查詢回復階層二的個股未實現損益與個股明細(融券)
         /// </summary>
         /// <param name="TDBUDList">融券餘額黨</param>
         /// <returns></returns>
-        public List<unoffset_qtype_sum> searchSum_TDBUD(List<TDBUD> TDBUDList, Dictionary<string, List<Symbol>> Quote_Dic)
+        protected static List<unoffset_qtype_sum> SearchSum(List<TDBUD> TDBUDList, Dictionary<string, List<Symbol>> Quote_Dic)
         {
             List<unoffset_qtype_sum> sumList = new List<unoffset_qtype_sum>();          //自訂unoffset_qtype_sum類別List (ESMP.STOCK.FORMAT.API) -函式回傳使用
             //依照股票代號產生新的清單群組grp_TDBUD
@@ -592,7 +568,7 @@ namespace ESMP.STOCK.TASK.API
                 row_Sum.stocknm = cname;
                 row_Sum.ttype = "1";
                 row_Sum.ttypename = detailList.First().ttypename;
-                row_Sum.bstype = "B";
+                row_Sum.bstype = "S";
                 row_Sum.bqty = yesterdayBqty;
                 row_Sum.real_qty = detailList.Sum(x => x.bqty);
                 row_Sum.cost = detailList.Sum(x => x.cost);
@@ -629,6 +605,8 @@ namespace ESMP.STOCK.TASK.API
         //--------------------------------------------------------------------------------------------
         private string resultListSerilizer(unoffset_qtype_accsum accsum, int type)
         {
+            if (accsum == null)
+                return resultErrListSerilizer(type);
             accsum.errcode = "0000";
             accsum.errmsg = "成功";
             //序列化為xml格式字串
