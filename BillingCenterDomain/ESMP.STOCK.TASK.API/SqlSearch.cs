@@ -20,7 +20,7 @@ namespace ESMP.STOCK.TASK.API
     public class SqlSearch
     {
         static string _sqlSet = ConfigurationManager.AppSettings.Get("ESMPConnectionString");
-        static int _dateDiff = -88;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
+        static int _dateDiff = -92;             //當日交易明細測試使用 資料庫當日資料為2022/10/17
         SqlConnection _sqlConn = new SqlConnection(_sqlSet);
 
         //----------------------------------------------------------------------------------
@@ -100,12 +100,17 @@ namespace ESMP.STOCK.TASK.API
             root SearchElement = o as root;
             IDbCommand cmd = new SqlCommand();
             cmd.Connection = new SqlConnection(_sqlSet);
-            cmd.CommandText = @"SELECT BHNO, CSEQ, STOCK, TDATE, DSEQ, DNO, QTY, BQTY, PRICE, FEE, COST
-                                FROM dbo.TCNUD
-                                WHERE BHNO = @BHNO AND CSEQ = @CSEQ
-                                ORDER BY BHNO, CSEQ, STOCK, TDATE, WTYPE, DNO";
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.CommandText = "SP_GET_TCNUD";
             cmd.Parameters.Add(new SqlParameter("@BHNO", SearchElement.bhno));
             cmd.Parameters.Add(new SqlParameter("@CSEQ", SearchElement.cseq));
+            //cmd.Parameters.AddWithValue("@Status", 0);
+            //cmd.CommandText = @"SELECT BHNO, CSEQ, STOCK, TDATE, DSEQ, DNO, QTY, BQTY, PRICE, FEE, COST
+            //                    FROM dbo.TCNUD
+            //                    WHERE BHNO = @BHNO AND CSEQ = @CSEQ
+            //                    ORDER BY BHNO, CSEQ, STOCK, TDATE, WTYPE, DNO";
+            //cmd.Parameters.Add(new SqlParameter("@BHNO", SearchElement.bhno));
+            //cmd.Parameters.Add(new SqlParameter("@CSEQ", SearchElement.cseq));
             //DBManager.ConvertCommandText(cmd);
 
             //TCNUDDataTable dtTCNUD = new TCNUDDataTable();

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using static ESMP.STOCK.DB.TABLE.dbESMP;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ESMP.STOCK.TASK.API
@@ -60,7 +61,8 @@ namespace ESMP.STOCK.TASK.API
             var obj = GetElement(_searchStr, _type);
             root SearchElement = obj as root;
             //查詢資料庫資料
-            _ = _sqlSearch.SelectTCNUDUseXsd(SearchElement);    //(測試)
+            List<TCNUDRow> tcnudList = new List<TCNUDRow>();
+            tcnudList = _sqlSearch.SelectTCNUDUseXsd(SearchElement);    //(測試)
             TCNUDList = _sqlSearch.selectTCNUD(SearchElement);
             TMHIOList = _sqlSearch.selectTMHIO(SearchElement);
             TCSIOList = _sqlSearch.selectTCSIO(SearchElement);
